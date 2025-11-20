@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { propertySchema } from '@/lib/validations/property'
-import { mockProperties } from '@/lib/mockData'
+import { getDataStore } from '@/lib/dataStore'
 
 // GET /api/properties - List all properties
 export async function GET() {
   try {
-    // Return mock properties for now
-    // Later: Replace with database query
-    return NextResponse.json(mockProperties)
+    const dataStore = getDataStore()
+    const properties = dataStore.getAllProperties()
+    return NextResponse.json(properties)
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to fetch properties' },
@@ -34,18 +34,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = propertySchema.parse(body)
 
-    // Create new property object
-    const newProperty = {
-      id: String(mockProperties.length + 1), // Simple ID generation
+    // Create property in data store
+    const dataStore = getDataStore()
+    const newProperty = dataStore.createProperty({
       ...validatedData,
-      createdAt: new Date(),
-    }
+      userId,
+      country: validatedData.country || 'USA',
+    })
 
-    // For now, we'll just return the created property
-    // Later: Save to database using Prisma
-    // await prisma.property.create({ data: newProperty })
-
-    // Simulate saving (in production, this would be in database)
     console.log('Property created:', newProperty)
 
     return NextResponse.json(newProperty, { status: 201 })
