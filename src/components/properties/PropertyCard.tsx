@@ -1,9 +1,14 @@
+"use client"
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Heart, MapPin, Bed, Bath, Maximize, Calendar } from 'lucide-react'
+import { useFavorites } from '@/contexts/FavoritesContext'
+import { useUser } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
 import type { MockProperty } from '@/lib/mockData'
 
 interface PropertyCardProps {
@@ -11,6 +16,27 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
+  const { toggleFavorite, isFavorite } = useFavorites()
+  const { user } = useUser()
+  const router = useRouter()
+  const favorite = isFavorite(property.id)
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    // Prompt to sign in if not logged in
+    if (!user) {
+      const shouldSignIn = confirm('Please sign in to save favorites. Go to sign in page?')
+      if (shouldSignIn) {
+        router.push('/sign-in')
+      }
+      return
+    }
+
+    await toggleFavorite(property.id)
+  }
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -53,9 +79,14 @@ export function PropertyCard({ property }: PropertyCardProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-2 right-2 bg-white/90 hover:bg-white"
+            onClick={handleFavoriteClick}
+            className={`absolute top-2 right-2 transition-colors ${
+              favorite
+                ? 'bg-red-500 hover:bg-red-600 text-white'
+                : 'bg-white/90 hover:bg-white text-gray-600'
+            }`}
           >
-            <Heart className="h-5 w-5" />
+            <Heart className={`h-5 w-5 ${favorite ? 'fill-current' : ''}`} />
           </Button>
         </div>
 
