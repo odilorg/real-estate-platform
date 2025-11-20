@@ -79,7 +79,10 @@ export default function CreatePropertyPage() {
 
       if (response.ok) {
         const property = await response.json()
-        router.push(`/properties/${property.id}`)
+        // Show success message
+        alert(`Property "${property.title}" created successfully!`)
+        // Redirect to properties list (property detail won't exist until we have database)
+        router.push('/properties')
       } else {
         alert('Failed to create property. Please try again.')
       }
