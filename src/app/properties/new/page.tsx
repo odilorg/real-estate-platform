@@ -12,8 +12,9 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { ImageUploader } from '@/components/properties/ImageUploader'
 import { propertySchema, type PropertyFormData } from '@/lib/validations/property'
-import { ChevronLeft, ChevronRight, Check, Upload } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
 
 const AMENITIES = [
   { value: 'PARKING', label: 'Parking' },
@@ -51,13 +52,14 @@ export default function CreatePropertyPage() {
     defaultValues: {
       country: 'USA',
       amenities: [],
-      images: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'], // Placeholder
+      images: [],
     },
   })
 
   const selectedAmenities = watch('amenities') || []
   const propertyType = watch('propertyType')
   const listingType = watch('listingType')
+  const images = watch('images') || []
 
   const toggleAmenity = (amenity: string) => {
     const current = selectedAmenities
@@ -347,15 +349,19 @@ export default function CreatePropertyPage() {
 
                 {/* Step 3: Photos */}
                 {currentStep === 3 && (
-                  <div className="text-center py-12">
-                    <Upload className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Photo Upload (Coming Soon)</h3>
-                    <p className="text-gray-600 mb-4">
-                      Image upload will be implemented with Uploadthing or Cloudinary
+                  <div>
+                    <Label>Property Photos</Label>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Upload high-quality photos of your property. The first image will be the primary image.
                     </p>
-                    <p className="text-sm text-gray-500">
-                      For now, we'll use a placeholder image for your property
-                    </p>
+                    <ImageUploader
+                      images={images}
+                      onChange={(newImages) => setValue('images', newImages)}
+                      maxImages={10}
+                    />
+                    {errors.images && (
+                      <p className="text-sm text-red-600 mt-2">{errors.images.message}</p>
+                    )}
                   </div>
                 )}
 

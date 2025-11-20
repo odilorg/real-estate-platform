@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from '@clerk/nextjs'
 import { FavoritesProvider } from '@/contexts/FavoritesContext'
+import { Toaster } from 'sonner'
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,6 +34,7 @@ export default function RootLayout({
           <FavoritesProvider>
             {children}
           </FavoritesProvider>
+          <Toaster position="top-right" richColors />
         </body>
       </html>
     </ClerkProvider>

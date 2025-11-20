@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ImageUploader } from '@/components/properties/ImageUploader'
 import { propertySchema, type PropertyFormData } from '@/lib/validations/property'
 import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react'
 
@@ -63,6 +64,7 @@ export default function EditPropertyPage() {
   const selectedAmenities = watch('amenities') || []
   const propertyType = watch('propertyType')
   const listingType = watch('listingType')
+  const images = watch('images') || []
 
   // Fetch property data
   useEffect(() => {
@@ -369,10 +371,19 @@ export default function EditPropertyPage() {
 
                 {/* Step 3: Photos */}
                 {currentStep === 3 && (
-                  <div className="text-center py-12">
-                    <p className="text-gray-600">
-                      Images cannot be changed at this time. Image upload feature coming soon.
+                  <div>
+                    <Label>Property Photos</Label>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Upload high-quality photos of your property. The first image will be the primary image.
                     </p>
+                    <ImageUploader
+                      images={images}
+                      onChange={(newImages) => setValue('images', newImages)}
+                      maxImages={10}
+                    />
+                    {errors.images && (
+                      <p className="text-sm text-red-600 mt-2">{errors.images.message}</p>
+                    )}
                   </div>
                 )}
 
