@@ -1,0 +1,228 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - handles authentication and user profiles
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  phone         String?
+  avatar        String?
+  role          UserRole  @default(BUYER)
+  verified      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  properties    Property[]
+  favorites     Favorite[]
+  sentMessages  Message[]  @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  reviews       Review[]   @relation("ReviewsWritten")
+  reviewsReceived Review[] @relation("ReviewsReceived")
+  savedSearches SavedSearch[]
+}
+
+enum UserRole {
+  BUYER
+  SELLER
+  AGENT
+  ADMIN
+}
+
+// Property model - main listing entity
+model Property {
+  id          String        @id @default(cuid())
+  userId      String
+  title       String
+  description String        @db.Text
+  price       Decimal       @db.Decimal(12, 2)
+  propertyType PropertyType
+  listingType ListingType
+  status      PropertyStatus @default(ACTIVE)
+
+  // Location details
+  address     String
+  city        String
+  state       String?
+  country     String        @default("USA")
+  zipCode     String?
+  latitude    Decimal?      @db.Decimal(10, 8)
+  longitude   Decimal?      @db.Decimal(11, 8)
+
+  // Property details
+  bedrooms    Int?
+  bathrooms   Int?
+  area        Decimal?      @db.Decimal(10, 2) // in sq ft or sq m
+  yearBuilt   Int?
+  floor       Int?
+  totalFloors Int?
+  parking     Int?
+
+  // Metadata
+  views       Int           @default(0)
+  featured    Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images      PropertyImage[]
+  amenities   PropertyAmenity[]
+  favorites   Favorite[]
+  reviews     Review[]
+
+  @@index([userId])
+  @@index([city])
+  @@index([propertyType])
+  @@index([listingType])
+  @@index([price])
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  CONDO
+  TOWNHOUSE
+  LAND
+  COMMERCIAL
+  VILLA
+  STUDIO
+}
+
+enum ListingType {
+  SALE
+  RENT
+}
+
+enum PropertyStatus {
+  ACTIVE
+  PENDING
+  SOLD
+  RENTED
+  INACTIVE
+}
+
+// Property images
+model PropertyImage {
+  id          String    @id @default(cuid())
+  propertyId  String
+  url         String
+  order       Int       @default(0)
+  isPrimary   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+}
+
+// Amenities/Features
+model PropertyAmenity {
+  id          String    @id @default(cuid())
+  propertyId  String
+  amenity     Amenity
+
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, amenity])
+  @@index([propertyId])
+}
+
+enum Amenity {
+  PARKING
+  GARAGE
+  POOL
+  GARDEN
+  BALCONY
+  ELEVATOR
+  SECURITY
+  GYM
+  AIR_CONDITIONING
+  HEATING
+  FURNISHED
+  PET_FRIENDLY
+  INTERNET
+  DISHWASHER
+  WASHING_MACHINE
+  FIREPLACE
+  STORAGE
+}
+
+// Favorites/Wishlist
+model Favorite {
+  id          String    @id @default(cuid())
+  userId      String
+  propertyId  String
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+}
+
+// Messaging system
+model Message {
+  id          String    @id @default(cuid())
+  senderId    String
+  receiverId  String
+  propertyId  String?
+  content     String    @db.Text
+  read        Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  sender      User      @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User      @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+}
+
+// Reviews and ratings
+model Review {
+  id          String    @id @default(cuid())
+  propertyId  String
+  reviewerId  String
+  revieweeId  String    // User being reviewed (seller/agent)
+  rating      Int       // 1-5
+  comment     String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  reviewer    User      @relation("ReviewsWritten", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewee    User      @relation("ReviewsReceived", fields: [revieweeId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, reviewerId])
+  @@index([propertyId])
+  @@index([revieweeId])
+}
+
+// Saved searches
+model SavedSearch {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  criteria    Json      // Store search filters as JSON
+  notifyEmail Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
