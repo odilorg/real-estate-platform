@@ -33,12 +33,33 @@ export interface Favorite {
   createdAt: Date
 }
 
+export interface Message {
+  id: string
+  conversationId: string
+  senderId: string
+  content: string
+  createdAt: Date
+  read: boolean
+}
+
+export interface Conversation {
+  id: string
+  propertyId: string
+  participants: string[] // Array of user IDs [buyer, seller]
+  lastMessageAt: Date
+  createdAt: Date
+}
+
 // In-memory data store
 class DataStore {
   private properties: Property[] = []
   private favorites: Favorite[] = []
+  private conversations: Conversation[] = []
+  private messages: Message[] = []
   private nextPropertyId: number = 1
   private nextFavoriteId: number = 1
+  private nextConversationId: number = 1
+  private nextMessageId: number = 1
 
   constructor() {
     // Initialize with mock data
@@ -211,6 +232,87 @@ class DataStore {
 
     this.favorites.splice(index, 1)
     return true
+  }
+
+  // Messaging operations
+  getOrCreateConversation(propertyId: string, user1Id: string, user2Id: string): Conversation {
+    // Check if conversation already exists between these users for this property
+    const existing = this.conversations.find(
+      c => c.propertyId === propertyId &&
+      c.participants.includes(user1Id) &&
+      c.participants.includes(user2Id)
+    )
+
+    if (existing) {
+      return existing
+    }
+
+    // Create new conversation
+    const newConversation: Conversation = {
+      id: String(this.nextConversationId++),
+      propertyId,
+      participants: [user1Id, user2Id],
+      lastMessageAt: new Date(),
+      createdAt: new Date(),
+    }
+    this.conversations.push(newConversation)
+    return newConversation
+  }
+
+  getConversationById(conversationId: string): Conversation | null {
+    return this.conversations.find(c => c.id === conversationId) || null
+  }
+
+  getConversationsByUserId(userId: string): Conversation[] {
+    return this.conversations
+      .filter(c => c.participants.includes(userId))
+      .sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime())
+  }
+
+  sendMessage(conversationId: string, senderId: string, content: string): Message | null {
+    const conversation = this.getConversationById(conversationId)
+    if (!conversation) return null
+
+    // Verify sender is a participant
+    if (!conversation.participants.includes(senderId)) return null
+
+    const newMessage: Message = {
+      id: String(this.nextMessageId++),
+      conversationId,
+      senderId,
+      content,
+      createdAt: new Date(),
+      read: false,
+    }
+    this.messages.push(newMessage)
+
+    // Update conversation's lastMessageAt
+    conversation.lastMessageAt = new Date()
+
+    return newMessage
+  }
+
+  getMessagesByConversationId(conversationId: string): Message[] {
+    return this.messages
+      .filter(m => m.conversationId === conversationId)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+  }
+
+  markMessagesAsRead(conversationId: string, userId: string): void {
+    this.messages
+      .filter(m => m.conversationId === conversationId && m.senderId !== userId && !m.read)
+      .forEach(m => m.read = true)
+  }
+
+  getUnreadCount(userId: string): number {
+    const userConversations = this.getConversationsByUserId(userId)
+    const conversationIds = userConversations.map(c => c.id)
+
+    return this.messages.filter(
+      m => conversationIds.includes(m.conversationId) &&
+      m.senderId !== userId &&
+      !m.read
+    ).length
   }
 }
 

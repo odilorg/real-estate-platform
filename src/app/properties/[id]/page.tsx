@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { auth } from '@clerk/nextjs/server'
 import { MainLayout } from '@/components/layout'
 import { ImageGallery } from '@/components/properties/ImageGallery'
 import { PropertyCard } from '@/components/properties/PropertyCard'
+import { ContactOwnerButton } from '@/components/properties/ContactOwnerButton'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -21,7 +23,7 @@ import {
   Home,
   Check,
 } from 'lucide-react'
-import { mockProperties } from '@/lib/mockData'
+import { getDataStore } from '@/lib/dataStore'
 
 interface PropertyDetailPageProps {
   params: Promise<{
@@ -31,7 +33,9 @@ interface PropertyDetailPageProps {
 
 export default async function PropertyDetailPage({ params }: PropertyDetailPageProps) {
   const { id } = await params
-  const property = mockProperties.find((p) => p.id === id)
+  const { userId } = await auth()
+  const dataStore = getDataStore()
+  const property = dataStore.getPropertyById(id)
 
   if (!property) {
     notFound()
@@ -50,7 +54,8 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
   }
 
   // Get similar properties (same city, different id)
-  const similarProperties = mockProperties
+  const allProperties = dataStore.getAllProperties()
+  const similarProperties = allProperties
     .filter((p) => p.city === property.city && p.id !== property.id)
     .slice(0, 3)
 
@@ -218,36 +223,21 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Contact Form */}
+              {/* Contact Owner */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Contact Seller</CardTitle>
+                  <CardTitle>Contact Owner</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Name</Label>
-                    <Input id="name" placeholder="Your name" />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="your@email.com" />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" type="tel" placeholder="(555) 123-4567" />
-                  </div>
-                  <div>
-                    <Label htmlFor="message">Message</Label>
-                    <Textarea
-                      id="message"
-                      placeholder="I'm interested in this property..."
-                      rows={4}
-                    />
-                  </div>
-                  <Button className="w-full">Send Message</Button>
-                  <Button variant="outline" className="w-full">
-                    Call Now
-                  </Button>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Interested in this property? Send a message to the owner to get more details
+                    or schedule a viewing.
+                  </p>
+                  <ContactOwnerButton
+                    propertyId={property.id}
+                    ownerId={property.userId}
+                    currentUserId={userId || undefined}
+                  />
                 </CardContent>
               </Card>
 
