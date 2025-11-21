@@ -163,6 +163,10 @@ class DataStore {
   }
 
   // Favorites operations
+  getAllFavorites(): Favorite[] {
+    return [...this.favorites]
+  }
+
   getAllFavoritesByUserId(userId: string): Favorite[] {
     return this.favorites.filter(f => f.userId === userId)
   }
