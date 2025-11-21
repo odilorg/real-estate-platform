@@ -11,12 +11,14 @@ import {
   Settings,
   ArrowLeft,
   Wrench,
+  Star,
 } from 'lucide-react'
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Properties', href: '/admin/properties', icon: Home },
   { name: 'Users', href: '/admin/users', icon: Users },
+  { name: 'Reviews', href: '/admin/reviews', icon: Star },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
   { name: 'Utilities', href: '/admin/utilities', icon: Wrench },
   { name: 'Settings', href: '/admin/settings', icon: Settings },

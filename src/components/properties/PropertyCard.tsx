@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { PropertyRating } from './PropertyRating'
 import { Heart, MapPin, Bed, Bath, Maximize, Calendar } from 'lucide-react'
 import { useFavorites } from '@/contexts/FavoritesContext'
 import { useUser } from '@clerk/nextjs'
@@ -113,9 +114,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
                 </h3>
               </Link>
 
-              <div className="flex items-center text-sm text-gray-600 mb-3">
-                <MapPin className="h-4 w-4 mr-1" />
-                <span>{property.address}, {property.city}, {property.state}</span>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center text-sm text-gray-600">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  <span>{property.address}, {property.city}, {property.state}</span>
+                </div>
+                <PropertyRating propertyId={property.id} />
               </div>
 
               <p className="text-sm text-gray-600 line-clamp-2 mb-4">
