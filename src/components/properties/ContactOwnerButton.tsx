@@ -25,8 +25,14 @@ export function ContactOwnerButton({ propertyId, ownerId, currentUserId }: Conta
       return
     }
 
+    // Check if property has an owner
+    if (!ownerId) {
+      toast.error("This property doesn't have an owner assigned yet")
+      return
+    }
+
     // Check if trying to message own property
-    if (ownerId && ownerId === currentUserId) {
+    if (ownerId === currentUserId) {
       toast.error("You can't message your own property")
       return
     }

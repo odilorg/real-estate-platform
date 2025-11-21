@@ -10,6 +10,7 @@ import {
   BarChart3,
   Settings,
   ArrowLeft,
+  Wrench,
 } from 'lucide-react'
 
 const navigation = [
@@ -17,6 +18,7 @@ const navigation = [
   { name: 'Properties', href: '/admin/properties', icon: Home },
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+  { name: 'Utilities', href: '/admin/utilities', icon: Wrench },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 
