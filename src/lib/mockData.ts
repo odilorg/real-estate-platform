@@ -23,6 +23,8 @@ export const mockProperties = [
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800",
     ],
     amenities: ["PARKING", "ELEVATOR", "GYM", "AIR_CONDITIONING"],
+    latitude: 40.7505,
+    longitude: -73.9934,
     createdAt: new Date("2024-01-15"),
   },
   {
@@ -47,6 +49,8 @@ export const mockProperties = [
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
     ],
     amenities: ["GARAGE", "GARDEN", "HEATING", "DISHWASHER"],
+    latitude: 30.2672,
+    longitude: -97.7431,
     createdAt: new Date("2024-01-20"),
   },
   {
@@ -71,6 +75,8 @@ export const mockProperties = [
       "https://images.unsplash.com/photo-1502672023488-70e25813eb80?w=800",
     ],
     amenities: ["ELEVATOR", "SECURITY", "GYM", "POOL"],
+    latitude: 37.7749,
+    longitude: -122.4194,
     createdAt: new Date("2024-02-01"),
   },
   {
@@ -94,6 +100,8 @@ export const mockProperties = [
       "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800",
     ],
     amenities: ["PARKING", "ELEVATOR", "SECURITY", "INTERNET"],
+    latitude: 41.8781,
+    longitude: -87.6298,
     createdAt: new Date("2024-02-05"),
   },
   {
@@ -119,6 +127,8 @@ export const mockProperties = [
       "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800",
     ],
     amenities: ["BALCONY", "PARKING", "PET_FRIENDLY", "WASHING_MACHINE"],
+    latitude: 39.7392,
+    longitude: -104.9903,
     createdAt: new Date("2024-02-10"),
   },
   {
@@ -143,6 +153,8 @@ export const mockProperties = [
       "https://images.unsplash.com/photo-1613977257592-4871e5fcd7c4?w=800",
     ],
     amenities: ["POOL", "GARDEN", "GARAGE", "FIREPLACE", "SECURITY"],
+    latitude: 34.0522,
+    longitude: -118.2437,
     createdAt: new Date("2024-02-12"),
   },
   {
@@ -162,6 +174,8 @@ export const mockProperties = [
       "https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800",
     ],
     amenities: [],
+    latitude: 40.0150,
+    longitude: -105.2705,
     createdAt: new Date("2024-02-15"),
   },
   {
@@ -185,6 +199,8 @@ export const mockProperties = [
       "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800",
     ],
     amenities: ["PARKING", "GARDEN", "STORAGE", "DISHWASHER"],
+    latitude: 47.6062,
+    longitude: -122.3321,
     createdAt: new Date("2024-02-18"),
   },
 ]

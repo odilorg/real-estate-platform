@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { MainLayout } from '@/components/layout'
 import { PropertyCard } from '@/components/properties/PropertyCard'
+import { MapView } from '@/components/map/MapView'
+import { AdvancedFilters, AdvancedFilterValues } from '@/components/search/AdvancedFilters'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -13,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Search, SlidersHorizontal, Loader2 } from 'lucide-react'
+import { Search, SlidersHorizontal, Loader2, Map as MapIcon, List } from 'lucide-react'
 
 interface Property {
   id: string
@@ -34,6 +36,8 @@ interface Property {
   totalFloors?: number
   images: string[]
   amenities: string[]
+  latitude?: number
+  longitude?: number
   createdAt: Date
 }
 
@@ -59,6 +63,12 @@ export default function PropertiesPage() {
   const [listingType, setListingType] = useState(searchParams.get('listingType') || 'all')
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'createdAt')
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1)
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterValues>({
+    propertyTypes: [],
+    listingTypes: [],
+    amenities: [],
+  })
 
   // Data states
   const [properties, setProperties] = useState<Property[]>([])
@@ -213,7 +223,24 @@ export default function PropertiesPage() {
 
         {/* Results */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Results Count and Sort */}
+          {/* Advanced Filters */}
+          <div className="mb-6">
+            <AdvancedFilters
+              values={advancedFilters}
+              onChange={setAdvancedFilters}
+              onApply={() => setPage(1)}
+              onReset={() => {
+                setAdvancedFilters({
+                  propertyTypes: [],
+                  listingTypes: [],
+                  amenities: [],
+                })
+                setPage(1)
+              }}
+            />
+          </div>
+
+          {/* Results Count, View Toggle and Sort */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-gray-600">
               {loading ? (
@@ -225,17 +252,41 @@ export default function PropertiesPage() {
                 </>
               )}
             </p>
-            <Select value={sortBy} onValueChange={handleSortChange}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="createdAt">Newest First</SelectItem>
-                <SelectItem value="price">Price: Low to High</SelectItem>
-                <SelectItem value="area">Area: Largest First</SelectItem>
-                <SelectItem value="bedrooms">Most Bedrooms</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-3">
+              {/* View Mode Toggle */}
+              <div className="flex border rounded-lg overflow-hidden">
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="rounded-none"
+                >
+                  <List className="h-4 w-4 mr-2" />
+                  List
+                </Button>
+                <Button
+                  variant={viewMode === 'map' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('map')}
+                  className="rounded-none"
+                >
+                  <MapIcon className="h-4 w-4 mr-2" />
+                  Map
+                </Button>
+              </div>
+
+              <Select value={sortBy} onValueChange={handleSortChange}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="createdAt">Newest First</SelectItem>
+                  <SelectItem value="price">Price: Low to High</SelectItem>
+                  <SelectItem value="area">Area: Largest First</SelectItem>
+                  <SelectItem value="bedrooms">Most Bedrooms</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Loading State */}
@@ -256,8 +307,19 @@ export default function PropertiesPage() {
             </div>
           )}
 
+          {/* Map View */}
+          {!loading && !error && properties.length > 0 && viewMode === 'map' && (
+            <div className="mb-6">
+              <MapView
+                properties={properties}
+                height="600px"
+                onMarkerClick={(property) => router.push(`/properties/${property.id}`)}
+              />
+            </div>
+          )}
+
           {/* Property Cards */}
-          {!loading && !error && properties.length > 0 && (
+          {!loading && !error && properties.length > 0 && viewMode === 'list' && (
             <>
               <div className="space-y-4">
                 {properties.map((property) => (
