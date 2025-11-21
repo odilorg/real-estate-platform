@@ -50,16 +50,29 @@ export interface Conversation {
   createdAt: Date
 }
 
+export interface Review {
+  id: string
+  propertyId: string
+  userId: string
+  rating: number // 1-5
+  comment: string
+  createdAt: Date
+  updatedAt?: Date
+  approved: boolean // For moderation
+}
+
 // In-memory data store
 class DataStore {
   private properties: Property[] = []
   private favorites: Favorite[] = []
   private conversations: Conversation[] = []
   private messages: Message[] = []
+  private reviews: Review[] = []
   private nextPropertyId: number = 1
   private nextFavoriteId: number = 1
   private nextConversationId: number = 1
   private nextMessageId: number = 1
+  private nextReviewId: number = 1
 
   constructor() {
     // Initialize with mock data
@@ -313,6 +326,89 @@ class DataStore {
       m.senderId !== userId &&
       !m.read
     ).length
+  }
+
+  // Review operations
+  createReview(reviewData: Omit<Review, 'id' | 'createdAt' | 'updatedAt'>): Review | null {
+    // Check if user already reviewed this property
+    const existingReview = this.reviews.find(
+      r => r.propertyId === reviewData.propertyId && r.userId === reviewData.userId
+    )
+    if (existingReview) {
+      return null // User can only review once
+    }
+
+    // Validate rating
+    if (reviewData.rating < 1 || reviewData.rating > 5) {
+      return null
+    }
+
+    const newReview: Review = {
+      ...reviewData,
+      id: String(this.nextReviewId++),
+      createdAt: new Date(),
+      approved: true, // Auto-approve for now (can be changed for moderation)
+    }
+    this.reviews.push(newReview)
+    return newReview
+  }
+
+  getReviewsByPropertyId(propertyId: string, includeUnapproved = false): Review[] {
+    return this.reviews
+      .filter(r => r.propertyId === propertyId && (includeUnapproved || r.approved))
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  }
+
+  getReviewsByUserId(userId: string): Review[] {
+    return this.reviews
+      .filter(r => r.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  }
+
+  getReviewById(id: string): Review | null {
+    return this.reviews.find(r => r.id === id) || null
+  }
+
+  updateReview(id: string, updates: Partial<Omit<Review, 'id' | 'createdAt' | 'propertyId' | 'userId'>>): Review | null {
+    const index = this.reviews.findIndex(r => r.id === id)
+    if (index === -1) return null
+
+    this.reviews[index] = {
+      ...this.reviews[index],
+      ...updates,
+      updatedAt: new Date(),
+    }
+    return this.reviews[index]
+  }
+
+  deleteReview(id: string): boolean {
+    const index = this.reviews.findIndex(r => r.id === id)
+    if (index === -1) return false
+
+    this.reviews.splice(index, 1)
+    return true
+  }
+
+  getAverageRating(propertyId: string): { average: number; count: number } {
+    const propertyReviews = this.reviews.filter(r => r.propertyId === propertyId && r.approved)
+
+    if (propertyReviews.length === 0) {
+      return { average: 0, count: 0 }
+    }
+
+    const sum = propertyReviews.reduce((acc, r) => acc + r.rating, 0)
+    return {
+      average: Math.round((sum / propertyReviews.length) * 10) / 10, // Round to 1 decimal
+      count: propertyReviews.length,
+    }
+  }
+
+  getAllReviews(): Review[] {
+    return [...this.reviews].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  }
+
+  hasUserReviewedProperty(userId: string, propertyId: string): boolean {
+    return this.reviews.some(r => r.userId === userId && r.propertyId === propertyId)
   }
 }
 

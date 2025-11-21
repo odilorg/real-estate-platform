@@ -5,6 +5,7 @@ import { MainLayout } from '@/components/layout'
 import { ImageGallery } from '@/components/properties/ImageGallery'
 import { PropertyCard } from '@/components/properties/PropertyCard'
 import { ContactOwnerButton } from '@/components/properties/ContactOwnerButton'
+import { ReviewsSection } from '@/components/reviews/ReviewsSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -219,6 +220,13 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                   </CardContent>
                 </Card>
               )}
+
+              {/* Reviews Section */}
+              <Card>
+                <CardContent className="pt-6">
+                  <ReviewsSection propertyId={property.id} />
+                </CardContent>
+              </Card>
             </div>
 
             {/* Sidebar */}
