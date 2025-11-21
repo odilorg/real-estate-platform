@@ -6,7 +6,7 @@ import { isAdmin } from '@/lib/admin'
 // PUT update a review
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth()
@@ -14,7 +14,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
     const { rating, comment } = await request.json()
 
     const dataStore = getDataStore()
@@ -63,7 +63,7 @@ export async function PUT(
 // DELETE a review
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth()
@@ -71,7 +71,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
     const dataStore = getDataStore()
     const review = dataStore.getReviewById(id)
 

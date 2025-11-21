@@ -5,10 +5,10 @@ import { getDataStore } from '@/lib/dataStore'
 // GET reviews for a property
 export async function GET(
   request: NextRequest,
-  { params }: { params: { propertyId: string } }
+  { params }: { params: Promise<{ propertyId: string }> }
 ) {
   try {
-    const { propertyId } = params
+    const { propertyId } = await params
     const dataStore = getDataStore()
 
     const reviews = dataStore.getReviewsByPropertyId(propertyId)
@@ -59,7 +59,7 @@ export async function GET(
 // POST create a new review
 export async function POST(
   request: NextRequest,
-  { params }: { params: { propertyId: string } }
+  { params }: { params: Promise<{ propertyId: string }> }
 ) {
   try {
     const { userId } = await auth()
@@ -67,7 +67,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { propertyId } = params
+    const { propertyId } = await params
     const { rating, comment } = await request.json()
 
     // Validate input
