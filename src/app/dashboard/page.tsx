@@ -11,6 +11,7 @@ import { PropertiesTab } from './components/PropertiesTab'
 import { FavoritesTab } from './components/FavoritesTab'
 import { MessagesTab } from './components/MessagesTab'
 import { SettingsTab } from './components/SettingsTab'
+import { SavedSearches } from '@/components/search/SavedSearches'
 
 export default function DashboardPage() {
   const { user, isLoaded } = useUser()
@@ -59,10 +60,11 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
             {/* Tab Navigation */}
-            <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex">
+            <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-flex">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="properties">My Properties</TabsTrigger>
               <TabsTrigger value="favorites">Favorites</TabsTrigger>
+              <TabsTrigger value="searches">Saved Searches</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
@@ -78,6 +80,10 @@ export default function DashboardPage() {
 
             <TabsContent value="favorites" className="space-y-6">
               <FavoritesTab />
+            </TabsContent>
+
+            <TabsContent value="searches" className="space-y-6">
+              <SavedSearches />
             </TabsContent>
 
             <TabsContent value="messages" className="space-y-6">

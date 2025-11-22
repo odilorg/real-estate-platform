@@ -29,6 +29,9 @@ export interface AdvancedFilterValues {
   amenities: string[]
   city?: string
   state?: string
+  latitude?: number
+  longitude?: number
+  radius?: number // in miles
 }
 
 interface AdvancedFiltersProps {
@@ -397,6 +400,60 @@ export function AdvancedFilters({
                 />
               </div>
             </div>
+          </div>
+
+          {/* Radius Search */}
+          <div>
+            <Label className="text-base mb-3 block">Search Radius</Label>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="latitude" className="text-xs text-gray-600">
+                  Latitude
+                </Label>
+                <Input
+                  id="latitude"
+                  type="number"
+                  step="0.0001"
+                  placeholder="40.7128"
+                  value={values.latitude || ''}
+                  onChange={(e) =>
+                    updateValue('latitude', e.target.value ? Number(e.target.value) : undefined)
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="longitude" className="text-xs text-gray-600">
+                  Longitude
+                </Label>
+                <Input
+                  id="longitude"
+                  type="number"
+                  step="0.0001"
+                  placeholder="-74.0060"
+                  value={values.longitude || ''}
+                  onChange={(e) =>
+                    updateValue('longitude', e.target.value ? Number(e.target.value) : undefined)
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="radius" className="text-xs text-gray-600">
+                  Radius (miles)
+                </Label>
+                <Input
+                  id="radius"
+                  type="number"
+                  placeholder="10"
+                  value={values.radius || ''}
+                  onChange={(e) =>
+                    updateValue('radius', e.target.value ? Number(e.target.value) : undefined)
+                  }
+                />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Find properties within a specific radius of coordinates
+            </p>
           </div>
 
           {/* Action Buttons */}

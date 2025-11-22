@@ -1,4 +1,5 @@
 import { mockProperties } from './mockData'
+import { calculateDistance } from './geoUtils'
 
 export interface Property {
   id: string
@@ -21,6 +22,8 @@ export interface Property {
   parking?: number
   images: string[]
   amenities: string[]
+  latitude?: number
+  longitude?: number
   userId?: string
   createdAt: Date
   updatedAt?: Date
@@ -61,6 +64,34 @@ export interface Review {
   approved: boolean // For moderation
 }
 
+export interface SavedSearch {
+  id: string
+  userId: string
+  name: string
+  filters: {
+    query?: string
+    propertyTypes?: string[]
+    listingTypes?: string[]
+    minPrice?: number
+    maxPrice?: number
+    minBedrooms?: number
+    maxBedrooms?: number
+    minBathrooms?: number
+    maxBathrooms?: number
+    minArea?: number
+    maxArea?: number
+    amenities?: string[]
+    city?: string
+    state?: string
+    latitude?: number
+    longitude?: number
+    radius?: number // in miles
+  }
+  notificationsEnabled: boolean
+  createdAt: Date
+  updatedAt?: Date
+}
+
 // In-memory data store
 class DataStore {
   private properties: Property[] = []
@@ -68,11 +99,13 @@ class DataStore {
   private conversations: Conversation[] = []
   private messages: Message[] = []
   private reviews: Review[] = []
+  private savedSearches: SavedSearch[] = []
   private nextPropertyId: number = 1
   private nextFavoriteId: number = 1
   private nextConversationId: number = 1
   private nextMessageId: number = 1
   private nextReviewId: number = 1
+  private nextSavedSearchId: number = 1
 
   constructor() {
     // Initialize with mock data
@@ -106,6 +139,9 @@ class DataStore {
     bathrooms?: number
     city?: string
     amenities?: string[]
+    latitude?: number
+    longitude?: number
+    radius?: number // in miles
   }): Property[] {
     let results = [...this.properties]
 
@@ -158,6 +194,27 @@ class DataStore {
       results = results.filter(p =>
         filters.amenities!.every(amenity => p.amenities.includes(amenity))
       )
+    }
+
+    // Filter by radius (if latitude, longitude, and radius are provided)
+    if (
+      filters.latitude !== undefined &&
+      filters.longitude !== undefined &&
+      filters.radius !== undefined &&
+      filters.radius > 0
+    ) {
+      results = results.filter(p => {
+        if (!p.latitude || !p.longitude) return false
+
+        const distance = calculateDistance(
+          filters.latitude!,
+          filters.longitude!,
+          p.latitude,
+          p.longitude
+        )
+
+        return distance <= filters.radius!
+      })
     }
 
     return results
@@ -409,6 +466,51 @@ class DataStore {
 
   hasUserReviewedProperty(userId: string, propertyId: string): boolean {
     return this.reviews.some(r => r.userId === userId && r.propertyId === propertyId)
+  }
+
+  // SavedSearch operations
+  createSavedSearch(searchData: Omit<SavedSearch, 'id' | 'createdAt' | 'updatedAt'>): SavedSearch {
+    const newSearch: SavedSearch = {
+      ...searchData,
+      id: String(this.nextSavedSearchId++),
+      createdAt: new Date(),
+    }
+    this.savedSearches.push(newSearch)
+    return newSearch
+  }
+
+  getSavedSearchesByUserId(userId: string): SavedSearch[] {
+    return this.savedSearches
+      .filter(s => s.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  }
+
+  getSavedSearchById(id: string): SavedSearch | null {
+    return this.savedSearches.find(s => s.id === id) || null
+  }
+
+  updateSavedSearch(id: string, updates: Partial<SavedSearch>): SavedSearch | null {
+    const index = this.savedSearches.findIndex(s => s.id === id)
+    if (index === -1) return null
+
+    this.savedSearches[index] = {
+      ...this.savedSearches[index],
+      ...updates,
+      updatedAt: new Date(),
+    }
+    return this.savedSearches[index]
+  }
+
+  deleteSavedSearch(id: string): boolean {
+    const index = this.savedSearches.findIndex(s => s.id === id)
+    if (index === -1) return false
+
+    this.savedSearches.splice(index, 1)
+    return true
+  }
+
+  getAllSavedSearches(): SavedSearch[] {
+    return [...this.savedSearches]
   }
 }
 

@@ -6,6 +6,7 @@ import { MainLayout } from '@/components/layout'
 import { PropertyCard } from '@/components/properties/PropertyCard'
 import { MapView } from '@/components/map/MapView'
 import { AdvancedFilters, AdvancedFilterValues } from '@/components/search/AdvancedFilters'
+import { SaveSearchDialog } from '@/components/search/SaveSearchDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -212,11 +213,17 @@ export default function PropertiesPage() {
                 </SelectContent>
               </Select>
 
-              {hasActiveFilters && (
-                <Button variant="outline" onClick={handleClearFilters} className="w-full md:w-auto">
-                  Clear Filters
-                </Button>
-              )}
+              <div className="flex gap-2 w-full md:w-auto">
+                <SaveSearchDialog
+                  filters={{ query, propertyType, listingType, sortBy }}
+                  advancedFilters={advancedFilters}
+                />
+                {hasActiveFilters && (
+                  <Button variant="outline" onClick={handleClearFilters}>
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
