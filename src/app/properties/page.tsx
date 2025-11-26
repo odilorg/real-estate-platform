@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { MainLayout } from '@/components/layout'
 import { PropertyCard } from '@/components/properties/PropertyCard'
@@ -17,44 +17,28 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Search, SlidersHorizontal, Loader2, Map as MapIcon, List } from 'lucide-react'
+import type { Property, SearchResponse } from '@/types'
 
-interface Property {
-  id: string
-  title: string
-  description: string
-  price: number
-  propertyType: string
-  listingType: string
-  address: string
-  city: string
-  state?: string
-  zipCode?: string
-  bedrooms?: number
-  bathrooms?: number
-  area?: number
-  yearBuilt?: number
-  floor?: number
-  totalFloors?: number
-  images: string[]
-  amenities: string[]
-  latitude?: number
-  longitude?: number
-  createdAt: Date
-}
-
-interface SearchResponse {
-  properties: Property[]
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-    hasMore: boolean
-  }
-  filters: any
+function PropertiesLoading() {
+  return (
+    <MainLayout>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-3 text-gray-600">Loading properties...</span>
+      </div>
+    </MainLayout>
+  )
 }
 
 export default function PropertiesPage() {
+  return (
+    <Suspense fallback={<PropertiesLoading />}>
+      <PropertiesContent />
+    </Suspense>
+  )
+}
+
+function PropertiesContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -112,6 +96,56 @@ export default function PropertiesPage() {
         params.append('page', page.toString())
         params.append('limit', '10')
 
+        // Add advanced filters
+        if (advancedFilters.propertyTypes.length > 0) {
+          params.append('propertyTypes', advancedFilters.propertyTypes.join(','))
+        }
+        if (advancedFilters.listingTypes.length > 0) {
+          params.append('listingTypes', advancedFilters.listingTypes.join(','))
+        }
+        if (advancedFilters.minPrice !== undefined) {
+          params.append('minPrice', advancedFilters.minPrice.toString())
+        }
+        if (advancedFilters.maxPrice !== undefined) {
+          params.append('maxPrice', advancedFilters.maxPrice.toString())
+        }
+        if (advancedFilters.minBedrooms !== undefined) {
+          params.append('minBedrooms', advancedFilters.minBedrooms.toString())
+        }
+        if (advancedFilters.maxBedrooms !== undefined) {
+          params.append('maxBedrooms', advancedFilters.maxBedrooms.toString())
+        }
+        if (advancedFilters.minBathrooms !== undefined) {
+          params.append('minBathrooms', advancedFilters.minBathrooms.toString())
+        }
+        if (advancedFilters.maxBathrooms !== undefined) {
+          params.append('maxBathrooms', advancedFilters.maxBathrooms.toString())
+        }
+        if (advancedFilters.minArea !== undefined) {
+          params.append('minArea', advancedFilters.minArea.toString())
+        }
+        if (advancedFilters.maxArea !== undefined) {
+          params.append('maxArea', advancedFilters.maxArea.toString())
+        }
+        if (advancedFilters.amenities.length > 0) {
+          params.append('amenities', advancedFilters.amenities.join(','))
+        }
+        if (advancedFilters.city) {
+          params.append('city', advancedFilters.city)
+        }
+        if (advancedFilters.state) {
+          params.append('state', advancedFilters.state)
+        }
+        if (advancedFilters.latitude !== undefined) {
+          params.append('latitude', advancedFilters.latitude.toString())
+        }
+        if (advancedFilters.longitude !== undefined) {
+          params.append('longitude', advancedFilters.longitude.toString())
+        }
+        if (advancedFilters.radius !== undefined) {
+          params.append('radius', advancedFilters.radius.toString())
+        }
+
         // Update URL
         const newUrl = `/properties?${params.toString()}`
         router.push(newUrl, { scroll: false })
@@ -132,7 +166,7 @@ export default function PropertiesPage() {
     }
 
     fetchProperties()
-  }, [debouncedQuery, propertyType, listingType, sortBy, page, router])
+  }, [debouncedQuery, propertyType, listingType, sortBy, page, router, advancedFilters])
 
   // Handle filter changes
   const handleQueryChange = (value: string) => {

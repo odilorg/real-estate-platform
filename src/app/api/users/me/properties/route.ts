@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getPropertiesByUserId } from '@/lib/db'
 
 // GET /api/users/me/properties - Get all properties for current user
 export async function GET() {
@@ -15,8 +15,7 @@ export async function GET() {
       )
     }
 
-    const dataStore = getDataStore()
-    const userProperties = dataStore.getPropertiesByUserId(userId)
+    const userProperties = await getPropertiesByUserId(userId)
 
     return NextResponse.json(userProperties)
   } catch (error) {

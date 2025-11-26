@@ -1,6 +1,6 @@
 import { auth, clerkClient } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getConversationsByUserId, getMessagesByConversationId, getPropertyById } from '@/lib/db'
 
 export async function GET() {
   try {
@@ -9,18 +9,17 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const dataStore = getDataStore()
-    const conversations = dataStore.getConversationsByUserId(userId)
+    const conversations = await getConversationsByUserId(userId)
 
     // Enrich conversations with property and participant info
     const enrichedConversations = await Promise.all(
       conversations.map(async (conv) => {
-        const property = dataStore.getPropertyById(conv.propertyId)
-        const messages = dataStore.getMessagesByConversationId(conv.id)
+        const property = await getPropertyById(conv.propertyId)
+        const messages = await getMessagesByConversationId(conv.id)
         const lastMessage = messages[messages.length - 1]
 
         // Get other participant info
-        const otherParticipantId = conv.participants.find(id => id !== userId)
+        const otherParticipantId = conv.participant1 === userId ? conv.participant2 : conv.participant1
         let otherParticipant = null
 
         if (otherParticipantId) {
@@ -34,7 +33,7 @@ export async function GET() {
               imageUrl: user.imageUrl,
             }
           } catch (error) {
-            console.error('Error fetching user:', error)
+            // User might not exist
           }
         }
 
@@ -45,6 +44,7 @@ export async function GET() {
 
         return {
           ...conv,
+          participants: [conv.participant1, conv.participant2],
           property: property ? {
             id: property.id,
             title: property.title,

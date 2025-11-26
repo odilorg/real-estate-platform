@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getPropertyById, getOrCreateConversation, sendMessage } from '@/lib/db'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,8 +15,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Property ID is required' }, { status: 400 })
     }
 
-    const dataStore = getDataStore()
-    const property = dataStore.getPropertyById(propertyId)
+    const property = await getPropertyById(propertyId)
 
     if (!property) {
       return NextResponse.json({ error: 'Property not found' }, { status: 404 })
@@ -34,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get or create conversation
-    const conversation = dataStore.getOrCreateConversation(
+    const conversation = await getOrCreateConversation(
       propertyId,
       userId,
       property.userId
@@ -42,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     // Send initial message if provided
     if (message && typeof message === 'string' && message.trim().length > 0) {
-      dataStore.sendMessage(conversation.id, userId, message.trim())
+      await sendMessage(conversation.id, userId, message.trim())
     }
 
     return NextResponse.json({ conversationId: conversation.id }, { status: 201 })

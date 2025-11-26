@@ -1,0 +1,638 @@
+import { prisma } from './prisma'
+import type { Prisma } from '@prisma/client'
+
+// Type aliases for property/listing types
+type PropertyType = string
+type ListingType = string
+
+// ============ Property Operations ============
+
+export interface PropertyWithRelations {
+  id: string
+  userId: string
+  title: string
+  description: string
+  price: number
+  propertyType: PropertyType
+  listingType: ListingType
+  status: string
+  address: string
+  city: string
+  state: string | null
+  country: string
+  zipCode: string | null
+  latitude: number | null
+  longitude: number | null
+  bedrooms: number | null
+  bathrooms: number | null
+  area: number | null
+  yearBuilt: number | null
+  floor: number | null
+  totalFloors: number | null
+  parking: number | null
+  views: number
+  featured: boolean
+  createdAt: Date
+  updatedAt: Date
+  images: string[]
+  amenities: string[]
+}
+
+// Transform Prisma property to our expected format
+function transformProperty(property: any): PropertyWithRelations {
+  return {
+    ...property,
+    images: property.images?.map((img: any) => img.url) || [],
+    amenities: property.amenities?.map((a: any) => a.amenity) || [],
+  }
+}
+
+export async function getAllProperties(): Promise<PropertyWithRelations[]> {
+  const properties = await prisma.property.findMany({
+    include: {
+      images: { orderBy: { order: 'asc' } },
+      amenities: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+  return properties.map(transformProperty)
+}
+
+export async function getPropertyById(id: string): Promise<PropertyWithRelations | null> {
+  const property = await prisma.property.findUnique({
+    where: { id },
+    include: {
+      images: { orderBy: { order: 'asc' } },
+      amenities: true,
+    },
+  })
+  return property ? transformProperty(property) : null
+}
+
+export async function getPropertiesByUserId(userId: string): Promise<PropertyWithRelations[]> {
+  const properties = await prisma.property.findMany({
+    where: { userId },
+    include: {
+      images: { orderBy: { order: 'asc' } },
+      amenities: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+  return properties.map(transformProperty)
+}
+
+export interface SearchFilters {
+  query?: string
+  propertyType?: string
+  listingType?: string
+  propertyTypes?: string[]
+  listingTypes?: string[]
+  minPrice?: number
+  maxPrice?: number
+  minBedrooms?: number
+  maxBedrooms?: number
+  minBathrooms?: number
+  maxBathrooms?: number
+  minArea?: number
+  maxArea?: number
+  city?: string
+  state?: string
+  amenities?: string[]
+  latitude?: number
+  longitude?: number
+  radius?: number
+}
+
+export async function searchProperties(filters: SearchFilters): Promise<PropertyWithRelations[]> {
+  const where: Prisma.PropertyWhereInput = {
+    status: 'ACTIVE',
+  }
+
+  if (filters.query) {
+    where.OR = [
+      { title: { contains: filters.query } },
+      { description: { contains: filters.query } },
+      { address: { contains: filters.query } },
+      { city: { contains: filters.query } },
+    ]
+  }
+
+  // Single property type filter
+  if (filters.propertyType) {
+    where.propertyType = filters.propertyType
+  }
+
+  // Multiple property types filter (from advanced filters)
+  if (filters.propertyTypes && filters.propertyTypes.length > 0) {
+    where.propertyType = { in: filters.propertyTypes }
+  }
+
+  // Single listing type filter
+  if (filters.listingType) {
+    where.listingType = filters.listingType
+  }
+
+  // Multiple listing types filter (from advanced filters)
+  if (filters.listingTypes && filters.listingTypes.length > 0) {
+    where.listingType = { in: filters.listingTypes }
+  }
+
+  if (filters.minPrice !== undefined) {
+    where.price = { ...where.price as any, gte: filters.minPrice }
+  }
+
+  if (filters.maxPrice !== undefined) {
+    where.price = { ...where.price as any, lte: filters.maxPrice }
+  }
+
+  // Bedroom filters
+  if (filters.minBedrooms !== undefined && filters.minBedrooms > 0) {
+    where.bedrooms = { ...where.bedrooms as any, gte: filters.minBedrooms }
+  }
+
+  if (filters.maxBedrooms !== undefined && filters.maxBedrooms > 0) {
+    where.bedrooms = { ...where.bedrooms as any, lte: filters.maxBedrooms }
+  }
+
+  // Bathroom filters
+  if (filters.minBathrooms !== undefined && filters.minBathrooms > 0) {
+    where.bathrooms = { ...where.bathrooms as any, gte: filters.minBathrooms }
+  }
+
+  if (filters.maxBathrooms !== undefined && filters.maxBathrooms > 0) {
+    where.bathrooms = { ...where.bathrooms as any, lte: filters.maxBathrooms }
+  }
+
+  // Area filters
+  if (filters.minArea !== undefined) {
+    where.area = { ...where.area as any, gte: filters.minArea }
+  }
+
+  if (filters.maxArea !== undefined) {
+    where.area = { ...where.area as any, lte: filters.maxArea }
+  }
+
+  if (filters.city) {
+    where.city = { contains: filters.city }
+  }
+
+  if (filters.state) {
+    where.state = { contains: filters.state }
+  }
+
+  const properties = await prisma.property.findMany({
+    where,
+    include: {
+      images: { orderBy: { order: 'asc' } },
+      amenities: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+
+  let results = properties.map(transformProperty)
+
+  // Filter by amenities (must have all requested)
+  if (filters.amenities && filters.amenities.length > 0) {
+    results = results.filter(p =>
+      filters.amenities!.every(amenity => p.amenities.includes(amenity))
+    )
+  }
+
+  // Filter by radius if coordinates provided
+  if (filters.latitude && filters.longitude && filters.radius) {
+    results = results.filter(p => {
+      if (!p.latitude || !p.longitude) return false
+      const distance = calculateDistance(
+        filters.latitude!,
+        filters.longitude!,
+        p.latitude,
+        p.longitude
+      )
+      return distance <= filters.radius!
+    })
+  }
+
+  return results
+}
+
+export interface CreatePropertyData {
+  userId: string
+  title: string
+  description: string
+  price: number
+  propertyType: string
+  listingType: string
+  address: string
+  city: string
+  state?: string
+  country?: string
+  zipCode?: string
+  bedrooms?: number
+  bathrooms?: number
+  area?: number
+  yearBuilt?: number
+  floor?: number
+  totalFloors?: number
+  parking?: number
+  images: string[]
+  amenities?: string[]
+  latitude?: number
+  longitude?: number
+}
+
+export async function createProperty(data: CreatePropertyData): Promise<PropertyWithRelations> {
+  const property = await prisma.property.create({
+    data: {
+      userId: data.userId,
+      title: data.title,
+      description: data.description,
+      price: data.price,
+      propertyType: data.propertyType,
+      listingType: data.listingType,
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      country: data.country || 'USA',
+      zipCode: data.zipCode,
+      bedrooms: data.bedrooms,
+      bathrooms: data.bathrooms,
+      area: data.area,
+      yearBuilt: data.yearBuilt,
+      floor: data.floor,
+      totalFloors: data.totalFloors,
+      parking: data.parking,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      images: {
+        create: data.images.map((url, index) => ({
+          url,
+          order: index,
+          isPrimary: index === 0,
+        })),
+      },
+      amenities: {
+        create: (data.amenities || []).map(amenity => ({
+          amenity: amenity,
+        })),
+      },
+    },
+    include: {
+      images: { orderBy: { order: 'asc' } },
+      amenities: true,
+    },
+  })
+  return transformProperty(property)
+}
+
+export async function updateProperty(
+  id: string,
+  data: Partial<CreatePropertyData>
+): Promise<PropertyWithRelations | null> {
+  // First delete existing images and amenities if they're being updated
+  if (data.images) {
+    await prisma.propertyImage.deleteMany({ where: { propertyId: id } })
+  }
+  if (data.amenities) {
+    await prisma.propertyAmenity.deleteMany({ where: { propertyId: id } })
+  }
+
+  const property = await prisma.property.update({
+    where: { id },
+    data: {
+      ...(data.title && { title: data.title }),
+      ...(data.description && { description: data.description }),
+      ...(data.price && { price: data.price }),
+      ...(data.propertyType && { propertyType: data.propertyType }),
+      ...(data.listingType && { listingType: data.listingType }),
+      ...(data.address && { address: data.address }),
+      ...(data.city && { city: data.city }),
+      ...(data.state !== undefined && { state: data.state }),
+      ...(data.country && { country: data.country }),
+      ...(data.zipCode !== undefined && { zipCode: data.zipCode }),
+      ...(data.bedrooms !== undefined && { bedrooms: data.bedrooms }),
+      ...(data.bathrooms !== undefined && { bathrooms: data.bathrooms }),
+      ...(data.area !== undefined && { area: data.area }),
+      ...(data.yearBuilt !== undefined && { yearBuilt: data.yearBuilt }),
+      ...(data.floor !== undefined && { floor: data.floor }),
+      ...(data.totalFloors !== undefined && { totalFloors: data.totalFloors }),
+      ...(data.parking !== undefined && { parking: data.parking }),
+      ...(data.latitude !== undefined && { latitude: data.latitude }),
+      ...(data.longitude !== undefined && { longitude: data.longitude }),
+      ...(data.images && {
+        images: {
+          create: data.images.map((url, index) => ({
+            url,
+            order: index,
+            isPrimary: index === 0,
+          })),
+        },
+      }),
+      ...(data.amenities && {
+        amenities: {
+          create: data.amenities.map(amenity => ({
+            amenity: amenity,
+          })),
+        },
+      }),
+    },
+    include: {
+      images: { orderBy: { order: 'asc' } },
+      amenities: true,
+    },
+  })
+  return transformProperty(property)
+}
+
+export async function deleteProperty(id: string): Promise<boolean> {
+  try {
+    await prisma.property.delete({ where: { id } })
+    return true
+  } catch {
+    return false
+  }
+}
+
+// ============ Favorites Operations ============
+
+export async function getFavoritesByUserId(userId: string): Promise<PropertyWithRelations[]> {
+  const favorites = await prisma.favorite.findMany({
+    where: { userId },
+    include: {
+      property: {
+        include: {
+          images: { orderBy: { order: 'asc' } },
+          amenities: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+  return favorites.map(f => transformProperty(f.property))
+}
+
+export async function isFavorite(userId: string, propertyId: string): Promise<boolean> {
+  const favorite = await prisma.favorite.findUnique({
+    where: { userId_propertyId: { userId, propertyId } },
+  })
+  return !!favorite
+}
+
+export async function addFavorite(userId: string, propertyId: string) {
+  try {
+    return await prisma.favorite.create({
+      data: { userId, propertyId },
+    })
+  } catch {
+    return null // Already exists
+  }
+}
+
+export async function removeFavorite(userId: string, propertyId: string): Promise<boolean> {
+  try {
+    await prisma.favorite.delete({
+      where: { userId_propertyId: { userId, propertyId } },
+    })
+    return true
+  } catch {
+    return false
+  }
+}
+
+export async function getAllFavorites() {
+  return prisma.favorite.findMany({
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+// ============ Conversation/Message Operations ============
+
+export async function getOrCreateConversation(
+  propertyId: string,
+  user1Id: string,
+  user2Id: string
+) {
+  // Sort user IDs to ensure consistent lookup
+  const [participant1, participant2] = [user1Id, user2Id].sort()
+
+  let conversation = await prisma.conversation.findFirst({
+    where: {
+      propertyId,
+      participant1,
+      participant2,
+    },
+  })
+
+  if (!conversation) {
+    conversation = await prisma.conversation.create({
+      data: {
+        propertyId,
+        participant1,
+        participant2,
+      },
+    })
+  }
+
+  return conversation
+}
+
+export async function getConversationById(conversationId: string) {
+  return prisma.conversation.findUnique({
+    where: { id: conversationId },
+  })
+}
+
+export async function getConversationsByUserId(userId: string) {
+  return prisma.conversation.findMany({
+    where: {
+      OR: [{ participant1: userId }, { participant2: userId }],
+    },
+    orderBy: { lastMessageAt: 'desc' },
+  })
+}
+
+export async function sendMessage(
+  conversationId: string,
+  senderId: string,
+  content: string
+) {
+  const message = await prisma.message.create({
+    data: {
+      conversationId,
+      senderId,
+      content,
+    },
+  })
+
+  // Update conversation's lastMessageAt
+  await prisma.conversation.update({
+    where: { id: conversationId },
+    data: { lastMessageAt: new Date() },
+  })
+
+  return message
+}
+
+export async function getMessagesByConversationId(conversationId: string) {
+  return prisma.message.findMany({
+    where: { conversationId },
+    orderBy: { createdAt: 'asc' },
+  })
+}
+
+export async function markMessagesAsRead(conversationId: string, userId: string) {
+  await prisma.message.updateMany({
+    where: {
+      conversationId,
+      senderId: { not: userId },
+      read: false,
+    },
+    data: { read: true },
+  })
+}
+
+// ============ Review Operations ============
+
+export async function getReviewsByPropertyId(propertyId: string) {
+  return prisma.review.findMany({
+    where: { propertyId, approved: true },
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+export async function getReviewById(id: string) {
+  return prisma.review.findUnique({ where: { id } })
+}
+
+export async function createReview(data: {
+  propertyId: string
+  userId: string
+  rating: number
+  comment: string
+}) {
+  try {
+    return await prisma.review.create({ data })
+  } catch {
+    return null // User already reviewed this property
+  }
+}
+
+export async function updateReview(id: string, data: { rating?: number; comment?: string }) {
+  return prisma.review.update({
+    where: { id },
+    data,
+  })
+}
+
+export async function deleteReview(id: string): Promise<boolean> {
+  try {
+    await prisma.review.delete({ where: { id } })
+    return true
+  } catch {
+    return false
+  }
+}
+
+export async function hasUserReviewedProperty(userId: string, propertyId: string): Promise<boolean> {
+  const review = await prisma.review.findUnique({
+    where: { propertyId_userId: { propertyId, userId } },
+  })
+  return !!review
+}
+
+export async function getAverageRating(propertyId: string) {
+  const result = await prisma.review.aggregate({
+    where: { propertyId, approved: true },
+    _avg: { rating: true },
+    _count: { rating: true },
+  })
+  return {
+    average: result._avg.rating || 0,
+    count: result._count.rating,
+  }
+}
+
+export async function getAllReviews() {
+  return prisma.review.findMany({
+    include: { property: true },
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+// ============ Saved Search Operations ============
+
+export async function getSavedSearchesByUserId(userId: string) {
+  const searches = await prisma.savedSearch.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  })
+  return searches.map(s => ({
+    ...s,
+    filters: JSON.parse(s.filters),
+  }))
+}
+
+export async function getSavedSearchById(id: string) {
+  const search = await prisma.savedSearch.findUnique({ where: { id } })
+  if (!search) return null
+  return {
+    ...search,
+    filters: JSON.parse(search.filters),
+  }
+}
+
+export async function createSavedSearch(data: {
+  userId: string
+  name: string
+  filters: any
+  notificationsEnabled?: boolean
+}) {
+  return prisma.savedSearch.create({
+    data: {
+      userId: data.userId,
+      name: data.name,
+      filters: JSON.stringify(data.filters),
+      notificationsEnabled: data.notificationsEnabled ?? false,
+    },
+  })
+}
+
+export async function updateSavedSearch(id: string, data: {
+  name?: string
+  filters?: any
+  notificationsEnabled?: boolean
+}) {
+  return prisma.savedSearch.update({
+    where: { id },
+    data: {
+      ...(data.name && { name: data.name }),
+      ...(data.filters && { filters: JSON.stringify(data.filters) }),
+      ...(data.notificationsEnabled !== undefined && { notificationsEnabled: data.notificationsEnabled }),
+    },
+  })
+}
+
+export async function deleteSavedSearch(id: string): Promise<boolean> {
+  try {
+    await prisma.savedSearch.delete({ where: { id } })
+    return true
+  } catch {
+    return false
+  }
+}
+
+// ============ Helper Functions ============
+
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 3959 // Earth's radius in miles
+  const dLat = toRad(lat2 - lat1)
+  const dLon = toRad(lon2 - lon1)
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return R * c
+}
+
+function toRad(deg: number): number {
+  return deg * (Math.PI / 180)
+}

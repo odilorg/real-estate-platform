@@ -3,11 +3,14 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { MessageSquare } from 'lucide-react'
+import { getConversationsByUserId, getPropertyById, getMessagesByConversationId } from '@/lib/db'
+import { clerkClient } from '@clerk/nextjs/server'
 
 interface ConversationData {
   id: string
   propertyId: string
-  participants: string[]
+  participant1: string
+  participant2: string
   lastMessageAt: Date
   createdAt: Date
   property: {
@@ -19,7 +22,6 @@ interface ConversationData {
   otherParticipant: {
     id: string
     name: string
-    email: string
     imageUrl: string
   } | null
   lastMessage: {
@@ -30,27 +32,70 @@ interface ConversationData {
   unreadCount: number
 }
 
-async function getConversations(): Promise<ConversationData[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  const res = await fetch(`${baseUrl}/api/messages/conversations`, {
-    cache: 'no-store',
-  })
-
-  if (!res.ok) {
-    return []
-  }
-
-  const data = await res.json()
-  return data.conversations || []
-}
-
 export default async function MessagesPage() {
   const { userId } = await auth()
   if (!userId) {
     redirect('/sign-in')
   }
 
-  const conversations = await getConversations()
+  // Get conversations from database
+  const rawConversations = await getConversationsByUserId(userId)
+
+  // Enrich conversations with property and user data
+  const conversations: ConversationData[] = await Promise.all(
+    rawConversations.map(async (conv) => {
+      // Get property
+      const property = await getPropertyById(conv.propertyId)
+
+      // Get other participant info
+      const otherParticipantId = conv.participant1 === userId ? conv.participant2 : conv.participant1
+      let otherParticipant = null
+      try {
+        const client = await clerkClient()
+        const user = await client.users.getUser(otherParticipantId)
+        otherParticipant = {
+          id: user.id,
+          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User',
+          imageUrl: user.imageUrl || '',
+        }
+      } catch {
+        otherParticipant = {
+          id: otherParticipantId,
+          name: 'Unknown User',
+          imageUrl: '',
+        }
+      }
+
+      // Get last message
+      const messages = await getMessagesByConversationId(conv.id)
+      const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null
+
+      // Count unread (messages from other user that are not read)
+      const unreadCount = messages.filter(m => m.senderId !== userId && !m.read).length
+
+      return {
+        id: conv.id,
+        propertyId: conv.propertyId,
+        participant1: conv.participant1,
+        participant2: conv.participant2,
+        lastMessageAt: conv.lastMessageAt,
+        createdAt: conv.createdAt,
+        property: property ? {
+          id: property.id,
+          title: property.title,
+          images: property.images,
+          price: property.price,
+        } : null,
+        otherParticipant,
+        lastMessage: lastMessage ? {
+          content: lastMessage.content,
+          createdAt: lastMessage.createdAt,
+          senderId: lastMessage.senderId,
+        } : null,
+        unreadCount,
+      }
+    })
+  )
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -71,7 +116,7 @@ export default async function MessagesPage() {
             Start a conversation by inquiring about a property
           </p>
           <Link
-            href="/"
+            href="/properties"
             className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Browse Properties

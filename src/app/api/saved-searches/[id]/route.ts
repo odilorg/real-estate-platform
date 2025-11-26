@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getSavedSearchById, updateSavedSearch, deleteSavedSearch } from '@/lib/db'
 
 // GET single saved search
 export async function GET(
@@ -14,8 +14,7 @@ export async function GET(
     }
 
     const { id } = await params
-    const dataStore = getDataStore()
-    const savedSearch = dataStore.getSavedSearchById(id)
+    const savedSearch = await getSavedSearchById(id)
 
     if (!savedSearch) {
       return NextResponse.json({ error: 'Saved search not found' }, { status: 404 })
@@ -51,8 +50,7 @@ export async function PUT(
     const body = await request.json()
     const { name, filters, notificationsEnabled } = body
 
-    const dataStore = getDataStore()
-    const savedSearch = dataStore.getSavedSearchById(id)
+    const savedSearch = await getSavedSearchById(id)
 
     if (!savedSearch) {
       return NextResponse.json({ error: 'Saved search not found' }, { status: 404 })
@@ -63,12 +61,12 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const updates: any = {}
+    const updates: { name?: string; filters?: any; notificationsEnabled?: boolean } = {}
     if (name !== undefined) updates.name = name.trim()
     if (filters !== undefined) updates.filters = filters
     if (notificationsEnabled !== undefined) updates.notificationsEnabled = notificationsEnabled
 
-    const updatedSearch = dataStore.updateSavedSearch(id, updates)
+    const updatedSearch = await updateSavedSearch(id, updates)
 
     if (!updatedSearch) {
       return NextResponse.json(
@@ -99,8 +97,7 @@ export async function DELETE(
     }
 
     const { id } = await params
-    const dataStore = getDataStore()
-    const savedSearch = dataStore.getSavedSearchById(id)
+    const savedSearch = await getSavedSearchById(id)
 
     if (!savedSearch) {
       return NextResponse.json({ error: 'Saved search not found' }, { status: 404 })
@@ -111,7 +108,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const deleted = dataStore.deleteSavedSearch(id)
+    const deleted = await deleteSavedSearch(id)
 
     if (!deleted) {
       return NextResponse.json(

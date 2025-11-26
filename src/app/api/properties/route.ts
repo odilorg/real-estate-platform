@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { propertySchema } from '@/lib/validations/property'
-import { getDataStore } from '@/lib/dataStore'
+import { getAllProperties, createProperty } from '@/lib/db'
 
 // GET /api/properties - List all properties
 export async function GET() {
   try {
-    const dataStore = getDataStore()
-    const properties = dataStore.getAllProperties()
+    const properties = await getAllProperties()
     return NextResponse.json(properties)
   } catch (error) {
+    console.error('Error fetching properties:', error)
     return NextResponse.json(
       { error: 'Failed to fetch properties' },
       { status: 500 }
@@ -34,15 +34,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = propertySchema.parse(body)
 
-    // Create property in data store
-    const dataStore = getDataStore()
-    const newProperty = dataStore.createProperty({
+    // Create property in database
+    const newProperty = await createProperty({
       ...validatedData,
       userId,
       country: validatedData.country || 'USA',
     })
-
-    console.log('Property created:', newProperty)
 
     return NextResponse.json(newProperty, { status: 201 })
   } catch (error: any) {

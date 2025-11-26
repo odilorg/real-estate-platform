@@ -1,7 +1,6 @@
-import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { isAdmin } from '@/lib/admin'
-import { getDataStore } from '@/lib/dataStore'
+import { getAllReviews, getPropertyById } from '@/lib/db'
 import { clerkClient } from '@clerk/nextjs/server'
 import { StarRating } from '@/components/reviews/StarRating'
 import { DeleteReviewButton } from '@/components/admin/DeleteReviewButton'
@@ -20,13 +19,12 @@ export default async function AdminReviewsPage() {
     redirect('/')
   }
 
-  const dataStore = getDataStore()
-  const reviews = dataStore.getAllReviews()
+  const reviews = await getAllReviews()
 
   // Enrich reviews with user and property info
   const enrichedReviews = await Promise.all(
     reviews.map(async (review) => {
-      const property = dataStore.getPropertyById(review.propertyId)
+      const property = await getPropertyById(review.propertyId)
 
       try {
         const client = await clerkClient()

@@ -12,7 +12,7 @@ export const propertySchema = z.object({
   address: z.string().min(5, 'Address is required'),
   city: z.string().min(2, 'City is required'),
   state: z.string().optional(),
-  country: z.string().default('USA'),
+  country: z.string().optional(),
   zipCode: z.string().optional(),
 
   // Property Details
@@ -28,25 +28,7 @@ export const propertySchema = z.object({
   images: z.array(z.string()).min(1, 'At least one image is required').max(20),
 
   // Amenities
-  amenities: z.array(z.enum([
-    'PARKING',
-    'GARAGE',
-    'POOL',
-    'GARDEN',
-    'BALCONY',
-    'ELEVATOR',
-    'SECURITY',
-    'GYM',
-    'AIR_CONDITIONING',
-    'HEATING',
-    'FURNISHED',
-    'PET_FRIENDLY',
-    'INTERNET',
-    'DISHWASHER',
-    'WASHING_MACHINE',
-    'FIREPLACE',
-    'STORAGE',
-  ])).optional().default([]),
+  amenities: z.array(z.string()).optional(),
 })
 
 export type PropertyFormData = z.infer<typeof propertySchema>

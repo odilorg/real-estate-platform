@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDataStore } from '@/lib/dataStore'
+import { searchProperties } from '@/lib/db'
 
 // GET /api/properties/search - Search and filter properties
 export async function GET(request: NextRequest) {
@@ -12,13 +12,31 @@ export async function GET(request: NextRequest) {
     const listingType = searchParams.get('listingType') || undefined
     const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined
     const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined
-    const bedrooms = searchParams.get('bedrooms') ? Number(searchParams.get('bedrooms')) : undefined
-    const bathrooms = searchParams.get('bathrooms') ? Number(searchParams.get('bathrooms')) : undefined
+    const minBedrooms = searchParams.get('minBedrooms') ? Number(searchParams.get('minBedrooms')) : undefined
+    const maxBedrooms = searchParams.get('maxBedrooms') ? Number(searchParams.get('maxBedrooms')) : undefined
+    const minBathrooms = searchParams.get('minBathrooms') ? Number(searchParams.get('minBathrooms')) : undefined
+    const maxBathrooms = searchParams.get('maxBathrooms') ? Number(searchParams.get('maxBathrooms')) : undefined
+    const minArea = searchParams.get('minArea') ? Number(searchParams.get('minArea')) : undefined
+    const maxArea = searchParams.get('maxArea') ? Number(searchParams.get('maxArea')) : undefined
     const city = searchParams.get('city') || undefined
+    const state = searchParams.get('state') || undefined
+
+    // Parse multiple property types (comma-separated)
+    const propertyTypesParam = searchParams.get('propertyTypes')
+    const propertyTypes = propertyTypesParam ? propertyTypesParam.split(',').map(t => t.trim()) : undefined
+
+    // Parse multiple listing types (comma-separated)
+    const listingTypesParam = searchParams.get('listingTypes')
+    const listingTypes = listingTypesParam ? listingTypesParam.split(',').map(t => t.trim()) : undefined
 
     // Parse amenities (comma-separated)
     const amenitiesParam = searchParams.get('amenities')
     const amenities = amenitiesParam ? amenitiesParam.split(',').map(a => a.trim()) : undefined
+
+    // Geolocation filters
+    const latitude = searchParams.get('latitude') ? Number(searchParams.get('latitude')) : undefined
+    const longitude = searchParams.get('longitude') ? Number(searchParams.get('longitude')) : undefined
+    const radius = searchParams.get('radius') ? Number(searchParams.get('radius')) : undefined
 
     // Get sort parameter
     const sort = searchParams.get('sort') || 'createdAt'
@@ -29,17 +47,26 @@ export async function GET(request: NextRequest) {
       query,
       propertyType,
       listingType,
+      propertyTypes,
+      listingTypes,
       minPrice,
       maxPrice,
-      bedrooms,
-      bathrooms,
+      minBedrooms,
+      maxBedrooms,
+      minBathrooms,
+      maxBathrooms,
+      minArea,
+      maxArea,
       city,
+      state,
       amenities,
+      latitude,
+      longitude,
+      radius,
     }
 
     // Search properties
-    const dataStore = getDataStore()
-    let properties = dataStore.searchProperties(filters)
+    let properties = await searchProperties(filters)
 
     // Apply sorting
     properties = properties.sort((a, b) => {
@@ -75,7 +102,7 @@ export async function GET(request: NextRequest) {
 
     // Pagination
     const page = searchParams.get('page') ? Number(searchParams.get('page')) : 1
-    const limit = searchParams.get('limit') ? Number(searchParams.get('limit')) : 10
+    const limit = Math.min(searchParams.get('limit') ? Number(searchParams.get('limit')) : 10, 100)
     const startIndex = (page - 1) * limit
     const endIndex = page * limit
 

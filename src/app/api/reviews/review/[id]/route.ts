@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getReviewById, updateReview, deleteReview } from '@/lib/db'
 import { isAdmin } from '@/lib/admin'
 
 // PUT update a review
@@ -17,8 +17,7 @@ export async function PUT(
     const { id } = await params
     const { rating, comment } = await request.json()
 
-    const dataStore = getDataStore()
-    const review = dataStore.getReviewById(id)
+    const review = await getReviewById(id)
 
     if (!review) {
       return NextResponse.json({ error: 'Review not found' }, { status: 404 })
@@ -37,11 +36,11 @@ export async function PUT(
       )
     }
 
-    const updates: any = {}
+    const updates: { rating?: number; comment?: string } = {}
     if (rating) updates.rating = rating
     if (comment) updates.comment = comment.trim()
 
-    const updatedReview = dataStore.updateReview(id, updates)
+    const updatedReview = await updateReview(id, updates)
 
     if (!updatedReview) {
       return NextResponse.json(
@@ -72,8 +71,7 @@ export async function DELETE(
     }
 
     const { id } = await params
-    const dataStore = getDataStore()
-    const review = dataStore.getReviewById(id)
+    const review = await getReviewById(id)
 
     if (!review) {
       return NextResponse.json({ error: 'Review not found' }, { status: 404 })
@@ -85,7 +83,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const deleted = dataStore.deleteReview(id)
+    const deleted = await deleteReview(id)
 
     if (!deleted) {
       return NextResponse.json(

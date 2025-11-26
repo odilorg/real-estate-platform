@@ -37,7 +37,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       const response = await fetch('/api/favorites')
       if (response.ok) {
         const properties = await response.json()
-        const favoriteIds = new Set(properties.map((p: any) => p.id))
+        const favoriteIds = new Set<string>(properties.map((p: { id: string }) => p.id))
         setFavorites(favoriteIds)
       }
     } catch (error) {

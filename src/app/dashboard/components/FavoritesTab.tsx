@@ -5,26 +5,7 @@ import { PropertyCard } from '@/components/properties/PropertyCard'
 import { Button } from '@/components/ui/button'
 import { Heart, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-
-interface Property {
-  id: string
-  title: string
-  description: string
-  price: number
-  propertyType: string
-  listingType: string
-  address: string
-  city: string
-  state?: string
-  zipCode?: string
-  bedrooms?: number
-  bathrooms?: number
-  area?: number
-  yearBuilt?: number
-  images: string[]
-  amenities: string[]
-  createdAt: Date
-}
+import type { Property } from '@/types'
 
 export function FavoritesTab() {
   const [properties, setProperties] = useState<Property[]>([])

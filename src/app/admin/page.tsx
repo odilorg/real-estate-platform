@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { AdminLayout } from '@/components/admin/AdminLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { isAdmin } from '@/lib/admin'
-import { getDataStore } from '@/lib/dataStore'
+import { getAllProperties, getAllFavorites } from '@/lib/db'
 import { clerkClient } from '@clerk/nextjs/server'
 import {
   Users,
@@ -21,9 +21,8 @@ export default async function AdminDashboardPage() {
   }
 
   // Get statistics
-  const dataStore = getDataStore()
-  const properties = dataStore.getAllProperties()
-  const favorites = dataStore.getAllFavorites()
+  const properties = await getAllProperties()
+  const favorites = await getAllFavorites()
 
   // Get total users from Clerk
   const client = await clerkClient()
@@ -158,7 +157,7 @@ export default async function AdminDashboardPage() {
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900">{property.title}</h4>
                     <p className="text-sm text-gray-600">
-                      {property.city}, {property.state} • {property.propertyType}
+                      {property.city}, {property.state} - {property.propertyType}
                     </p>
                   </div>
                   <div className="text-right">

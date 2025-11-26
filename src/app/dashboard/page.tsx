@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { MainLayout } from '@/components/layout'
@@ -13,7 +13,26 @@ import { MessagesTab } from './components/MessagesTab'
 import { SettingsTab } from './components/SettingsTab'
 import { SavedSearches } from '@/components/search/SavedSearches'
 
+function DashboardLoading() {
+  return (
+    <MainLayout>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-3 text-gray-600">Loading dashboard...</span>
+      </div>
+    </MainLayout>
+  )
+}
+
 export default function DashboardPage() {
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <DashboardContent />
+    </Suspense>
+  )
+}
+
+function DashboardContent() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
   const searchParams = useSearchParams()

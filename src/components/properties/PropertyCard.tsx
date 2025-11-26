@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -10,10 +11,10 @@ import { Heart, MapPin, Bed, Bath, Maximize, Calendar } from 'lucide-react'
 import { useFavorites } from '@/contexts/FavoritesContext'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
-import type { MockProperty } from '@/lib/mockData'
+import type { Property } from '@/types'
 
 interface PropertyCardProps {
-  property: MockProperty
+  property: Property
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
@@ -28,10 +29,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
     // Prompt to sign in if not logged in
     if (!user) {
-      const shouldSignIn = confirm('Please sign in to save favorites. Go to sign in page?')
-      if (shouldSignIn) {
-        router.push('/sign-in')
-      }
+      toast.info('Please sign in to save favorites', {
+        action: {
+          label: 'Sign In',
+          onClick: () => router.push('/sign-in'),
+        },
+      })
       return
     }
 

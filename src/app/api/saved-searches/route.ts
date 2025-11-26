@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getSavedSearchesByUserId, createSavedSearch } from '@/lib/db'
 
 // GET all saved searches for current user
 export async function GET() {
@@ -10,8 +10,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const dataStore = getDataStore()
-    const savedSearches = dataStore.getSavedSearchesByUserId(userId)
+    const savedSearches = await getSavedSearchesByUserId(userId)
 
     return NextResponse.json({ savedSearches })
   } catch (error) {
@@ -42,8 +41,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const dataStore = getDataStore()
-    const savedSearch = dataStore.createSavedSearch({
+    const savedSearch = await createSavedSearch({
       userId,
       name: name.trim(),
       filters: filters || {},

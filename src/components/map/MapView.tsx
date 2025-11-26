@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import type { MockProperty } from '@/lib/mockData'
+import type { Property } from '@/types'
 
 // Dynamically import map components to avoid SSR issues
 const MapContainer = dynamic(
@@ -23,11 +23,11 @@ const Popup = dynamic(
 )
 
 interface MapViewProps {
-  properties: MockProperty[]
+  properties: Property[]
   center?: [number, number]
   zoom?: number
   height?: string
-  onMarkerClick?: (property: MockProperty) => void
+  onMarkerClick?: (property: Property) => void
 }
 
 export function MapView({

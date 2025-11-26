@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getPropertyById, updateProperty, deleteProperty } from '@/lib/db'
 import { propertySchema } from '@/lib/validations/property'
 
 interface RouteParams {
@@ -16,8 +16,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const dataStore = getDataStore()
-    const property = dataStore.getPropertyById(id)
+    const property = await getPropertyById(id)
 
     if (!property) {
       return NextResponse.json(
@@ -53,10 +52,9 @@ export async function PUT(
     }
 
     const { id } = await params
-    const dataStore = getDataStore()
 
     // Check if property exists
-    const existingProperty = dataStore.getPropertyById(id)
+    const existingProperty = await getPropertyById(id)
     if (!existingProperty) {
       return NextResponse.json(
         { error: 'Property not found' },
@@ -65,7 +63,7 @@ export async function PUT(
     }
 
     // Check ownership
-    if (existingProperty.userId && existingProperty.userId !== userId) {
+    if (existingProperty.userId !== userId) {
       return NextResponse.json(
         { error: 'Forbidden: You can only update your own properties' },
         { status: 403 }
@@ -77,7 +75,7 @@ export async function PUT(
     const validatedData = propertySchema.partial().parse(body)
 
     // Update property
-    const updatedProperty = dataStore.updateProperty(id, validatedData)
+    const updatedProperty = await updateProperty(id, validatedData)
 
     if (!updatedProperty) {
       return NextResponse.json(
@@ -121,10 +119,9 @@ export async function DELETE(
     }
 
     const { id } = await params
-    const dataStore = getDataStore()
 
     // Check if property exists
-    const existingProperty = dataStore.getPropertyById(id)
+    const existingProperty = await getPropertyById(id)
     if (!existingProperty) {
       return NextResponse.json(
         { error: 'Property not found' },
@@ -133,7 +130,7 @@ export async function DELETE(
     }
 
     // Check ownership
-    if (existingProperty.userId && existingProperty.userId !== userId) {
+    if (existingProperty.userId !== userId) {
       return NextResponse.json(
         { error: 'Forbidden: You can only delete your own properties' },
         { status: 403 }
@@ -141,7 +138,7 @@ export async function DELETE(
     }
 
     // Delete property
-    const deleted = dataStore.deleteProperty(id)
+    const deleted = await deleteProperty(id)
 
     if (!deleted) {
       return NextResponse.json(

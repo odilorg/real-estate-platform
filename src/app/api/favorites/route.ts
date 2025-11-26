@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getFavoritesByUserId, getPropertyById, addFavorite, removeFavorite } from '@/lib/db'
 
 // GET /api/favorites - Get all favorites for current user
 export async function GET() {
@@ -15,8 +15,7 @@ export async function GET() {
       )
     }
 
-    const dataStore = getDataStore()
-    const favoriteProperties = dataStore.getFavoritePropertiesByUserId(userId)
+    const favoriteProperties = await getFavoritesByUserId(userId)
 
     return NextResponse.json(favoriteProperties)
   } catch (error) {
@@ -52,10 +51,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const dataStore = getDataStore()
-
     // Check if property exists
-    const property = dataStore.getPropertyById(propertyId)
+    const property = await getPropertyById(propertyId)
     if (!property) {
       return NextResponse.json(
         { error: 'Property not found' },
@@ -64,11 +61,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Add to favorites
-    const favorite = dataStore.addFavorite(userId, propertyId)
+    const favorite = await addFavorite(userId, propertyId)
 
     if (!favorite) {
       return NextResponse.json(
-        { error: 'Property already in favorites or failed to add' },
+        { error: 'Property already in favorites' },
         { status: 400 }
       )
     }
@@ -107,8 +104,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const dataStore = getDataStore()
-    const removed = dataStore.removeFavorite(userId, propertyId)
+    const removed = await removeFavorite(userId, propertyId)
 
     if (!removed) {
       return NextResponse.json(

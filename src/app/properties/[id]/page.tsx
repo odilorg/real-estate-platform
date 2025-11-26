@@ -9,9 +9,6 @@ import { ReviewsSection } from '@/components/reviews/ReviewsSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Textarea } from '@/components/ui/textarea'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   MapPin,
   Bed,
@@ -24,7 +21,7 @@ import {
   Home,
   Check,
 } from 'lucide-react'
-import { getDataStore } from '@/lib/dataStore'
+import { getPropertyById, getAllProperties } from '@/lib/db'
 
 interface PropertyDetailPageProps {
   params: Promise<{
@@ -35,8 +32,7 @@ interface PropertyDetailPageProps {
 export default async function PropertyDetailPage({ params }: PropertyDetailPageProps) {
   const { id } = await params
   const { userId } = await auth()
-  const dataStore = getDataStore()
-  const property = dataStore.getPropertyById(id)
+  const property = await getPropertyById(id)
 
   if (!property) {
     notFound()
@@ -55,7 +51,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
   }
 
   // Get similar properties (same city, different id)
-  const allProperties = dataStore.getAllProperties()
+  const allProperties = await getAllProperties()
   const similarProperties = allProperties
     .filter((p) => p.city === property.city && p.id !== property.id)
     .slice(0, 3)

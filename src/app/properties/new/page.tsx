@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { MainLayout } from '@/components/layout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -11,7 +12,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
 import { ImageUploader } from '@/components/properties/ImageUploader'
 import { propertySchema, type PropertyFormData } from '@/lib/validations/property'
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
@@ -46,6 +46,7 @@ export default function CreatePropertyPage() {
     handleSubmit,
     watch,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
@@ -81,22 +82,37 @@ export default function CreatePropertyPage() {
 
       if (response.ok) {
         const property = await response.json()
-        // Show success message
-        alert(`Property "${property.title}" created successfully!`)
-        // Redirect to properties list (property detail won't exist until we have database)
+        toast.success(`Property "${property.title}" created successfully!`)
         router.push('/properties')
       } else {
-        alert('Failed to create property. Please try again.')
+        toast.error('Failed to create property. Please try again.')
       }
     } catch (error) {
       console.error('Error creating property:', error)
-      alert('An error occurred. Please try again.')
+      toast.error('An error occurred. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 4))
+  // Define which fields to validate per step
+  const stepFields: Record<number, (keyof PropertyFormData)[]> = {
+    1: ['title', 'propertyType', 'listingType', 'price'],
+    2: ['address', 'city'],
+    3: ['images'],
+    4: ['description'],
+  }
+
+  const nextStep = async () => {
+    // Validate current step's fields before proceeding
+    const fieldsToValidate = stepFields[currentStep]
+    const isValid = await trigger(fieldsToValidate)
+
+    if (isValid) {
+      setCurrentStep(prev => Math.min(prev + 1, 4))
+    }
+  }
+
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1))
 
   return (

@@ -1,6 +1,6 @@
 import { auth, clerkClient } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getReviewsByPropertyId, getAverageRating, getPropertyById, hasUserReviewedProperty, createReview } from '@/lib/db'
 
 // GET reviews for a property
 export async function GET(
@@ -9,10 +9,9 @@ export async function GET(
 ) {
   try {
     const { propertyId } = await params
-    const dataStore = getDataStore()
 
-    const reviews = dataStore.getReviewsByPropertyId(propertyId)
-    const averageRating = dataStore.getAverageRating(propertyId)
+    const reviews = await getReviewsByPropertyId(propertyId)
+    const averageRating = await getAverageRating(propertyId)
 
     // Enrich reviews with user info
     const enrichedReviews = await Promise.all(
@@ -29,7 +28,6 @@ export async function GET(
             },
           }
         } catch (error) {
-          console.error('Error fetching user:', error)
           return {
             ...review,
             user: {
@@ -85,16 +83,14 @@ export async function POST(
       )
     }
 
-    const dataStore = getDataStore()
-
     // Check if property exists
-    const property = dataStore.getPropertyById(propertyId)
+    const property = await getPropertyById(propertyId)
     if (!property) {
       return NextResponse.json({ error: 'Property not found' }, { status: 404 })
     }
 
     // Check if user already reviewed this property
-    if (dataStore.hasUserReviewedProperty(userId, propertyId)) {
+    if (await hasUserReviewedProperty(userId, propertyId)) {
       return NextResponse.json(
         { error: 'You have already reviewed this property' },
         { status: 400 }
@@ -102,12 +98,11 @@ export async function POST(
     }
 
     // Create review
-    const review = dataStore.createReview({
+    const review = await createReview({
       propertyId,
       userId,
       rating,
       comment: comment.trim(),
-      approved: true,
     })
 
     if (!review) {

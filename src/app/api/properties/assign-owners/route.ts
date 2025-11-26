@@ -1,6 +1,6 @@
 import { auth, clerkClient } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getAllProperties, updateProperty } from '@/lib/db'
 
 // This is a one-time utility endpoint to assign owners to properties
 export async function POST() {
@@ -10,8 +10,7 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const dataStore = getDataStore()
-    const properties = dataStore.getAllProperties()
+    const properties = await getAllProperties()
 
     // Get some random user IDs from Clerk (or use current user for all)
     const client = await clerkClient()
@@ -24,16 +23,17 @@ export async function POST() {
 
     // Assign owners to properties that don't have one
     let updatedCount = 0
-    properties.forEach((property, index) => {
+    for (let i = 0; i < properties.length; i++) {
+      const property = properties[i]
       if (!property.userId) {
         // Distribute properties among available users
-        const ownerIndex = index % users.length
+        const ownerIndex = i % users.length
         const ownerId = users[ownerIndex].id
 
-        dataStore.updateProperty(property.id, { userId: ownerId })
+        await updateProperty(property.id, { userId: ownerId })
         updatedCount++
       }
-    })
+    }
 
     return NextResponse.json({
       message: `Successfully assigned owners to ${updatedCount} properties`,

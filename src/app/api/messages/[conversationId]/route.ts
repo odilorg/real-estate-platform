@@ -1,11 +1,11 @@
 import { auth, clerkClient } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { getDataStore } from '@/lib/dataStore'
+import { getConversationById, getMessagesByConversationId, markMessagesAsRead, sendMessage } from '@/lib/db'
 
 // GET messages for a conversation
 export async function GET(
   request: NextRequest,
-  { params }: { params: { conversationId: string } }
+  { params }: { params: Promise<{ conversationId: string }> }
 ) {
   try {
     const { userId } = await auth()
@@ -13,20 +13,19 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { conversationId } = params
-    const dataStore = getDataStore()
+    const { conversationId } = await params
 
     // Verify user is part of the conversation
-    const conversation = dataStore.getConversationById(conversationId)
+    const conversation = await getConversationById(conversationId)
     if (!conversation) {
       return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
     }
 
-    if (!conversation.participants.includes(userId)) {
+    if (conversation.participant1 !== userId && conversation.participant2 !== userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const messages = dataStore.getMessagesByConversationId(conversationId)
+    const messages = await getMessagesByConversationId(conversationId)
 
     // Enrich messages with sender info
     const enrichedMessages = await Promise.all(
@@ -43,7 +42,6 @@ export async function GET(
             },
           }
         } catch (error) {
-          console.error('Error fetching sender:', error)
           return {
             ...msg,
             sender: {
@@ -57,7 +55,7 @@ export async function GET(
     )
 
     // Mark messages as read
-    dataStore.markMessagesAsRead(conversationId, userId)
+    await markMessagesAsRead(conversationId, userId)
 
     return NextResponse.json({ messages: enrichedMessages })
   } catch (error) {
@@ -72,7 +70,7 @@ export async function GET(
 // POST send a new message
 export async function POST(
   request: NextRequest,
-  { params }: { params: { conversationId: string } }
+  { params }: { params: Promise<{ conversationId: string }> }
 ) {
   try {
     const { userId } = await auth()
@@ -80,26 +78,24 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { conversationId } = params
+    const { conversationId } = await params
     const { content } = await request.json()
 
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
       return NextResponse.json({ error: 'Message content is required' }, { status: 400 })
     }
 
-    const dataStore = getDataStore()
-
     // Verify user is part of the conversation
-    const conversation = dataStore.getConversationById(conversationId)
+    const conversation = await getConversationById(conversationId)
     if (!conversation) {
       return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
     }
 
-    if (!conversation.participants.includes(userId)) {
+    if (conversation.participant1 !== userId && conversation.participant2 !== userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const message = dataStore.sendMessage(conversationId, userId, content.trim())
+    const message = await sendMessage(conversationId, userId, content.trim())
 
     if (!message) {
       return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })

@@ -1,12 +1,12 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { ChatView } from '@/components/messages/ChatView'
-import { getDataStore } from '@/lib/dataStore'
+import { getConversationById, getPropertyById } from '@/lib/db'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     conversationId: string
-  }
+  }>
 }
 
 export default async function ConversationPage({ params }: PageProps) {
@@ -15,21 +15,21 @@ export default async function ConversationPage({ params }: PageProps) {
     redirect('/sign-in')
   }
 
-  const { conversationId } = params
-  const dataStore = getDataStore()
+  const { conversationId } = await params
 
   // Verify conversation exists and user is a participant
-  const conversation = dataStore.getConversationById(conversationId)
+  const conversation = await getConversationById(conversationId)
   if (!conversation) {
     redirect('/messages')
   }
 
-  if (!conversation.participants.includes(userId)) {
+  const participants = [conversation.participant1, conversation.participant2]
+  if (!participants.includes(userId)) {
     redirect('/messages')
   }
 
   // Get property info
-  const property = dataStore.getPropertyById(conversation.propertyId)
+  const property = await getPropertyById(conversation.propertyId)
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">

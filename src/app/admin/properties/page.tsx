@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { isAdmin } from '@/lib/admin'
-import { getDataStore } from '@/lib/dataStore'
+import { getAllProperties } from '@/lib/db'
 import { Eye, Edit, Trash2 } from 'lucide-react'
 
 export default async function AdminPropertiesPage() {
@@ -17,8 +17,7 @@ export default async function AdminPropertiesPage() {
   }
 
   // Get all properties
-  const dataStore = getDataStore()
-  const properties = dataStore.getAllProperties()
+  const properties = await getAllProperties()
 
   return (
     <AdminLayout>
@@ -54,7 +53,7 @@ export default async function AdminPropertiesPage() {
                       <div>
                         <h3 className="font-semibold text-lg">{property.title}</h3>
                         <p className="text-sm text-gray-600">
-                          {property.city}, {property.state} • {property.propertyType}
+                          {property.city}, {property.state} - {property.propertyType}
                         </p>
                       </div>
                       <Badge variant={property.listingType === 'SALE' ? 'default' : 'secondary'}>
