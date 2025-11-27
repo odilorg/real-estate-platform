@@ -38,6 +38,27 @@ export async function GET(request: NextRequest) {
     const longitude = searchParams.get('longitude') ? Number(searchParams.get('longitude')) : undefined
     const radius = searchParams.get('radius') ? Number(searchParams.get('radius')) : undefined
 
+    // Enhanced CIAN-style filters
+    const buildingClassesParam = searchParams.get('buildingClasses')
+    const buildingClasses = buildingClassesParam ? buildingClassesParam.split(',').map(c => c.trim()) : undefined
+
+    const renovationTypesParam = searchParams.get('renovationTypes')
+    const renovationTypes = renovationTypesParam ? renovationTypesParam.split(',').map(r => r.trim()) : undefined
+
+    const parkingTypesParam = searchParams.get('parkingTypes')
+    const parkingTypes = parkingTypesParam ? parkingTypesParam.split(',').map(p => p.trim()) : undefined
+
+    const maxMetroDistance = searchParams.get('maxMetroDistance') ? Number(searchParams.get('maxMetroDistance')) : undefined
+    const minPricePerSqFt = searchParams.get('minPricePerSqFt') ? Number(searchParams.get('minPricePerSqFt')) : undefined
+    const maxPricePerSqFt = searchParams.get('maxPricePerSqFt') ? Number(searchParams.get('maxPricePerSqFt')) : undefined
+    const minYearBuilt = searchParams.get('minYearBuilt') ? Number(searchParams.get('minYearBuilt')) : undefined
+    const maxYearBuilt = searchParams.get('maxYearBuilt') ? Number(searchParams.get('maxYearBuilt')) : undefined
+    const minFloor = searchParams.get('minFloor') ? Number(searchParams.get('minFloor')) : undefined
+    const maxFloor = searchParams.get('maxFloor') ? Number(searchParams.get('maxFloor')) : undefined
+    const hasBalcony = searchParams.get('hasBalcony') === 'true' ? true : undefined
+    const hasConcierge = searchParams.get('hasConcierge') === 'true' ? true : undefined
+    const hasGatedArea = searchParams.get('hasGatedArea') === 'true' ? true : undefined
+
     // Get sort parameter
     const sort = searchParams.get('sort') || 'createdAt'
     const order = searchParams.get('order') || 'desc'
@@ -63,6 +84,20 @@ export async function GET(request: NextRequest) {
       latitude,
       longitude,
       radius,
+      // Enhanced CIAN-style filters
+      buildingClasses,
+      renovationTypes,
+      parkingTypes,
+      maxMetroDistance,
+      minPricePerSqFt,
+      maxPricePerSqFt,
+      minYearBuilt,
+      maxYearBuilt,
+      minFloor,
+      maxFloor,
+      hasBalcony,
+      hasConcierge,
+      hasGatedArea,
     }
 
     // Search properties

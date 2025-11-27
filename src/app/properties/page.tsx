@@ -53,6 +53,9 @@ function PropertiesContent() {
     propertyTypes: [],
     listingTypes: [],
     amenities: [],
+    buildingClasses: [],
+    renovationTypes: [],
+    parkingTypes: [],
   })
 
   // Data states
@@ -144,6 +147,46 @@ function PropertiesContent() {
         }
         if (advancedFilters.radius !== undefined) {
           params.append('radius', advancedFilters.radius.toString())
+        }
+        // Enhanced CIAN-style filters
+        if (advancedFilters.buildingClasses && advancedFilters.buildingClasses.length > 0) {
+          params.append('buildingClasses', advancedFilters.buildingClasses.join(','))
+        }
+        if (advancedFilters.renovationTypes && advancedFilters.renovationTypes.length > 0) {
+          params.append('renovationTypes', advancedFilters.renovationTypes.join(','))
+        }
+        if (advancedFilters.maxMetroDistance !== undefined) {
+          params.append('maxMetroDistance', advancedFilters.maxMetroDistance.toString())
+        }
+        if (advancedFilters.minPricePerSqFt !== undefined) {
+          params.append('minPricePerSqFt', advancedFilters.minPricePerSqFt.toString())
+        }
+        if (advancedFilters.maxPricePerSqFt !== undefined) {
+          params.append('maxPricePerSqFt', advancedFilters.maxPricePerSqFt.toString())
+        }
+        if (advancedFilters.minYearBuilt !== undefined) {
+          params.append('minYearBuilt', advancedFilters.minYearBuilt.toString())
+        }
+        if (advancedFilters.maxYearBuilt !== undefined) {
+          params.append('maxYearBuilt', advancedFilters.maxYearBuilt.toString())
+        }
+        if (advancedFilters.minFloor !== undefined) {
+          params.append('minFloor', advancedFilters.minFloor.toString())
+        }
+        if (advancedFilters.maxFloor !== undefined) {
+          params.append('maxFloor', advancedFilters.maxFloor.toString())
+        }
+        if (advancedFilters.parkingTypes && advancedFilters.parkingTypes.length > 0) {
+          params.append('parkingTypes', advancedFilters.parkingTypes.join(','))
+        }
+        if (advancedFilters.hasBalcony !== undefined) {
+          params.append('hasBalcony', advancedFilters.hasBalcony.toString())
+        }
+        if (advancedFilters.hasConcierge !== undefined) {
+          params.append('hasConcierge', advancedFilters.hasConcierge.toString())
+        }
+        if (advancedFilters.hasGatedArea !== undefined) {
+          params.append('hasGatedArea', advancedFilters.hasGatedArea.toString())
         }
 
         // Update URL
@@ -275,6 +318,9 @@ function PropertiesContent() {
                   propertyTypes: [],
                   listingTypes: [],
                   amenities: [],
+                  buildingClasses: [],
+                  renovationTypes: [],
+                  parkingTypes: [],
                 })
                 setPage(1)
               }}

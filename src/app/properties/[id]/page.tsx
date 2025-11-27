@@ -7,6 +7,8 @@ import { PropertyCard } from '@/components/properties/PropertyCard'
 import { ContactOwnerButton } from '@/components/properties/ContactOwnerButton'
 import { PropertyPageActions, PropertySidebarActions } from '@/components/properties/PropertyPageActions'
 import { ReviewsSection } from '@/components/reviews/ReviewsSection'
+import { PropertyMapSection } from '@/components/properties/PropertyMap'
+import { MortgageCalculator } from '@/components/properties/MortgageCalculator'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -436,6 +438,18 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 </CardContent>
               </Card>
 
+              {/* Map */}
+              <Card>
+                <CardContent className="pt-6">
+                  <PropertyMapSection
+                    latitude={property.latitude}
+                    longitude={property.longitude}
+                    title={property.title}
+                    address={`${property.address}, ${property.city}, ${property.state} ${property.zipCode}`}
+                  />
+                </CardContent>
+              </Card>
+
               {/* Amenities */}
               {property.amenities && property.amenities.length > 0 && (
                 <Card>
@@ -563,6 +577,11 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     )}
                   </CardContent>
                 </Card>
+              )}
+
+              {/* Mortgage Calculator (only for properties for sale) */}
+              {property.listingType === 'SALE' && (
+                <MortgageCalculator propertyPrice={property.price} />
               )}
             </div>
           </div>

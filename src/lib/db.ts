@@ -101,6 +101,20 @@ export interface SearchFilters {
   latitude?: number
   longitude?: number
   radius?: number
+  // Enhanced CIAN-style filters
+  buildingClasses?: string[]
+  renovationTypes?: string[]
+  parkingTypes?: string[]
+  maxMetroDistance?: number
+  minPricePerSqFt?: number
+  maxPricePerSqFt?: number
+  minYearBuilt?: number
+  maxYearBuilt?: number
+  minFloor?: number
+  maxFloor?: number
+  hasBalcony?: boolean
+  hasConcierge?: boolean
+  hasGatedArea?: boolean
 }
 
 export async function searchProperties(filters: SearchFilters): Promise<PropertyWithRelations[]> {
@@ -180,6 +194,51 @@ export async function searchProperties(filters: SearchFilters): Promise<Property
     where.state = { contains: filters.state }
   }
 
+  // Enhanced CIAN-style filters
+  if (filters.buildingClasses && filters.buildingClasses.length > 0) {
+    where.buildingClass = { in: filters.buildingClasses }
+  }
+
+  if (filters.renovationTypes && filters.renovationTypes.length > 0) {
+    where.renovation = { in: filters.renovationTypes }
+  }
+
+  if (filters.parkingTypes && filters.parkingTypes.length > 0) {
+    where.parkingType = { in: filters.parkingTypes }
+  }
+
+  if (filters.maxMetroDistance !== undefined) {
+    where.metroDistance = { lte: filters.maxMetroDistance }
+  }
+
+  if (filters.minYearBuilt !== undefined) {
+    where.yearBuilt = { ...where.yearBuilt as any, gte: filters.minYearBuilt }
+  }
+
+  if (filters.maxYearBuilt !== undefined) {
+    where.yearBuilt = { ...where.yearBuilt as any, lte: filters.maxYearBuilt }
+  }
+
+  if (filters.minFloor !== undefined) {
+    where.floor = { ...where.floor as any, gte: filters.minFloor }
+  }
+
+  if (filters.maxFloor !== undefined) {
+    where.floor = { ...where.floor as any, lte: filters.maxFloor }
+  }
+
+  if (filters.hasBalcony === true) {
+    where.balcony = { gt: 0 }
+  }
+
+  if (filters.hasConcierge === true) {
+    where.hasConcierge = true
+  }
+
+  if (filters.hasGatedArea === true) {
+    where.hasGatedArea = true
+  }
+
   const properties = await prisma.property.findMany({
     where,
     include: {
@@ -209,6 +268,21 @@ export async function searchProperties(filters: SearchFilters): Promise<Property
         p.longitude
       )
       return distance <= filters.radius!
+    })
+  }
+
+  // Filter by price per sq ft (calculated field)
+  if (filters.minPricePerSqFt !== undefined || filters.maxPricePerSqFt !== undefined) {
+    results = results.filter(p => {
+      if (!p.area || p.area === 0) return false
+      const pricePerSqFt = p.price / p.area
+      if (filters.minPricePerSqFt !== undefined && pricePerSqFt < filters.minPricePerSqFt) {
+        return false
+      }
+      if (filters.maxPricePerSqFt !== undefined && pricePerSqFt > filters.maxPricePerSqFt) {
+        return false
+      }
+      return true
     })
   }
 
