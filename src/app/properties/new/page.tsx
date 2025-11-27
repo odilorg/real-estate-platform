@@ -216,9 +216,10 @@ export default function CreatePropertyPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  {STEPS[currentStep - 1].icon && (
-                    <STEPS[currentStep - 1].icon className="h-5 w-5" />
-                  )}
+                  {(() => {
+                    const Icon = STEPS[currentStep - 1].icon
+                    return Icon ? <Icon className="h-5 w-5" /> : null
+                  })()}
                   Step {currentStep}: {STEPS[currentStep - 1].title}
                 </CardTitle>
                 <CardDescription>

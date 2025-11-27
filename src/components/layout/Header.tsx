@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
-import { Home, PlusCircle, Heart, MessageSquare } from 'lucide-react'
+import { Home, PlusCircle, Heart, MessageSquare, LayoutDashboard } from 'lucide-react'
 
 export function Header() {
   return (
@@ -43,6 +43,12 @@ export function Header() {
           {/* Actions */}
           <div className="flex items-center space-x-4">
             <SignedIn>
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm">
+                  <LayoutDashboard className="h-5 w-5" />
+                  <span className="ml-2 hidden sm:inline">Dashboard</span>
+                </Button>
+              </Link>
               <Link href="/favorites">
                 <Button variant="ghost" size="sm">
                   <Heart className="h-5 w-5" />
