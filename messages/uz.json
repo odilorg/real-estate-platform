@@ -1,0 +1,183 @@
+{
+  "common": {
+    "search": "Qidirish",
+    "filter": "Filtr",
+    "filters": "Filtrlar",
+    "apply": "Qo'llash",
+    "reset": "Tozalash",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "delete": "O'chirish",
+    "edit": "Tahrirlash",
+    "view": "Ko'rish",
+    "back": "Orqaga",
+    "next": "Keyingi",
+    "previous": "Oldingi",
+    "loading": "Yuklanmoqda...",
+    "noResults": "Hech narsa topilmadi",
+    "error": "Xatolik yuz berdi",
+    "success": "Muvaffaqiyatli",
+    "confirm": "Tasdiqlash",
+    "close": "Yopish",
+    "showMore": "Ko'proq ko'rsatish",
+    "showLess": "Kamroq ko'rsatish"
+  },
+  "nav": {
+    "home": "Bosh sahifa",
+    "properties": "Ko'chmas mulk",
+    "dashboard": "Boshqaruv paneli",
+    "favorites": "Sevimlilar",
+    "myListings": "Mening e'lonlarim",
+    "addProperty": "E'lon joylashtirish",
+    "signIn": "Kirish",
+    "signOut": "Chiqish",
+    "profile": "Profil",
+    "forSale": "Sotish",
+    "forRent": "Ijara",
+    "messages": "Xabarlar",
+    "getStarted": "Boshlash"
+  },
+  "home": {
+    "hero": {
+      "title": "Orzuingizdagi uyni toping",
+      "subtitle": "Uylar, kvartiralar va tijorat binolari to'plamimizdan o'zingizga mos mulkni toping",
+      "searchPlaceholder": "Shahar, tuman yoki pochta indeksini kiriting"
+    },
+    "featured": {
+      "title": "Tavsiya etilgan mulklar",
+      "viewAll": "Barcha mulklarni ko'rish"
+    },
+    "stats": {
+      "properties": "Ro'yxatdagi mulklar",
+      "happyClients": "Mamnun mijozlar",
+      "citiesCovered": "Qamrab olingan shaharlar"
+    }
+  },
+  "properties": {
+    "title": "Ko'chmas mulk",
+    "searchPlaceholder": "Joylashuv, nom bo'yicha qidirish...",
+    "filters": {
+      "propertyType": "Mulk turi",
+      "listingType": "Bitim turi",
+      "priceRange": "Narx oralig'i",
+      "bedrooms": "Yotoq xonalar",
+      "bathrooms": "Hammomlar",
+      "area": "Maydon",
+      "amenities": "Qulayliklar",
+      "buildingClass": "Bino sinfi",
+      "renovation": "Ta'mirlash",
+      "parking": "Avtoturargoh",
+      "metroDistance": "Metrogacha masofa",
+      "yearBuilt": "Qurilgan yili",
+      "floor": "Qavat",
+      "pricePerSqFt": "Har m² uchun narx",
+      "features": "Xususiyatlar",
+      "balcony": "Balkon",
+      "concierge": "Konsyerj",
+      "gatedArea": "Yopiq hudud"
+    },
+    "types": {
+      "house": "Uy",
+      "apartment": "Kvartira",
+      "condo": "Kondominium",
+      "townhouse": "Taunxaus",
+      "land": "Yer uchastkasi",
+      "commercial": "Tijorat binosi"
+    },
+    "listingTypes": {
+      "sale": "Sotish",
+      "rent": "Ijara"
+    },
+    "sort": {
+      "newest": "Avval yangisi",
+      "oldest": "Avval eskisi",
+      "priceAsc": "Narx: pastdan yuqoriga",
+      "priceDesc": "Narx: yuqoridan pastga",
+      "areaAsc": "Maydon: kichikdan kattaga",
+      "areaDesc": "Maydon: kattadan kichikka"
+    },
+    "card": {
+      "beds": "yotoq",
+      "baths": "hammom",
+      "sqft": "m²",
+      "perMonth": "/oy",
+      "featured": "Tavsiya etilgan",
+      "new": "Yangi"
+    },
+    "details": {
+      "description": "Tavsif",
+      "features": "Xususiyatlar va qulayliklar",
+      "location": "Joylashuv",
+      "contactAgent": "Agent bilan bog'lanish",
+      "schedule": "Ko'rishga yozilish",
+      "share": "Ulashish",
+      "report": "Shikoyat qilish",
+      "similarProperties": "O'xshash mulklar",
+      "propertyDetails": "Mulk ma'lumotlari",
+      "yearBuilt": "Qurilgan yili",
+      "parkingSpaces": "Avtoturargoh joylari",
+      "lotSize": "Uchastka hajmi",
+      "propertyType": "Mulk turi",
+      "listingType": "Bitim turi",
+      "buildingClass": "Bino sinfi",
+      "renovation": "Ta'mirlash",
+      "floor": "Qavat",
+      "totalFloors": "Jami qavatlar",
+      "metroDistance": "Metrogacha",
+      "minutes": "daq"
+    }
+  },
+  "mortgage": {
+    "title": "Ipoteka kalkulyatori",
+    "homePrice": "Uy narxi",
+    "downPayment": "Boshlang'ich to'lov",
+    "loanTerm": "Kredit muddati",
+    "interestRate": "Foiz stavkasi",
+    "years": "yil",
+    "monthlyPayment": "Oylik to'lov",
+    "breakdown": "To'lov tarkibi",
+    "principal": "Asosiy qarz va foizlar",
+    "propertyTax": "Mulk solig'i",
+    "insurance": "Uy sug'urtasi",
+    "loanSummary": "Kredit xulosasi",
+    "loanAmount": "Kredit summasi",
+    "totalInterest": "Jami foizlar",
+    "totalPayment": "Jami to'lov"
+  },
+  "dashboard": {
+    "title": "Boshqaruv paneli",
+    "welcome": "Xush kelibsiz",
+    "overview": "Umumiy ko'rinish",
+    "activeListings": "Faol e'lonlar",
+    "totalViews": "Jami ko'rishlar",
+    "savedProperties": "Saqlangan mulklar",
+    "messages": "Xabarlar",
+    "recentActivity": "So'nggi faoliyat",
+    "quickActions": "Tezkor amallar"
+  },
+  "auth": {
+    "signIn": "Kirish",
+    "signUp": "Ro'yxatdan o'tish",
+    "email": "Elektron pochta",
+    "password": "Parol",
+    "forgotPassword": "Parolni unutdingizmi?",
+    "noAccount": "Hisobingiz yo'qmi?",
+    "hasAccount": "Hisobingiz bormi?",
+    "orContinueWith": "Yoki davom eting"
+  },
+  "footer": {
+    "about": "Biz haqimizda",
+    "contact": "Bog'lanish",
+    "privacy": "Maxfiylik siyosati",
+    "terms": "Foydalanish shartlari",
+    "copyright": "Barcha huquqlar himoyalangan"
+  },
+  "validation": {
+    "required": "Bu maydon to'ldirilishi shart",
+    "invalidEmail": "Noto'g'ri elektron pochta manzili",
+    "minLength": "Kamida {min} ta belgi",
+    "maxLength": "Ko'pi bilan {max} ta belgi",
+    "invalidPhone": "Noto'g'ri telefon raqami",
+    "invalidPrice": "Noto'g'ri narx"
+  }
+}

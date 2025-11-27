@@ -1,0 +1,183 @@
+{
+  "common": {
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "filters": "Фильтры",
+    "apply": "Применить",
+    "reset": "Сбросить",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "view": "Просмотр",
+    "back": "Назад",
+    "next": "Далее",
+    "previous": "Предыдущий",
+    "loading": "Загрузка...",
+    "noResults": "Ничего не найдено",
+    "error": "Произошла ошибка",
+    "success": "Успешно",
+    "confirm": "Подтвердить",
+    "close": "Закрыть",
+    "showMore": "Показать больше",
+    "showLess": "Показать меньше"
+  },
+  "nav": {
+    "home": "Главная",
+    "properties": "Недвижимость",
+    "dashboard": "Панель управления",
+    "favorites": "Избранное",
+    "myListings": "Мои объявления",
+    "addProperty": "Разместить объект",
+    "signIn": "Войти",
+    "signOut": "Выйти",
+    "profile": "Профиль",
+    "forSale": "Продажа",
+    "forRent": "Аренда",
+    "messages": "Сообщения",
+    "getStarted": "Начать"
+  },
+  "home": {
+    "hero": {
+      "title": "Найдите дом своей мечты",
+      "subtitle": "Откройте для себя идеальную недвижимость из нашей обширной коллекции домов, квартир и коммерческих помещений",
+      "searchPlaceholder": "Введите город, район или почтовый индекс"
+    },
+    "featured": {
+      "title": "Рекомендуемые объекты",
+      "viewAll": "Смотреть все объекты"
+    },
+    "stats": {
+      "properties": "Объектов в каталоге",
+      "happyClients": "Довольных клиентов",
+      "citiesCovered": "Городов охвачено"
+    }
+  },
+  "properties": {
+    "title": "Недвижимость",
+    "searchPlaceholder": "Поиск по местоположению, названию...",
+    "filters": {
+      "propertyType": "Тип недвижимости",
+      "listingType": "Тип сделки",
+      "priceRange": "Диапазон цен",
+      "bedrooms": "Спальни",
+      "bathrooms": "Ванные",
+      "area": "Площадь",
+      "amenities": "Удобства",
+      "buildingClass": "Класс дома",
+      "renovation": "Ремонт",
+      "parking": "Парковка",
+      "metroDistance": "До метро",
+      "yearBuilt": "Год постройки",
+      "floor": "Этаж",
+      "pricePerSqFt": "Цена за м²",
+      "features": "Особенности",
+      "balcony": "Балкон",
+      "concierge": "Консьерж",
+      "gatedArea": "Закрытая территория"
+    },
+    "types": {
+      "house": "Дом",
+      "apartment": "Квартира",
+      "condo": "Кондоминиум",
+      "townhouse": "Таунхаус",
+      "land": "Земельный участок",
+      "commercial": "Коммерческая"
+    },
+    "listingTypes": {
+      "sale": "Продажа",
+      "rent": "Аренда"
+    },
+    "sort": {
+      "newest": "Сначала новые",
+      "oldest": "Сначала старые",
+      "priceAsc": "Цена: по возрастанию",
+      "priceDesc": "Цена: по убыванию",
+      "areaAsc": "Площадь: по возрастанию",
+      "areaDesc": "Площадь: по убыванию"
+    },
+    "card": {
+      "beds": "спален",
+      "baths": "ванных",
+      "sqft": "м²",
+      "perMonth": "/мес",
+      "featured": "Рекомендуем",
+      "new": "Новое"
+    },
+    "details": {
+      "description": "Описание",
+      "features": "Особенности и удобства",
+      "location": "Расположение",
+      "contactAgent": "Связаться с агентом",
+      "schedule": "Записаться на просмотр",
+      "share": "Поделиться",
+      "report": "Пожаловаться",
+      "similarProperties": "Похожие объекты",
+      "propertyDetails": "Характеристики объекта",
+      "yearBuilt": "Год постройки",
+      "parkingSpaces": "Парковочные места",
+      "lotSize": "Размер участка",
+      "propertyType": "Тип недвижимости",
+      "listingType": "Тип сделки",
+      "buildingClass": "Класс дома",
+      "renovation": "Ремонт",
+      "floor": "Этаж",
+      "totalFloors": "Всего этажей",
+      "metroDistance": "До метро",
+      "minutes": "мин"
+    }
+  },
+  "mortgage": {
+    "title": "Ипотечный калькулятор",
+    "homePrice": "Стоимость жилья",
+    "downPayment": "Первоначальный взнос",
+    "loanTerm": "Срок кредита",
+    "interestRate": "Процентная ставка",
+    "years": "лет",
+    "monthlyPayment": "Ежемесячный платёж",
+    "breakdown": "Структура платежа",
+    "principal": "Основной долг и проценты",
+    "propertyTax": "Налог на имущество",
+    "insurance": "Страхование жилья",
+    "loanSummary": "Сводка по кредиту",
+    "loanAmount": "Сумма кредита",
+    "totalInterest": "Общая сумма процентов",
+    "totalPayment": "Общая сумма выплат"
+  },
+  "dashboard": {
+    "title": "Панель управления",
+    "welcome": "С возвращением",
+    "overview": "Обзор",
+    "activeListings": "Активные объявления",
+    "totalViews": "Всего просмотров",
+    "savedProperties": "Сохранённые объекты",
+    "messages": "Сообщения",
+    "recentActivity": "Последняя активность",
+    "quickActions": "Быстрые действия"
+  },
+  "auth": {
+    "signIn": "Войти",
+    "signUp": "Регистрация",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "forgotPassword": "Забыли пароль?",
+    "noAccount": "Нет аккаунта?",
+    "hasAccount": "Уже есть аккаунт?",
+    "orContinueWith": "Или продолжить через"
+  },
+  "footer": {
+    "about": "О нас",
+    "contact": "Контакты",
+    "privacy": "Политика конфиденциальности",
+    "terms": "Условия использования",
+    "copyright": "Все права защищены"
+  },
+  "validation": {
+    "required": "Это поле обязательно",
+    "invalidEmail": "Неверный адрес электронной почты",
+    "minLength": "Минимум {min} символов",
+    "maxLength": "Максимум {max} символов",
+    "invalidPhone": "Неверный номер телефона",
+    "invalidPrice": "Неверная цена"
+  }
+}

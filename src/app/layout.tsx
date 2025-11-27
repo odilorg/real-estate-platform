@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from '@clerk/nextjs'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale, getMessages } from 'next-intl/server'
 import { FavoritesProvider } from '@/contexts/FavoritesContext'
 import { Toaster } from 'sonner'
 import "./globals.css";
@@ -20,20 +22,25 @@ export const metadata: Metadata = {
   description: "Discover and list properties for sale or rent. Browse apartments, houses, and commercial spaces.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale()
+  const messages = await getMessages()
+
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang={locale}>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <FavoritesProvider>
-            {children}
-          </FavoritesProvider>
+          <NextIntlClientProvider messages={messages}>
+            <FavoritesProvider>
+              {children}
+            </FavoritesProvider>
+          </NextIntlClientProvider>
           <Toaster position="top-right" richColors />
         </body>
       </html>

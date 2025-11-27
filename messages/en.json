@@ -1,0 +1,183 @@
+{
+  "common": {
+    "search": "Search",
+    "filter": "Filter",
+    "filters": "Filters",
+    "apply": "Apply",
+    "reset": "Reset",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "error": "An error occurred",
+    "success": "Success",
+    "confirm": "Confirm",
+    "close": "Close",
+    "showMore": "Show more",
+    "showLess": "Show less"
+  },
+  "nav": {
+    "home": "Home",
+    "properties": "Properties",
+    "dashboard": "Dashboard",
+    "favorites": "Favorites",
+    "myListings": "My Listings",
+    "addProperty": "List Property",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "profile": "Profile",
+    "forSale": "For Sale",
+    "forRent": "For Rent",
+    "messages": "Messages",
+    "getStarted": "Get Started"
+  },
+  "home": {
+    "hero": {
+      "title": "Find Your Dream Home",
+      "subtitle": "Discover the perfect property from our extensive collection of homes, apartments, and commercial spaces",
+      "searchPlaceholder": "Enter city, neighborhood, or ZIP code"
+    },
+    "featured": {
+      "title": "Featured Properties",
+      "viewAll": "View All Properties"
+    },
+    "stats": {
+      "properties": "Properties Listed",
+      "happyClients": "Happy Clients",
+      "citiesCovered": "Cities Covered"
+    }
+  },
+  "properties": {
+    "title": "Properties",
+    "searchPlaceholder": "Search by location, title...",
+    "filters": {
+      "propertyType": "Property Type",
+      "listingType": "Listing Type",
+      "priceRange": "Price Range",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "area": "Area",
+      "amenities": "Amenities",
+      "buildingClass": "Building Class",
+      "renovation": "Renovation",
+      "parking": "Parking",
+      "metroDistance": "Metro Distance",
+      "yearBuilt": "Year Built",
+      "floor": "Floor",
+      "pricePerSqFt": "Price per sq ft",
+      "features": "Features",
+      "balcony": "Balcony",
+      "concierge": "Concierge",
+      "gatedArea": "Gated Area"
+    },
+    "types": {
+      "house": "House",
+      "apartment": "Apartment",
+      "condo": "Condo",
+      "townhouse": "Townhouse",
+      "land": "Land",
+      "commercial": "Commercial"
+    },
+    "listingTypes": {
+      "sale": "For Sale",
+      "rent": "For Rent"
+    },
+    "sort": {
+      "newest": "Newest First",
+      "oldest": "Oldest First",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "areaAsc": "Area: Small to Large",
+      "areaDesc": "Area: Large to Small"
+    },
+    "card": {
+      "beds": "beds",
+      "baths": "baths",
+      "sqft": "sq ft",
+      "perMonth": "/month",
+      "featured": "Featured",
+      "new": "New"
+    },
+    "details": {
+      "description": "Description",
+      "features": "Features & Amenities",
+      "location": "Location",
+      "contactAgent": "Contact Agent",
+      "schedule": "Schedule a Tour",
+      "share": "Share",
+      "report": "Report",
+      "similarProperties": "Similar Properties",
+      "propertyDetails": "Property Details",
+      "yearBuilt": "Year Built",
+      "parkingSpaces": "Parking Spaces",
+      "lotSize": "Lot Size",
+      "propertyType": "Property Type",
+      "listingType": "Listing Type",
+      "buildingClass": "Building Class",
+      "renovation": "Renovation",
+      "floor": "Floor",
+      "totalFloors": "Total Floors",
+      "metroDistance": "Metro Distance",
+      "minutes": "min"
+    }
+  },
+  "mortgage": {
+    "title": "Mortgage Calculator",
+    "homePrice": "Home Price",
+    "downPayment": "Down Payment",
+    "loanTerm": "Loan Term",
+    "interestRate": "Interest Rate",
+    "years": "years",
+    "monthlyPayment": "Estimated Monthly Payment",
+    "breakdown": "Payment Breakdown",
+    "principal": "Principal & Interest",
+    "propertyTax": "Property Tax",
+    "insurance": "Home Insurance",
+    "loanSummary": "Loan Summary",
+    "loanAmount": "Loan Amount",
+    "totalInterest": "Total Interest",
+    "totalPayment": "Total Payment"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "overview": "Overview",
+    "activeListings": "Active Listings",
+    "totalViews": "Total Views",
+    "savedProperties": "Saved Properties",
+    "messages": "Messages",
+    "recentActivity": "Recent Activity",
+    "quickActions": "Quick Actions"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "Or continue with"
+  },
+  "footer": {
+    "about": "About Us",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "copyright": "All rights reserved"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Must be at most {max} characters",
+    "invalidPhone": "Invalid phone number",
+    "invalidPrice": "Invalid price"
+  }
+}
