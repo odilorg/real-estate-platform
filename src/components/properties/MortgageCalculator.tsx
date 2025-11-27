@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -13,6 +14,7 @@ interface MortgageCalculatorProps {
 }
 
 export function MortgageCalculator({ propertyPrice, className }: MortgageCalculatorProps) {
+  const t = useTranslations('mortgage')
   const [homePrice, setHomePrice] = useState(propertyPrice)
   const [downPayment, setDownPayment] = useState(Math.round(propertyPrice * 0.2))
   const [downPaymentPercent, setDownPaymentPercent] = useState(20)
@@ -63,18 +65,18 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calculator className="h-5 w-5 text-blue-600" />
-          Mortgage Calculator
+          {t('title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Monthly Payment Summary */}
         <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <p className="text-sm text-gray-600 mb-1">Estimated Monthly Payment</p>
+          <p className="text-sm text-gray-600 mb-1">{t('monthlyPayment')}</p>
           <p className="text-3xl font-bold text-blue-600">
             {formatCurrencyDetailed(monthlyPayment)}
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Principal & Interest: {formatCurrencyDetailed(monthlyPI)}
+            {t('principal')}: {formatCurrencyDetailed(monthlyPI)}
           </p>
         </div>
 
@@ -82,7 +84,7 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
         <div className="space-y-2">
           <Label className="flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-gray-500" />
-            Home Price
+            {t('homePrice')}
           </Label>
           <Input
             type="number"
@@ -97,7 +99,7 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
           <div className="flex items-center justify-between">
             <Label className="flex items-center gap-2">
               <PiggyBank className="h-4 w-4 text-gray-500" />
-              Down Payment
+              {t('downPayment')}
             </Label>
             <span className="text-sm font-medium text-blue-600">
               {downPaymentPercent}% ({formatCurrency(downPayment)})
@@ -121,7 +123,7 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
         {/* Loan Amount Display */}
         <div className="bg-gray-50 rounded-lg p-3">
           <div className="flex justify-between">
-            <span className="text-sm text-gray-600">Loan Amount</span>
+            <span className="text-sm text-gray-600">{t('loanAmount')}</span>
             <span className="font-semibold">{formatCurrency(loanAmount)}</span>
           </div>
         </div>
@@ -131,7 +133,7 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
           <div className="flex items-center justify-between">
             <Label className="flex items-center gap-2">
               <Percent className="h-4 w-4 text-gray-500" />
-              Interest Rate
+              {t('interestRate')}
             </Label>
             <span className="text-sm font-medium text-blue-600">{interestRate}%</span>
           </div>
@@ -154,7 +156,7 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
         <div className="space-y-2">
           <Label className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-gray-500" />
-            Loan Term
+            {t('loanTerm')}
           </Label>
           <div className="grid grid-cols-3 gap-2">
             {[15, 20, 30].map((term) => (
@@ -167,7 +169,7 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {term} years
+                {term} {t('years')}
               </button>
             ))}
           </div>
@@ -175,10 +177,10 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
 
         {/* Additional Costs */}
         <div className="space-y-3 border-t pt-4">
-          <p className="text-sm font-medium text-gray-700">Monthly Costs (included above)</p>
+          <p className="text-sm font-medium text-gray-700">{t('breakdown')}</p>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-gray-500">Property Tax</Label>
+              <Label className="text-xs text-gray-500">{t('propertyTax')}</Label>
               <Input
                 type="number"
                 value={propertyTax}
@@ -187,7 +189,7 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
               />
             </div>
             <div>
-              <Label className="text-xs text-gray-500">Home Insurance</Label>
+              <Label className="text-xs text-gray-500">{t('insurance')}</Label>
               <Input
                 type="number"
                 value={insurance}
@@ -202,23 +204,23 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
         <div className="space-y-2 border-t pt-4">
           <p className="text-sm font-medium text-gray-700 flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
-            Payment Breakdown
+            {t('breakdown')}
           </p>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-600">Principal & Interest</span>
+              <span className="text-gray-600">{t('principal')}</span>
               <span className="font-medium">{formatCurrencyDetailed(monthlyPI)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Property Tax</span>
+              <span className="text-gray-600">{t('propertyTax')}</span>
               <span className="font-medium">{formatCurrencyDetailed(propertyTax)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Insurance</span>
+              <span className="text-gray-600">{t('insurance')}</span>
               <span className="font-medium">{formatCurrencyDetailed(insurance)}</span>
             </div>
             <div className="flex justify-between border-t pt-2 font-semibold">
-              <span>Total Monthly</span>
+              <span>{t('monthlyPayment')}</span>
               <span className="text-blue-600">{formatCurrencyDetailed(monthlyPayment)}</span>
             </div>
           </div>
@@ -226,14 +228,14 @@ export function MortgageCalculator({ propertyPrice, className }: MortgageCalcula
 
         {/* Loan Summary */}
         <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-          <p className="text-sm font-medium text-gray-700">Loan Summary</p>
+          <p className="text-sm font-medium text-gray-700">{t('loanSummary')}</p>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-gray-500">Total of Payments</p>
+              <p className="text-gray-500">{t('totalPayment')}</p>
               <p className="font-semibold">{formatCurrency(totalPayment)}</p>
             </div>
             <div>
-              <p className="text-gray-500">Total Interest Paid</p>
+              <p className="text-gray-500">{t('totalInterest')}</p>
               <p className="font-semibold text-orange-600">{formatCurrency(totalInterest)}</p>
             </div>
           </div>

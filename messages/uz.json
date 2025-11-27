@@ -5,6 +5,7 @@
     "filters": "Filtrlar",
     "apply": "Qo'llash",
     "reset": "Tozalash",
+    "resetFilters": "Filtrlarni tozalash",
     "save": "Saqlash",
     "cancel": "Bekor qilish",
     "delete": "O'chirish",
@@ -20,7 +21,22 @@
     "confirm": "Tasdiqlash",
     "close": "Yopish",
     "showMore": "Ko'proq ko'rsatish",
-    "showLess": "Kamroq ko'rsatish"
+    "showLess": "Kamroq ko'rsatish",
+    "browse": "Ko'rish",
+    "viewAll": "Hammasini ko'rish",
+    "learnMore": "Batafsil",
+    "min": "Min",
+    "max": "Maks",
+    "any": "Har qanday",
+    "all": "Hammasi",
+    "from": "Dan",
+    "to": "Gacha",
+    "results": "natija",
+    "showing": "Ko'rsatilmoqda",
+    "of": "dan",
+    "page": "Sahifa",
+    "send": "Yuborish",
+    "submit": "Yuborish"
   },
   "nav": {
     "home": "Bosh sahifa",
@@ -39,9 +55,34 @@
   },
   "home": {
     "hero": {
-      "title": "Orzuingizdagi uyni toping",
-      "subtitle": "Uylar, kvartiralar va tijorat binolari to'plamimizdan o'zingizga mos mulkni toping",
-      "searchPlaceholder": "Shahar, tuman yoki pochta indeksini kiriting"
+      "title": "Ideal ko'chmas mulkni toping",
+      "subtitle": "O'z hududingizda ideal uy, kvartira yoki tijorat binolarini kashf eting",
+      "searchPlaceholder": "Shahar, tuman yoki pochta indeksini kiriting",
+      "browseProperties": "Mulklarni ko'rish",
+      "listProperty": "Mulk joylashtirish"
+    },
+    "propertyTypes": {
+      "title": "Mulk turi bo'yicha qidirish",
+      "residential": "Turar-joy",
+      "residentialDesc": "Uylar, kvartiralar va apartamentlar",
+      "commercial": "Tijorat",
+      "commercialDesc": "Ofislar, do'konlar va biznes binolari",
+      "land": "Yer",
+      "landDesc": "Uchastkalar, fermalar va qurilish yerlari"
+    },
+    "features": {
+      "title": "Nima uchun EstateHub?",
+      "locationSearch": "Joylashuv bo'yicha qidirish",
+      "locationSearchDesc": "Kengaytirilgan xarita qidiruvimiz yordamida afzal ko'rgan tumanlaringizda mulk toping",
+      "advancedFilters": "Kengaytirilgan filtrlar",
+      "advancedFiltersDesc": "Narx, maydon, qulayliklar va boshqalar bo'yicha batafsil filtrlar bilan qidiruvni aniqlang",
+      "verifiedListings": "Tasdiqlangan e'lonlar",
+      "verifiedListingsDesc": "Ishonchli sotuvchilar va agentlarning tasdiqlangan mulklarini ko'ring"
+    },
+    "cta": {
+      "title": "Boshlashga tayyormisiz?",
+      "subtitle": "Ideal mulk topayotgan minglab foydalanuvchilarga qo'shiling",
+      "createAccount": "Bepul hisob yaratish"
     },
     "featured": {
       "title": "Tavsiya etilgan mulklar",
@@ -56,6 +97,9 @@
   "properties": {
     "title": "Ko'chmas mulk",
     "searchPlaceholder": "Joylashuv, nom bo'yicha qidirish...",
+    "foundProperties": "mulk topildi",
+    "noProperties": "Mulklar topilmadi",
+    "noPropertiesDesc": "Qidiruv parametrlarini o'zgartirib ko'ring",
     "filters": {
       "propertyType": "Mulk turi",
       "listingType": "Bitim turi",
@@ -71,10 +115,22 @@
       "yearBuilt": "Qurilgan yili",
       "floor": "Qavat",
       "pricePerSqFt": "Har m² uchun narx",
-      "features": "Xususiyatlar",
+      "features": "Bino xususiyatlari",
       "balcony": "Balkon",
       "concierge": "Konsyerj",
-      "gatedArea": "Yopiq hudud"
+      "gatedArea": "Yopiq hudud",
+      "minPrice": "Min narx",
+      "maxPrice": "Maks narx",
+      "minArea": "Min maydon",
+      "maxArea": "Maks maydon",
+      "minBeds": "Min yotoq",
+      "maxBeds": "Maks yotoq",
+      "minBaths": "Min hammom",
+      "maxBaths": "Maks hammom",
+      "minYear": "Min yil",
+      "maxYear": "Maks yil",
+      "minFloor": "Min qavat",
+      "maxFloor": "Maks qavat"
     },
     "types": {
       "house": "Uy",
@@ -88,7 +144,34 @@
       "sale": "Sotish",
       "rent": "Ijara"
     },
+    "buildingClasses": {
+      "economy": "Ekonom",
+      "comfort": "Komfort",
+      "business": "Biznes",
+      "premium": "Premium",
+      "elite": "Elit"
+    },
+    "renovationTypes": {
+      "noRenovation": "Ta'mirsiz",
+      "cosmetic": "Kosmetik",
+      "euro": "Yevro ta'mir",
+      "designer": "Dizayner"
+    },
+    "parkingTypes": {
+      "none": "Yo'q",
+      "street": "Ko'cha parkingsi",
+      "garage": "Garaj",
+      "underground": "Yer osti",
+      "covered": "Yopiq parking"
+    },
+    "metroDistances": {
+      "walking5": "5 daq piyoda",
+      "walking10": "10 daq piyoda",
+      "walking15": "15 daq piyoda",
+      "transport": "Transport bilan"
+    },
     "sort": {
+      "title": "Saralash",
       "newest": "Avval yangisi",
       "oldest": "Avval eskisi",
       "priceAsc": "Narx: pastdan yuqoriga",
@@ -108,6 +191,7 @@
       "description": "Tavsif",
       "features": "Xususiyatlar va qulayliklar",
       "location": "Joylashuv",
+      "locationInfo": "Joylashuv ma'lumotlari",
       "contactAgent": "Agent bilan bog'lanish",
       "schedule": "Ko'rishga yozilish",
       "share": "Ulashish",
@@ -124,7 +208,34 @@
       "floor": "Qavat",
       "totalFloors": "Jami qavatlar",
       "metroDistance": "Metrogacha",
-      "minutes": "daq"
+      "minutes": "daq",
+      "postedBy": "Joylashtirilgan",
+      "contactSeller": "Sotuvchi bilan bog'lanish",
+      "sendMessage": "Xabar yuborish",
+      "writeMessage": "Xabar yozing...",
+      "phone": "Telefon",
+      "email": "Elektron pochta"
+    },
+    "form": {
+      "title": "Mulk nomi",
+      "description": "Tavsif",
+      "price": "Narx",
+      "address": "Manzil",
+      "city": "Shahar",
+      "state": "Viloyat",
+      "zipCode": "Pochta indeksi",
+      "bedrooms": "Yotoq xonalar",
+      "bathrooms": "Hammomlar",
+      "area": "Maydon (m²)",
+      "propertyType": "Mulk turi",
+      "listingType": "Bitim turi",
+      "images": "Rasmlar",
+      "uploadImages": "Rasmlarni yuklash",
+      "amenities": "Qulayliklar",
+      "submit": "Mulkni joylashtirish",
+      "update": "Mulkni yangilash",
+      "latitude": "Kenglik",
+      "longitude": "Uzunlik"
     }
   },
   "mortgage": {
@@ -153,7 +264,32 @@
     "savedProperties": "Saqlangan mulklar",
     "messages": "Xabarlar",
     "recentActivity": "So'nggi faoliyat",
-    "quickActions": "Tezkor amallar"
+    "quickActions": "Tezkor amallar",
+    "myProperties": "Mening mulklarim",
+    "noProperties": "Siz hali hech qanday mulk joylashtirmadingiz",
+    "addFirstProperty": "Birinchi mulkni qo'shish",
+    "editProperty": "Tahrirlash",
+    "deleteProperty": "O'chirish",
+    "viewProperty": "Ko'rish",
+    "propertyStatus": "Holat",
+    "active": "Faol",
+    "pending": "Tekshiruvda",
+    "sold": "Sotilgan",
+    "rented": "Ijaraga berilgan"
+  },
+  "favorites": {
+    "title": "Sevimlilar",
+    "noFavorites": "Hali sevimlilar yo'q",
+    "noFavoritesDesc": "Mulklarni ko'rib chiqing va yoqqanlarini saqlang",
+    "browseProperties": "Mulklarni ko'rish",
+    "removeFromFavorites": "Sevimlilardan olib tashlash"
+  },
+  "messages": {
+    "title": "Xabarlar",
+    "noMessages": "Hali xabarlar yo'q",
+    "noMessagesDesc": "Mulk egasi bilan bog'langaningizda, suhbatlaringiz shu yerda ko'rinadi",
+    "typeMessage": "Xabar yozing...",
+    "send": "Yuborish"
   },
   "auth": {
     "signIn": "Kirish",
@@ -170,7 +306,8 @@
     "contact": "Bog'lanish",
     "privacy": "Maxfiylik siyosati",
     "terms": "Foydalanish shartlari",
-    "copyright": "Barcha huquqlar himoyalangan"
+    "copyright": "Barcha huquqlar himoyalangan",
+    "description": "EstateHub bilan ideal mulkingizni toping"
   },
   "validation": {
     "required": "Bu maydon to'ldirilishi shart",
@@ -179,5 +316,22 @@
     "maxLength": "Ko'pi bilan {max} ta belgi",
     "invalidPhone": "Noto'g'ri telefon raqami",
     "invalidPrice": "Noto'g'ri narx"
+  },
+  "amenities": {
+    "pool": "Hovuz",
+    "gym": "Sport zali",
+    "parking": "Avtoturargoh",
+    "elevator": "Lift",
+    "security": "Qo'riqlash",
+    "airConditioning": "Konditsioner",
+    "heating": "Isitish",
+    "laundry": "Kir yuvish",
+    "dishwasher": "Idish yuvish mashinasi",
+    "balcony": "Balkon",
+    "garden": "Bog'",
+    "petFriendly": "Hayvonlar bilan mumkin",
+    "furnished": "Mebelllangan",
+    "internet": "Internet",
+    "cableTV": "Kabel TV"
   }
 }

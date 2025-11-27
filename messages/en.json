@@ -5,6 +5,7 @@
     "filters": "Filters",
     "apply": "Apply",
     "reset": "Reset",
+    "resetFilters": "Reset Filters",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -20,7 +21,22 @@
     "confirm": "Confirm",
     "close": "Close",
     "showMore": "Show more",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "browse": "Browse",
+    "viewAll": "View All",
+    "learnMore": "Learn More",
+    "min": "Min",
+    "max": "Max",
+    "any": "Any",
+    "all": "All",
+    "from": "From",
+    "to": "To",
+    "results": "results",
+    "showing": "Showing",
+    "of": "of",
+    "page": "Page",
+    "send": "Send",
+    "submit": "Submit"
   },
   "nav": {
     "home": "Home",
@@ -39,9 +55,34 @@
   },
   "home": {
     "hero": {
-      "title": "Find Your Dream Home",
-      "subtitle": "Discover the perfect property from our extensive collection of homes, apartments, and commercial spaces",
-      "searchPlaceholder": "Enter city, neighborhood, or ZIP code"
+      "title": "Find Your Dream Property",
+      "subtitle": "Discover the perfect home, apartment, or commercial space in your area",
+      "searchPlaceholder": "Enter city, neighborhood, or ZIP code",
+      "browseProperties": "Browse Properties",
+      "listProperty": "List Your Property"
+    },
+    "propertyTypes": {
+      "title": "Browse by Property Type",
+      "residential": "Residential",
+      "residentialDesc": "Houses, apartments, and condos",
+      "commercial": "Commercial",
+      "commercialDesc": "Offices, retail, and business spaces",
+      "land": "Land",
+      "landDesc": "Plots, farms, and development land"
+    },
+    "features": {
+      "title": "Why Choose EstateHub?",
+      "locationSearch": "Location-Based Search",
+      "locationSearchDesc": "Find properties in your preferred neighborhoods with our advanced map search",
+      "advancedFilters": "Advanced Filters",
+      "advancedFiltersDesc": "Narrow down your search with detailed filters for price, size, amenities, and more",
+      "verifiedListings": "Verified Listings",
+      "verifiedListingsDesc": "Browse through verified properties from trusted sellers and agents"
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "subtitle": "Join thousands of users finding their perfect property",
+      "createAccount": "Create Free Account"
     },
     "featured": {
       "title": "Featured Properties",
@@ -56,6 +97,9 @@
   "properties": {
     "title": "Properties",
     "searchPlaceholder": "Search by location, title...",
+    "foundProperties": "properties found",
+    "noProperties": "No properties found",
+    "noPropertiesDesc": "Try adjusting your search filters",
     "filters": {
       "propertyType": "Property Type",
       "listingType": "Listing Type",
@@ -71,10 +115,22 @@
       "yearBuilt": "Year Built",
       "floor": "Floor",
       "pricePerSqFt": "Price per sq ft",
-      "features": "Features",
+      "features": "Building Features",
       "balcony": "Balcony",
       "concierge": "Concierge",
-      "gatedArea": "Gated Area"
+      "gatedArea": "Gated Area",
+      "minPrice": "Min Price",
+      "maxPrice": "Max Price",
+      "minArea": "Min Area",
+      "maxArea": "Max Area",
+      "minBeds": "Min Beds",
+      "maxBeds": "Max Beds",
+      "minBaths": "Min Baths",
+      "maxBaths": "Max Baths",
+      "minYear": "Min Year",
+      "maxYear": "Max Year",
+      "minFloor": "Min Floor",
+      "maxFloor": "Max Floor"
     },
     "types": {
       "house": "House",
@@ -88,7 +144,34 @@
       "sale": "For Sale",
       "rent": "For Rent"
     },
+    "buildingClasses": {
+      "economy": "Economy",
+      "comfort": "Comfort",
+      "business": "Business",
+      "premium": "Premium",
+      "elite": "Elite"
+    },
+    "renovationTypes": {
+      "noRenovation": "No Renovation",
+      "cosmetic": "Cosmetic",
+      "euro": "Euro Renovation",
+      "designer": "Designer"
+    },
+    "parkingTypes": {
+      "none": "None",
+      "street": "Street Parking",
+      "garage": "Garage",
+      "underground": "Underground",
+      "covered": "Covered Parking"
+    },
+    "metroDistances": {
+      "walking5": "5 min walk",
+      "walking10": "10 min walk",
+      "walking15": "15 min walk",
+      "transport": "By transport"
+    },
     "sort": {
+      "title": "Sort by",
       "newest": "Newest First",
       "oldest": "Oldest First",
       "priceAsc": "Price: Low to High",
@@ -108,6 +191,7 @@
       "description": "Description",
       "features": "Features & Amenities",
       "location": "Location",
+      "locationInfo": "Location Information",
       "contactAgent": "Contact Agent",
       "schedule": "Schedule a Tour",
       "share": "Share",
@@ -124,7 +208,34 @@
       "floor": "Floor",
       "totalFloors": "Total Floors",
       "metroDistance": "Metro Distance",
-      "minutes": "min"
+      "minutes": "min",
+      "postedBy": "Posted by",
+      "contactSeller": "Contact Seller",
+      "sendMessage": "Send Message",
+      "writeMessage": "Write your message...",
+      "phone": "Phone",
+      "email": "Email"
+    },
+    "form": {
+      "title": "Property Title",
+      "description": "Description",
+      "price": "Price",
+      "address": "Address",
+      "city": "City",
+      "state": "State",
+      "zipCode": "ZIP Code",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "area": "Area (sq ft)",
+      "propertyType": "Property Type",
+      "listingType": "Listing Type",
+      "images": "Images",
+      "uploadImages": "Upload Images",
+      "amenities": "Amenities",
+      "submit": "Submit Property",
+      "update": "Update Property",
+      "latitude": "Latitude",
+      "longitude": "Longitude"
     }
   },
   "mortgage": {
@@ -153,7 +264,32 @@
     "savedProperties": "Saved Properties",
     "messages": "Messages",
     "recentActivity": "Recent Activity",
-    "quickActions": "Quick Actions"
+    "quickActions": "Quick Actions",
+    "myProperties": "My Properties",
+    "noProperties": "You haven't listed any properties yet",
+    "addFirstProperty": "Add Your First Property",
+    "editProperty": "Edit",
+    "deleteProperty": "Delete",
+    "viewProperty": "View",
+    "propertyStatus": "Status",
+    "active": "Active",
+    "pending": "Pending",
+    "sold": "Sold",
+    "rented": "Rented"
+  },
+  "favorites": {
+    "title": "Favorites",
+    "noFavorites": "No favorites yet",
+    "noFavoritesDesc": "Start browsing properties and save your favorites",
+    "browseProperties": "Browse Properties",
+    "removeFromFavorites": "Remove from Favorites"
+  },
+  "messages": {
+    "title": "Messages",
+    "noMessages": "No messages yet",
+    "noMessagesDesc": "When you contact property owners, your conversations will appear here",
+    "typeMessage": "Type a message...",
+    "send": "Send"
   },
   "auth": {
     "signIn": "Sign In",
@@ -170,7 +306,8 @@
     "contact": "Contact",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "copyright": "All rights reserved"
+    "copyright": "All rights reserved",
+    "description": "Find your perfect property with EstateHub"
   },
   "validation": {
     "required": "This field is required",
@@ -179,5 +316,22 @@
     "maxLength": "Must be at most {max} characters",
     "invalidPhone": "Invalid phone number",
     "invalidPrice": "Invalid price"
+  },
+  "amenities": {
+    "pool": "Pool",
+    "gym": "Gym",
+    "parking": "Parking",
+    "elevator": "Elevator",
+    "security": "Security",
+    "airConditioning": "Air Conditioning",
+    "heating": "Heating",
+    "laundry": "Laundry",
+    "dishwasher": "Dishwasher",
+    "balcony": "Balcony",
+    "garden": "Garden",
+    "petFriendly": "Pet Friendly",
+    "furnished": "Furnished",
+    "internet": "Internet",
+    "cableTV": "Cable TV"
   }
 }
