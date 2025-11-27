@@ -6,6 +6,7 @@ export const propertySchema = z.object({
   description: z.string().min(50, 'Description must be at least 50 characters'),
   propertyType: z.enum(['APARTMENT', 'HOUSE', 'CONDO', 'TOWNHOUSE', 'LAND', 'COMMERCIAL', 'VILLA', 'STUDIO']),
   listingType: z.enum(['SALE', 'RENT']),
+  status: z.enum(['ACTIVE', 'PENDING', 'SOLD', 'RENTED', 'DRAFT']).optional(),
   price: z.number().positive('Price must be positive'),
 
   // Location
@@ -14,6 +15,8 @@ export const propertySchema = z.object({
   state: z.string().optional(),
   country: z.string().optional(),
   zipCode: z.string().optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
 
   // Property Details
   bedrooms: z.number().int().min(0).optional(),
@@ -46,6 +49,8 @@ export const stepTwoSchema = propertySchema.pick({
   city: true,
   state: true,
   zipCode: true,
+  latitude: true,
+  longitude: true,
   bedrooms: true,
   bathrooms: true,
   area: true,

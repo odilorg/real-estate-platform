@@ -3,22 +3,46 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Home, Heart, DollarSign, TrendingUp, PlusCircle, Eye } from 'lucide-react'
+import { Home, Heart, DollarSign, TrendingUp, PlusCircle, Eye, MessageSquare, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
 
-interface Property {
+interface PropertyStats {
   id: string
+  title: string
+  views: number
+  status: string
   listingType: string
+  _count: {
+    favorites: number
+    reviews: number
+  }
+}
+
+interface Stats {
+  totalProperties: number
+  propertiesForSale: number
+  propertiesForRent: number
+  totalFavorites: number
+  totalViews: number
+  totalInquiries: number
+  soldCount: number
+  rentedCount: number
+  topProperties: PropertyStats[]
 }
 
 export function OverviewTab() {
   const { user } = useUser()
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<Stats>({
     totalProperties: 0,
     propertiesForSale: 0,
     propertiesForRent: 0,
     totalFavorites: 0,
+    totalViews: 0,
+    totalInquiries: 0,
+    soldCount: 0,
+    rentedCount: 0,
+    topProperties: [],
   })
   const [loading, setLoading] = useState(true)
 
@@ -28,20 +52,29 @@ export function OverviewTab() {
 
   const fetchStats = async () => {
     try {
-      // Fetch user properties
-      const propsResponse = await fetch('/api/users/me/properties')
-      const properties: Property[] = propsResponse.ok ? await propsResponse.json() : []
+      // Fetch detailed stats
+      const statsResponse = await fetch('/api/users/me/stats')
+      if (statsResponse.ok) {
+        const data = await statsResponse.json()
+        const properties = data.properties || []
 
-      // Fetch favorites
-      const favsResponse = await fetch('/api/favorites')
-      const favorites = favsResponse.ok ? await favsResponse.json() : []
+        // Sort by views for top properties
+        const topProperties = [...properties]
+          .sort((a: PropertyStats, b: PropertyStats) => b.views - a.views)
+          .slice(0, 5)
 
-      setStats({
-        totalProperties: properties.length,
-        propertiesForSale: properties.filter((p) => p.listingType === 'SALE').length,
-        propertiesForRent: properties.filter((p) => p.listingType === 'RENT').length,
-        totalFavorites: favorites.length,
-      })
+        setStats({
+          totalProperties: data.totals?.properties || properties.length,
+          propertiesForSale: properties.filter((p: PropertyStats) => p.listingType === 'SALE').length,
+          propertiesForRent: properties.filter((p: PropertyStats) => p.listingType === 'RENT').length,
+          totalFavorites: data.totals?.favorites || 0,
+          totalViews: data.totals?.views || 0,
+          totalInquiries: data.totals?.inquiries || 0,
+          soldCount: data.totals?.sold || 0,
+          rentedCount: data.totals?.rented || 0,
+          topProperties,
+        })
+      }
     } catch (error) {
       console.error('Error fetching stats:', error)
     } finally {
@@ -58,25 +91,39 @@ export function OverviewTab() {
       bgColor: 'bg-blue-100',
     },
     {
-      title: 'For Sale',
-      value: stats.propertiesForSale,
-      icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      title: 'Total Views',
+      value: stats.totalViews,
+      icon: Eye,
+      color: 'text-indigo-600',
+      bgColor: 'bg-indigo-100',
     },
     {
-      title: 'For Rent',
-      value: stats.propertiesForRent,
-      icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
+      title: 'Inquiries',
+      value: stats.totalInquiries,
+      icon: MessageSquare,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
     },
     {
-      title: 'Saved Favorites',
+      title: 'Favorites',
       value: stats.totalFavorites,
       icon: Heart,
       color: 'text-red-600',
       bgColor: 'bg-red-100',
+    },
+    {
+      title: 'Sold',
+      value: stats.soldCount,
+      icon: CheckCircle,
+      color: 'text-green-600',
+      bgColor: 'bg-green-100',
+    },
+    {
+      title: 'Rented',
+      value: stats.rentedCount,
+      icon: TrendingUp,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-100',
     },
   ]
 
@@ -123,23 +170,66 @@ export function OverviewTab() {
       </Card>
 
       {/* Statistics Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
         {statCards.map((stat) => (
           <Card key={stat.title} className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs font-medium text-gray-600">
                 {stat.title}
               </CardTitle>
-              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`h-5 w-5 ${stat.color}`} />
+              <div className={`p-1.5 rounded-lg ${stat.bgColor}`}>
+                <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stat.value}</div>
+              <div className="text-2xl font-bold">{stat.value}</div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* Top Performing Properties */}
+      {stats.topProperties.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Performing Properties</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats.topProperties.map((property, index) => (
+                <div key={property.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-bold text-gray-400">#{index + 1}</span>
+                    <div>
+                      <Link href={`/properties/${property.id}`} className="font-medium hover:text-blue-600">
+                        {property.title}
+                      </Link>
+                      <div className="text-sm text-gray-500">
+                        Status: <span className={`font-medium ${
+                          property.status === 'ACTIVE' ? 'text-green-600' :
+                          property.status === 'SOLD' ? 'text-blue-600' :
+                          property.status === 'RENTED' ? 'text-purple-600' :
+                          'text-gray-600'
+                        }`}>{property.status}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6 text-sm">
+                    <div className="text-center">
+                      <div className="font-bold text-gray-900">{property.views}</div>
+                      <div className="text-gray-500">Views</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-bold text-gray-900">{property._count.favorites}</div>
+                      <div className="text-gray-500">Favorites</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Actions */}
       <Card>

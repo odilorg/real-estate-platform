@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ImageUploader } from '@/components/properties/ImageUploader'
 import { propertySchema, type PropertyFormData } from '@/lib/validations/property'
-import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Check, Loader2, MapPin } from 'lucide-react'
 
 const AMENITIES = [
   { value: 'PARKING', label: 'Parking' },
@@ -66,6 +66,8 @@ export default function EditPropertyPage() {
   const listingType = watch('listingType')
   const images = watch('images') || []
 
+  const [propertyStatus, setPropertyStatus] = useState('ACTIVE')
+
   // Fetch property data
   useEffect(() => {
     const fetchProperty = async () => {
@@ -74,6 +76,9 @@ export default function EditPropertyPage() {
         if (!response.ok) throw new Error('Property not found')
 
         const property = await response.json()
+
+        // Set status separately
+        setPropertyStatus(property.status || 'ACTIVE')
 
         // Pre-populate form
         reset({
@@ -87,6 +92,8 @@ export default function EditPropertyPage() {
           state: property.state || '',
           country: property.country || 'USA',
           zipCode: property.zipCode || '',
+          latitude: property.latitude || undefined,
+          longitude: property.longitude || undefined,
           bedrooms: property.bedrooms || undefined,
           bathrooms: property.bathrooms || undefined,
           area: property.area || undefined,
@@ -123,7 +130,7 @@ export default function EditPropertyPage() {
       const response = await fetch(`/api/properties/${propertyId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, status: propertyStatus }),
       })
 
       if (response.ok) {
@@ -139,6 +146,14 @@ export default function EditPropertyPage() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const onError = (formErrors: any) => {
+    console.log('Form validation errors:', formErrors)
+    const errorMessages = Object.entries(formErrors)
+      .map(([field, error]: [string, any]) => `${field}: ${error?.message}`)
+      .join('\n')
+    alert(`Please fix the following errors:\n${errorMessages}`)
   }
 
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 4))
@@ -206,7 +221,7 @@ export default function EditPropertyPage() {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit, onError)}>
             <Card>
               <CardHeader>
                 <CardTitle>
@@ -273,16 +288,37 @@ export default function EditPropertyPage() {
                       </div>
                     </div>
 
-                    <div>
-                      <Label htmlFor="price">Price ({listingType === 'RENT' ? '$ per month' : '$'}) *</Label>
-                      <Input
-                        id="price"
-                        type="number"
-                        {...register('price', { valueAsNumber: true })}
-                      />
-                      {errors.price && (
-                        <p className="text-sm text-red-600 mt-1">{errors.price.message}</p>
-                      )}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="price">Price ({listingType === 'RENT' ? '$ per month' : '$'}) *</Label>
+                        <Input
+                          id="price"
+                          type="number"
+                          {...register('price', { valueAsNumber: true })}
+                        />
+                        {errors.price && (
+                          <p className="text-sm text-red-600 mt-1">{errors.price.message}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <Label htmlFor="status">Status</Label>
+                        <Select
+                          value={propertyStatus}
+                          onValueChange={setPropertyStatus}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ACTIVE">Active</SelectItem>
+                            <SelectItem value="PENDING">Pending</SelectItem>
+                            <SelectItem value="SOLD">Sold</SelectItem>
+                            <SelectItem value="RENTED">Rented</SelectItem>
+                            <SelectItem value="DRAFT">Draft</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </>
                 )}
@@ -309,6 +345,45 @@ export default function EditPropertyPage() {
                       <div>
                         <Label htmlFor="state">State</Label>
                         <Input id="state" {...register('state')} />
+                      </div>
+                    </div>
+
+                    {/* GPS Coordinates */}
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex items-center gap-2 mb-3">
+                        <MapPin className="h-4 w-4 text-blue-600" />
+                        <Label className="font-medium">GPS Coordinates (for map display)</Label>
+                      </div>
+                      <p className="text-sm text-gray-500 mb-3">
+                        Enter coordinates to show your property on the map. You can find coordinates using Google Maps.
+                      </p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="latitude">Latitude</Label>
+                          <Input
+                            id="latitude"
+                            type="number"
+                            step="any"
+                            placeholder="e.g., 40.7128"
+                            {...register('latitude', { valueAsNumber: true })}
+                          />
+                          {errors.latitude && (
+                            <p className="text-sm text-red-600 mt-1">{errors.latitude.message}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Label htmlFor="longitude">Longitude</Label>
+                          <Input
+                            id="longitude"
+                            type="number"
+                            step="any"
+                            placeholder="e.g., -74.0060"
+                            {...register('longitude', { valueAsNumber: true })}
+                          />
+                          {errors.longitude && (
+                            <p className="text-sm text-red-600 mt-1">{errors.longitude.message}</p>
+                          )}
+                        </div>
                       </div>
                     </div>
 

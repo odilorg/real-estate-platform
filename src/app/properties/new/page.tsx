@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ImageUploader } from '@/components/properties/ImageUploader'
 import { propertySchema, type PropertyFormData } from '@/lib/validations/property'
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Check, MapPin } from 'lucide-react'
 
 const AMENITIES = [
   { value: 'PARKING', label: 'Parking' },
@@ -281,6 +281,45 @@ export default function CreatePropertyPage() {
                       <div>
                         <Label htmlFor="zipCode">Zip Code</Label>
                         <Input id="zipCode" {...register('zipCode')} placeholder="10001" />
+                      </div>
+                    </div>
+
+                    {/* GPS Coordinates */}
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex items-center gap-2 mb-3">
+                        <MapPin className="h-4 w-4 text-blue-600" />
+                        <Label className="font-medium">GPS Coordinates (for map display)</Label>
+                      </div>
+                      <p className="text-sm text-gray-500 mb-3">
+                        Enter coordinates to show your property on the map. You can find coordinates using Google Maps.
+                      </p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="latitude">Latitude</Label>
+                          <Input
+                            id="latitude"
+                            type="number"
+                            step="any"
+                            placeholder="e.g., 40.7128"
+                            {...register('latitude', { valueAsNumber: true })}
+                          />
+                          {errors.latitude && (
+                            <p className="text-sm text-red-600 mt-1">{errors.latitude.message}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Label htmlFor="longitude">Longitude</Label>
+                          <Input
+                            id="longitude"
+                            type="number"
+                            step="any"
+                            placeholder="e.g., -74.0060"
+                            {...register('longitude', { valueAsNumber: true })}
+                          />
+                          {errors.longitude && (
+                            <p className="text-sm text-red-600 mt-1">{errors.longitude.message}</p>
+                          )}
+                        </div>
                       </div>
                     </div>
 

@@ -5,8 +5,8 @@ import { MainLayout } from '@/components/layout'
 import { ImageGallery } from '@/components/properties/ImageGallery'
 import { PropertyCard } from '@/components/properties/PropertyCard'
 import { ContactOwnerButton } from '@/components/properties/ContactOwnerButton'
+import { PropertyPageActions, PropertySidebarActions } from '@/components/properties/PropertyPageActions'
 import { ReviewsSection } from '@/components/reviews/ReviewsSection'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -15,13 +15,12 @@ import {
   Bath,
   Maximize,
   Calendar,
-  Heart,
-  Share2,
   Building,
   Home,
   Check,
+  Eye,
 } from 'lucide-react'
-import { getPropertyById, getAllProperties } from '@/lib/db'
+import { getPropertyById, getAllProperties, incrementPropertyViews } from '@/lib/db'
 
 interface PropertyDetailPageProps {
   params: Promise<{
@@ -37,6 +36,9 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
   if (!property) {
     notFound()
   }
+
+  // Increment view count
+  await incrementPropertyViews(id)
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -98,14 +100,13 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                       </span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="icon">
-                      <Heart className="h-5 w-5" />
-                    </Button>
-                    <Button variant="outline" size="icon">
-                      <Share2 className="h-5 w-5" />
-                    </Button>
-                  </div>
+                  <PropertyPageActions
+                    propertyId={property.id}
+                    propertyTitle={property.title}
+                    propertyPrice={property.price}
+                    propertyCity={property.city}
+                    ownerId={property.userId}
+                  />
                 </div>
 
                 <div className="text-4xl font-bold text-blue-600">
@@ -242,6 +243,11 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     ownerId={property.userId}
                     currentUserId={userId || undefined}
                   />
+                  <PropertySidebarActions
+                    propertyId={property.id}
+                    propertyTitle={property.title}
+                    ownerId={property.userId}
+                  />
                 </CardContent>
               </Card>
 
@@ -270,6 +276,13 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     <span className="font-semibold">
                       {property.createdAt.toLocaleDateString()}
                     </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 flex items-center">
+                      <Eye className="h-4 w-4 mr-1" />
+                      Views:
+                    </span>
+                    <span className="font-semibold">{property.views}</span>
                   </div>
                 </CardContent>
               </Card>

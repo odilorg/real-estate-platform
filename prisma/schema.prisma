@@ -29,19 +29,50 @@ model Property {
   zipCode     String?
   latitude    Float?
   longitude   Float?
+  district    String?       // Neighborhood/District name
+  nearestMetro String?      // Nearest metro/transit station
+  metroDistance Int?        // Walking minutes to metro
 
-  // Property details
+  // Property details - Areas
   bedrooms    Int?
   bathrooms   Float?
-  area        Float?        // in sq ft
+  area        Float?        // Total area in sq ft/m²
+  livingArea  Float?        // Living area (excluding kitchen, bathroom)
+  kitchenArea Float?        // Kitchen area
+  rooms       Int?          // Total number of rooms
+
+  // Property details - Building info
   yearBuilt   Int?
   floor       Int?
   totalFloors Int?
-  parking     Int?
+  ceilingHeight Float?      // Ceiling height in meters/feet
+
+  // Property details - Features
+  parking     Int?          // Number of parking spaces
+  parkingType String?       // STREET, UNDERGROUND, GARAGE, MULTI_LEVEL
+  balcony     Int?          // Number of balconies
+  loggia      Int?          // Number of loggias
+
+  // Building characteristics
+  buildingType  String?     // BRICK, PANEL, MONOLITHIC, WOOD, BLOCK
+  buildingClass String?     // ECONOMY, COMFORT, BUSINESS, ELITE
+  buildingName  String?     // Name of residential complex
+  elevatorPassenger Int?    // Number of passenger elevators
+  elevatorCargo     Int?    // Number of cargo elevators
+  hasGarbageChute   Boolean @default(false)
+  hasConcierge      Boolean @default(false)
+  hasGatedArea      Boolean @default(false)
+
+  // Apartment condition
+  renovation    String?     // NONE, COSMETIC, EURO, DESIGNER, NEEDS_REPAIR
+  windowView    String?     // COURTYARD, STREET, PARK, WATER, PANORAMIC
+  bathroomType  String?     // COMBINED, SEPARATE, MULTIPLE
+  furnished     String?     // NONE, PARTIAL, FULL
 
   // Metadata
   views       Int           @default(0)
   featured    Boolean       @default(false)
+  verified    Boolean       @default(false)  // Verified listing badge
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -56,6 +87,7 @@ model Property {
   @@index([propertyType])
   @@index([listingType])
   @@index([price])
+  @@index([buildingClass])
 }
 
 // Property images
@@ -158,4 +190,65 @@ model SavedSearch {
   updatedAt            DateTime  @updatedAt
 
   @@index([userId])
+}
+
+// Viewing appointments/scheduling
+model Viewing {
+  id          String    @id @default(cuid())
+  propertyId  String
+  requesterId String    // User requesting the viewing
+  ownerId     String    // Property owner
+  date        DateTime
+  time        String    // Time slot like "10:00 AM"
+  status      String    @default("PENDING") // PENDING, CONFIRMED, CANCELLED, COMPLETED
+  message     String?   // Optional message from requester
+  notes       String?   // Notes from owner
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([propertyId])
+  @@index([requesterId])
+  @@index([ownerId])
+  @@index([date])
+}
+
+// Recently viewed properties
+model RecentlyViewed {
+  id          String    @id @default(cuid())
+  userId      String
+  propertyId  String
+  viewedAt    DateTime  @default(now())
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+  @@index([viewedAt])
+}
+
+// User profile with role for admin functionality
+model UserProfile {
+  id          String    @id @default(cuid())
+  clerkId     String    @unique  // Clerk user ID
+  role        String    @default("USER") // USER, AGENT, ADMIN
+  banned      Boolean   @default(false)
+  banReason   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([clerkId])
+  @@index([role])
+}
+
+// Admin action log for audit trail
+model AdminLog {
+  id          String    @id @default(cuid())
+  adminId     String    // Clerk user ID of admin
+  action      String    // Action type (BAN_USER, DELETE_PROPERTY, etc.)
+  targetType  String    // Type of target (USER, PROPERTY, REVIEW)
+  targetId    String    // ID of target
+  details     String?   // JSON details
+  createdAt   DateTime  @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
 }

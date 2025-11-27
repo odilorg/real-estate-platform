@@ -222,6 +222,7 @@ export interface CreatePropertyData {
   price: number
   propertyType: string
   listingType: string
+  status?: string
   address: string
   city: string
   state?: string
@@ -304,6 +305,7 @@ export async function updateProperty(
       ...(data.price && { price: data.price }),
       ...(data.propertyType && { propertyType: data.propertyType }),
       ...(data.listingType && { listingType: data.listingType }),
+      ...(data.status && { status: data.status }),
       ...(data.address && { address: data.address }),
       ...(data.city && { city: data.city }),
       ...(data.state !== undefined && { state: data.state }),
@@ -620,6 +622,141 @@ export async function deleteSavedSearch(id: string): Promise<boolean> {
   }
 }
 
+// ============ View Tracking ============
+
+export async function incrementPropertyViews(propertyId: string): Promise<void> {
+  await prisma.property.update({
+    where: { id: propertyId },
+    data: { views: { increment: 1 } },
+  })
+}
+
+export async function getPropertyStats(userId: string) {
+  const properties = await prisma.property.findMany({
+    where: { userId },
+    select: {
+      id: true,
+      title: true,
+      views: true,
+      status: true,
+      listingType: true,
+      _count: {
+        select: {
+          favorites: true,
+          reviews: true,
+        },
+      },
+    },
+  })
+
+  const totalViews = properties.reduce((sum, p) => sum + p.views, 0)
+  const totalFavorites = properties.reduce((sum, p) => sum + p._count.favorites, 0)
+  const totalInquiries = await prisma.conversation.count({
+    where: {
+      OR: properties.map(p => ({ propertyId: p.id })),
+    },
+  })
+
+  return {
+    properties,
+    totals: {
+      properties: properties.length,
+      views: totalViews,
+      favorites: totalFavorites,
+      inquiries: totalInquiries,
+      active: properties.filter(p => p.status === 'ACTIVE').length,
+      sold: properties.filter(p => p.status === 'SOLD').length,
+      rented: properties.filter(p => p.status === 'RENTED').length,
+    },
+  }
+}
+
+// ============ Viewing/Scheduling Operations ============
+
+export async function createViewing(data: {
+  propertyId: string
+  requesterId: string
+  ownerId: string
+  date: Date
+  time: string
+  message?: string
+}) {
+  return prisma.viewing.create({
+    data: {
+      propertyId: data.propertyId,
+      requesterId: data.requesterId,
+      ownerId: data.ownerId,
+      date: data.date,
+      time: data.time,
+      message: data.message,
+    },
+  })
+}
+
+export async function getViewingsByUserId(userId: string) {
+  return prisma.viewing.findMany({
+    where: {
+      OR: [{ requesterId: userId }, { ownerId: userId }],
+    },
+    orderBy: { date: 'asc' },
+  })
+}
+
+export async function getViewingsByPropertyId(propertyId: string) {
+  return prisma.viewing.findMany({
+    where: { propertyId },
+    orderBy: { date: 'asc' },
+  })
+}
+
+export async function updateViewingStatus(id: string, status: string, notes?: string) {
+  return prisma.viewing.update({
+    where: { id },
+    data: {
+      status,
+      ...(notes && { notes }),
+    },
+  })
+}
+
+export async function getViewingById(id: string) {
+  return prisma.viewing.findUnique({ where: { id } })
+}
+
+// ============ Recently Viewed Operations ============
+
+export async function addRecentlyViewed(userId: string, propertyId: string) {
+  return prisma.recentlyViewed.upsert({
+    where: { userId_propertyId: { userId, propertyId } },
+    update: { viewedAt: new Date() },
+    create: { userId, propertyId },
+  })
+}
+
+export async function getRecentlyViewed(userId: string, limit = 10): Promise<PropertyWithRelations[]> {
+  const recent = await prisma.recentlyViewed.findMany({
+    where: { userId },
+    orderBy: { viewedAt: 'desc' },
+    take: limit,
+  })
+
+  const propertyIds = recent.map(r => r.propertyId)
+
+  const properties = await prisma.property.findMany({
+    where: { id: { in: propertyIds } },
+    include: {
+      images: { orderBy: { order: 'asc' } },
+      amenities: true,
+    },
+  })
+
+  // Maintain order from recently viewed
+  return propertyIds
+    .map(id => properties.find(p => p.id === id))
+    .filter(Boolean)
+    .map(transformProperty) as PropertyWithRelations[]
+}
+
 // ============ Helper Functions ============
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -635,4 +772,156 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 
 function toRad(deg: number): number {
   return deg * (Math.PI / 180)
+}
+
+// ============ Admin Operations ============
+
+export async function getUserProfile(clerkId: string) {
+  return prisma.userProfile.findUnique({ where: { clerkId } })
+}
+
+export async function getOrCreateUserProfile(clerkId: string) {
+  return prisma.userProfile.upsert({
+    where: { clerkId },
+    update: {},
+    create: { clerkId },
+  })
+}
+
+export async function updateUserRole(clerkId: string, role: string) {
+  return prisma.userProfile.upsert({
+    where: { clerkId },
+    update: { role },
+    create: { clerkId, role },
+  })
+}
+
+export async function banUser(clerkId: string, reason?: string) {
+  return prisma.userProfile.upsert({
+    where: { clerkId },
+    update: { banned: true, banReason: reason },
+    create: { clerkId, banned: true, banReason: reason },
+  })
+}
+
+export async function unbanUser(clerkId: string) {
+  return prisma.userProfile.update({
+    where: { clerkId },
+    data: { banned: false, banReason: null },
+  })
+}
+
+export async function isUserAdmin(clerkId: string): Promise<boolean> {
+  const profile = await prisma.userProfile.findUnique({ where: { clerkId } })
+  return profile?.role === 'ADMIN'
+}
+
+export async function isUserBanned(clerkId: string): Promise<boolean> {
+  const profile = await prisma.userProfile.findUnique({ where: { clerkId } })
+  return profile?.banned ?? false
+}
+
+export async function getAllUserProfiles() {
+  return prisma.userProfile.findMany({
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+export async function logAdminAction(data: {
+  adminId: string
+  action: string
+  targetType: string
+  targetId: string
+  details?: string
+}) {
+  return prisma.adminLog.create({ data })
+}
+
+export async function getAdminLogs(limit = 100) {
+  return prisma.adminLog.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  })
+}
+
+// Admin stats
+export async function getAdminStats() {
+  const [
+    totalProperties,
+    totalReviews,
+    pendingReviews,
+    totalUsers,
+    totalViewings,
+    totalMessages,
+    recentProperties,
+  ] = await Promise.all([
+    prisma.property.count(),
+    prisma.review.count(),
+    prisma.review.count({ where: { approved: false } }),
+    prisma.userProfile.count(),
+    prisma.viewing.count(),
+    prisma.message.count(),
+    prisma.property.count({
+      where: {
+        createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+      },
+    }),
+  ])
+
+  return {
+    totalProperties,
+    totalReviews,
+    pendingReviews,
+    totalUsers,
+    totalViewings,
+    totalMessages,
+    recentProperties,
+  }
+}
+
+// Get all properties with user info (for admin)
+export async function getAdminProperties(filters?: {
+  status?: string
+  search?: string
+}) {
+  return prisma.property.findMany({
+    where: {
+      ...(filters?.status && { status: filters.status }),
+      ...(filters?.search && {
+        OR: [
+          { title: { contains: filters.search } },
+          { city: { contains: filters.search } },
+          { address: { contains: filters.search } },
+        ],
+      }),
+    },
+    include: {
+      images: { take: 1, orderBy: { order: 'asc' } },
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+// Get all reviews (for admin moderation)
+export async function getAdminReviews(filters?: { approved?: boolean }) {
+  return prisma.review.findMany({
+    where: filters?.approved !== undefined ? { approved: filters.approved } : {},
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+export async function approveReview(id: string) {
+  return prisma.review.update({
+    where: { id },
+    data: { approved: true },
+  })
+}
+
+export async function rejectReview(id: string) {
+  return prisma.review.delete({ where: { id } })
+}
+
+// Delete property (admin action)
+export async function adminDeleteProperty(id: string) {
+  return prisma.property.delete({ where: { id } })
 }
