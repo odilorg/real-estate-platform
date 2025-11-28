@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Home, Heart, DollarSign, TrendingUp, PlusCircle, Eye, MessageSquare, CheckCircle } from 'lucide-react'
@@ -33,6 +34,7 @@ interface Stats {
 
 export function OverviewTab() {
   const { user } = useUser()
+  const t = useTranslations('dashboard')
   const [stats, setStats] = useState<Stats>({
     totalProperties: 0,
     propertiesForSale: 0,
@@ -84,42 +86,42 @@ export function OverviewTab() {
 
   const statCards = [
     {
-      title: 'Total Properties',
+      title: t('totalProperties'),
       value: stats.totalProperties,
       icon: Home,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
     },
     {
-      title: 'Total Views',
+      title: t('totalViews'),
       value: stats.totalViews,
       icon: Eye,
       color: 'text-indigo-600',
       bgColor: 'bg-indigo-100',
     },
     {
-      title: 'Inquiries',
+      title: t('inquiries'),
       value: stats.totalInquiries,
       icon: MessageSquare,
       color: 'text-orange-600',
       bgColor: 'bg-orange-100',
     },
     {
-      title: 'Favorites',
+      title: t('favorites'),
       value: stats.totalFavorites,
       icon: Heart,
       color: 'text-red-600',
       bgColor: 'bg-red-100',
     },
     {
-      title: 'Sold',
+      title: t('sold'),
       value: stats.soldCount,
       icon: CheckCircle,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
     },
     {
-      title: 'Rented',
+      title: t('rented'),
       value: stats.rentedCount,
       icon: TrendingUp,
       color: 'text-purple-600',
@@ -147,22 +149,22 @@ export function OverviewTab() {
       <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
         <CardContent className="pt-6">
           <h2 className="text-2xl font-bold mb-2">
-            Welcome back, {user?.firstName || 'User'}! 👋
+            {t('welcomeUser', { name: user?.firstName || 'User' })} 👋
           </h2>
           <p className="text-blue-100 mb-4">
-            Here's what's happening with your properties today
+            {t('heresWhatsHappening')}
           </p>
           <div className="flex gap-3">
             <Link href="/properties/new">
               <Button size="sm" variant="secondary">
                 <PlusCircle className="h-4 w-4 mr-2" />
-                List New Property
+                {t('listNewProperty')}
               </Button>
             </Link>
             <Link href="/properties">
               <Button size="sm" variant="secondary">
                 <Eye className="h-4 w-4 mr-2" />
-                Browse Properties
+                {t('browseProperties')}
               </Button>
             </Link>
           </div>
@@ -192,7 +194,7 @@ export function OverviewTab() {
       {stats.topProperties.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Top Performing Properties</CardTitle>
+            <CardTitle>{t('topPerformingProperties')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -205,23 +207,23 @@ export function OverviewTab() {
                         {property.title}
                       </Link>
                       <div className="text-sm text-gray-500">
-                        Status: <span className={`font-medium ${
+                        {t('propertyStatus')}: <span className={`font-medium ${
                           property.status === 'ACTIVE' ? 'text-green-600' :
                           property.status === 'SOLD' ? 'text-blue-600' :
                           property.status === 'RENTED' ? 'text-purple-600' :
                           'text-gray-600'
-                        }`}>{property.status}</span>
+                        }`}>{t(property.status.toLowerCase() as any)}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-6 text-sm">
                     <div className="text-center">
                       <div className="font-bold text-gray-900">{property.views}</div>
-                      <div className="text-gray-500">Views</div>
+                      <div className="text-gray-500">{t('views')}</div>
                     </div>
                     <div className="text-center">
                       <div className="font-bold text-gray-900">{property._count.favorites}</div>
-                      <div className="text-gray-500">Favorites</div>
+                      <div className="text-gray-500">{t('favorites')}</div>
                     </div>
                   </div>
                 </div>
@@ -234,15 +236,15 @@ export function OverviewTab() {
       {/* Quick Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
+          <CardTitle>{t('quickActions')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <Link href="/dashboard?tab=properties">
             <Button variant="outline" className="w-full justify-start h-auto py-4">
               <Home className="h-5 w-5 mr-3 text-blue-600" />
               <div className="text-left">
-                <div className="font-semibold">Manage Properties</div>
-                <div className="text-sm text-gray-500">Edit or delete your listings</div>
+                <div className="font-semibold">{t('manageProperties')}</div>
+                <div className="text-sm text-gray-500">{t('managePropertiesDesc')}</div>
               </div>
             </Button>
           </Link>
@@ -251,8 +253,8 @@ export function OverviewTab() {
             <Button variant="outline" className="w-full justify-start h-auto py-4">
               <Heart className="h-5 w-5 mr-3 text-red-600" />
               <div className="text-left">
-                <div className="font-semibold">View Favorites</div>
-                <div className="text-sm text-gray-500">See properties you've saved</div>
+                <div className="font-semibold">{t('viewFavorites')}</div>
+                <div className="text-sm text-gray-500">{t('viewFavoritesDesc')}</div>
               </div>
             </Button>
           </Link>
@@ -261,8 +263,8 @@ export function OverviewTab() {
             <Button variant="outline" className="w-full justify-start h-auto py-4">
               <PlusCircle className="h-5 w-5 mr-3 text-green-600" />
               <div className="text-left">
-                <div className="font-semibold">List New Property</div>
-                <div className="text-sm text-gray-500">Add a property to the platform</div>
+                <div className="font-semibold">{t('listNewProperty')}</div>
+                <div className="text-sm text-gray-500">{t('addPropertyDesc')}</div>
               </div>
             </Button>
           </Link>
@@ -271,8 +273,8 @@ export function OverviewTab() {
             <Button variant="outline" className="w-full justify-start h-auto py-4">
               <Eye className="h-5 w-5 mr-3 text-purple-600" />
               <div className="text-left">
-                <div className="font-semibold">Browse Listings</div>
-                <div className="text-sm text-gray-500">Discover new properties</div>
+                <div className="font-semibold">{t('browseListings')}</div>
+                <div className="text-sm text-gray-500">{t('browseListingsDesc')}</div>
               </div>
             </Button>
           </Link>

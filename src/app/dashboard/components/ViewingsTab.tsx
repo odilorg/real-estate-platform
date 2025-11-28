@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -30,6 +31,7 @@ interface ViewingWithProperty extends Viewing {
 
 export function ViewingsTab() {
   const { user } = useUser()
+  const t = useTranslations('dashboard')
   const [viewings, setViewings] = useState<ViewingWithProperty[]>([])
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState<string | null>(null)
@@ -108,7 +110,7 @@ export function ViewingsTab() {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        <span className="ml-3 text-gray-600">Loading viewings...</span>
+        <span className="ml-3 text-gray-600">{t('loadingViewings')}</span>
       </div>
     )
   }
@@ -138,13 +140,13 @@ export function ViewingsTab() {
 
             {viewing.message && (
               <p className="text-sm text-gray-600 mt-2">
-                <span className="font-medium">Message:</span> {viewing.message}
+                <span className="font-medium">{t('message')}:</span> {viewing.message}
               </p>
             )}
 
             {viewing.notes && (
               <p className="text-sm text-gray-600">
-                <span className="font-medium">Notes:</span> {viewing.notes}
+                <span className="font-medium">{t('notes')}:</span> {viewing.notes}
               </p>
             )}
           </div>
@@ -164,7 +166,7 @@ export function ViewingsTab() {
                   ) : (
                     <>
                       <Check className="h-4 w-4 mr-1" />
-                      Confirm
+                      {t('confirm')}
                     </>
                   )}
                 </Button>
@@ -175,7 +177,7 @@ export function ViewingsTab() {
                   disabled={updating === viewing.id}
                 >
                   <X className="h-4 w-4 mr-1" />
-                  Decline
+                  {t('decline')}
                 </Button>
               </div>
             )}
@@ -187,7 +189,7 @@ export function ViewingsTab() {
                 onClick={() => updateStatus(viewing.id, 'COMPLETED')}
                 disabled={updating === viewing.id}
               >
-                Mark Completed
+                {t('markCompleted')}
               </Button>
             )}
 
@@ -198,7 +200,7 @@ export function ViewingsTab() {
                 onClick={() => updateStatus(viewing.id, 'CANCELLED')}
                 disabled={updating === viewing.id}
               >
-                Cancel Request
+                {t('cancelRequest')}
               </Button>
             )}
           </div>
@@ -210,19 +212,19 @@ export function ViewingsTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Viewings</h2>
+        <h2 className="text-2xl font-bold">{t('viewings')}</h2>
         <p className="text-gray-600 mt-1">
-          Manage your property viewing requests
+          {t('viewingsSubtitle')}
         </p>
       </div>
 
       <Tabs defaultValue="incoming" className="space-y-4">
         <TabsList>
           <TabsTrigger value="incoming">
-            Incoming Requests ({incomingRequests.length})
+            {t('incomingRequests')} ({incomingRequests.length})
           </TabsTrigger>
           <TabsTrigger value="my-requests">
-            My Requests ({myRequests.length})
+            {t('myRequests')} ({myRequests.length})
           </TabsTrigger>
         </TabsList>
 
@@ -232,10 +234,10 @@ export function ViewingsTab() {
               <CardContent className="pt-6 text-center py-12">
                 <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  No incoming requests
+                  {t('noIncomingRequests')}
                 </h3>
                 <p className="text-gray-600">
-                  When someone requests to view your properties, they'll appear here.
+                  {t('noIncomingRequestsDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -250,13 +252,13 @@ export function ViewingsTab() {
               <CardContent className="pt-6 text-center py-12">
                 <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  No viewing requests
+                  {t('noViewingRequests')}
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  You haven't requested any property viewings yet.
+                  {t('noViewingRequestsDesc')}
                 </p>
                 <Link href="/properties">
-                  <Button>Browse Properties</Button>
+                  <Button>{t('browseProperties')}</Button>
                 </Link>
               </CardContent>
             </Card>

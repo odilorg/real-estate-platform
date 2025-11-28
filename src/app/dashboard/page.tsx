@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { MainLayout } from '@/components/layout'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Loader2 } from 'lucide-react'
@@ -15,11 +16,12 @@ import { SettingsTab } from './components/SettingsTab'
 import { SavedSearches } from '@/components/search/SavedSearches'
 
 function DashboardLoading() {
+  const t = useTranslations('dashboard')
   return (
     <MainLayout>
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        <span className="ml-3 text-gray-600">Loading dashboard...</span>
+        <span className="ml-3 text-gray-600">{t('loading')}</span>
       </div>
     </MainLayout>
   )
@@ -37,6 +39,7 @@ function DashboardContent() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('dashboard')
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview')
 
   useEffect(() => {
@@ -57,7 +60,7 @@ function DashboardContent() {
       <MainLayout>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <span className="ml-3 text-gray-600">Loading dashboard...</span>
+          <span className="ml-3 text-gray-600">{t('loading')}</span>
         </div>
       </MainLayout>
     )
@@ -69,9 +72,9 @@ function DashboardContent() {
         {/* Header */}
         <div className="bg-white border-b">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+            <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
             <p className="text-gray-600">
-              Welcome back, {user.firstName || user.username || 'User'}!
+              {t('welcomeUser', { name: user.firstName || user.username || 'User' })}
             </p>
           </div>
         </div>
@@ -81,13 +84,13 @@ function DashboardContent() {
           <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
             {/* Tab Navigation */}
             <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 lg:w-auto lg:inline-flex">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="properties">My Properties</TabsTrigger>
-              <TabsTrigger value="favorites">Favorites</TabsTrigger>
-              <TabsTrigger value="viewings">Viewings</TabsTrigger>
-              <TabsTrigger value="searches">Saved Searches</TabsTrigger>
-              <TabsTrigger value="messages">Messages</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
+              <TabsTrigger value="overview">{t('overview')}</TabsTrigger>
+              <TabsTrigger value="properties">{t('myProperties')}</TabsTrigger>
+              <TabsTrigger value="favorites">{t('favorites')}</TabsTrigger>
+              <TabsTrigger value="viewings">{t('viewings')}</TabsTrigger>
+              <TabsTrigger value="searches">{t('savedSearches')}</TabsTrigger>
+              <TabsTrigger value="messages">{t('messages')}</TabsTrigger>
+              <TabsTrigger value="settings">{t('settings')}</TabsTrigger>
             </TabsList>
 
             {/* Tab Contents */}

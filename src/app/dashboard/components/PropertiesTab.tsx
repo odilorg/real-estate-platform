@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -30,6 +31,7 @@ interface Property {
 }
 
 export function PropertiesTab() {
+  const t = useTranslations('dashboard')
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -96,7 +98,7 @@ export function PropertiesTab() {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        <span className="ml-3 text-gray-600">Loading your properties...</span>
+        <span className="ml-3 text-gray-600">{t('loadingProperties')}</span>
       </div>
     )
   }
@@ -107,14 +109,14 @@ export function PropertiesTab() {
         <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
           <Home className="h-10 w-10 text-gray-400" />
         </div>
-        <h3 className="text-2xl font-semibold text-gray-900 mb-2">No properties listed yet</h3>
+        <h3 className="text-2xl font-semibold text-gray-900 mb-2">{t('noProperties')}</h3>
         <p className="text-gray-600 mb-6 max-w-md mx-auto">
-          Start earning by listing your first property on the platform
+          {t('noPropertiesDesc')}
         </p>
         <Link href="/properties/new">
           <Button size="lg">
             <PlusCircle className="h-5 w-5 mr-2" />
-            List Your First Property
+            {t('addFirstProperty')}
           </Button>
         </Link>
       </div>
@@ -126,15 +128,15 @@ export function PropertiesTab() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">My Properties</h2>
+          <h2 className="text-2xl font-bold">{t('myProperties')}</h2>
           <p className="text-gray-600 mt-1">
-            {properties.length} {properties.length === 1 ? 'property' : 'properties'} listed
+            {t('propertiesListed', { count: properties.length })}
           </p>
         </div>
         <Link href="/properties/new">
           <Button>
             <PlusCircle className="h-4 w-4 mr-2" />
-            Add New
+            {t('addNew')}
           </Button>
         </Link>
       </div>
@@ -153,7 +155,7 @@ export function PropertiesTab() {
               />
               <div className="absolute top-2 left-2 flex gap-2">
                 <Badge variant="secondary" className="bg-white/90">
-                  {property.listingType === 'SALE' ? 'For Sale' : 'For Rent'}
+                  {property.listingType === 'SALE' ? t('forSale') : t('forRent')}
                 </Badge>
               </div>
             </div>
@@ -203,13 +205,13 @@ export function PropertiesTab() {
                 <Link href={`/properties/${property.id}`} className="flex-1">
                   <Button variant="outline" size="sm" className="w-full">
                     <Eye className="h-4 w-4 mr-1" />
-                    View
+                    {t('viewProperty')}
                   </Button>
                 </Link>
                 <Link href={`/properties/${property.id}/edit`} className="flex-1">
                   <Button variant="outline" size="sm" className="w-full">
                     <Edit className="h-4 w-4 mr-1" />
-                    Edit
+                    {t('editProperty')}
                   </Button>
                 </Link>
                 <Button

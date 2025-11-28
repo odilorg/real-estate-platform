@@ -1,14 +1,17 @@
 "use client"
 
+import { useTranslations } from 'next-intl'
 import { Card, CardContent } from '@/components/ui/card'
 import { MessageSquare } from 'lucide-react'
 
 export function MessagesTab() {
+  const t = useTranslations('dashboard')
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Messages</h2>
-        <p className="text-gray-600 mt-1">Communicate with buyers and sellers</p>
+        <h2 className="text-2xl font-bold">{t('messages')}</h2>
+        <p className="text-gray-600 mt-1">{t('messagesSubtitle')}</p>
       </div>
 
       <Card>
@@ -16,10 +19,9 @@ export function MessagesTab() {
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
             <MessageSquare className="h-10 w-10 text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Messages Coming Soon</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('messagesComingSoon')}</h3>
           <p className="text-gray-600 max-w-md mx-auto">
-            The messaging feature is under development. Soon you'll be able to chat directly with
-            property owners and interested buyers.
+            {t('messagesComingSoonDesc')}
           </p>
         </CardContent>
       </Card>

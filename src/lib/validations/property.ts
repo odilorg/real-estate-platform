@@ -12,6 +12,37 @@ export const WINDOW_VIEWS = ['COURTYARD', 'STREET', 'PARK', 'WATER', 'PANORAMIC'
 export const BATHROOM_TYPES = ['COMBINED', 'SEPARATE', 'MULTIPLE'] as const
 export const FURNISHED_TYPES = ['NONE', 'PARTIAL', 'FULL'] as const
 
+// Helper to handle empty number inputs (converts NaN and empty strings to undefined)
+const optionalNumber = z.preprocess(
+  (val) => {
+    if (val === '' || val === null || val === undefined || (typeof val === 'number' && isNaN(val))) {
+      return undefined
+    }
+    return typeof val === 'string' ? parseFloat(val) : val
+  },
+  z.number().optional()
+)
+
+const optionalPositiveNumber = z.preprocess(
+  (val) => {
+    if (val === '' || val === null || val === undefined || (typeof val === 'number' && isNaN(val))) {
+      return undefined
+    }
+    return typeof val === 'string' ? parseFloat(val) : val
+  },
+  z.number().positive('Must be a positive number').optional()
+)
+
+const optionalNonNegativeInt = z.preprocess(
+  (val) => {
+    if (val === '' || val === null || val === undefined || (typeof val === 'number' && isNaN(val))) {
+      return undefined
+    }
+    return typeof val === 'string' ? parseInt(val, 10) : val
+  },
+  z.number().int('Must be a whole number').min(0, 'Cannot be negative').optional()
+)
+
 export const propertySchema = z.object({
   // Basic Information
   title: z.string().min(10, 'Title must be at least 10 characters').max(100, 'Title too long'),
@@ -27,38 +58,50 @@ export const propertySchema = z.object({
   state: z.string().optional(),
   country: z.string().optional(),
   zipCode: z.string().optional(),
-  latitude: z.number().min(-90).max(90).optional(),
-  longitude: z.number().min(-180).max(180).optional(),
+  latitude: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined || (typeof val === 'number' && isNaN(val))) ? undefined : val,
+    z.number().min(-90, 'Latitude must be between -90 and 90').max(90, 'Latitude must be between -90 and 90').optional()
+  ),
+  longitude: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined || (typeof val === 'number' && isNaN(val))) ? undefined : val,
+    z.number().min(-180, 'Longitude must be between -180 and 180').max(180, 'Longitude must be between -180 and 180').optional()
+  ),
   district: z.string().optional(),
   nearestMetro: z.string().optional(),
-  metroDistance: z.number().int().min(0).optional(),
+  metroDistance: optionalNonNegativeInt,
 
   // Property Details - Areas
-  bedrooms: z.number().int().min(0).optional(),
-  bathrooms: z.number().min(0).optional(),
-  area: z.number().positive().optional(),
-  livingArea: z.number().positive().optional(),
-  kitchenArea: z.number().positive().optional(),
-  rooms: z.number().int().min(0).optional(),
+  bedrooms: optionalNonNegativeInt,
+  bathrooms: optionalPositiveNumber,
+  area: optionalPositiveNumber,
+  livingArea: optionalPositiveNumber,
+  kitchenArea: optionalPositiveNumber,
+  rooms: optionalNonNegativeInt,
 
   // Property Details - Building info
-  yearBuilt: z.number().int().min(1800).max(new Date().getFullYear() + 1).optional(),
-  floor: z.number().int().min(0).optional(),
-  totalFloors: z.number().int().min(1).optional(),
-  ceilingHeight: z.number().positive().optional(),
+  yearBuilt: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined || (typeof val === 'number' && isNaN(val))) ? undefined : val,
+    z.number().int('Year must be a whole number').min(1800, 'Year must be after 1800').max(new Date().getFullYear() + 1, 'Invalid year').optional()
+  ),
+  floor: optionalNonNegativeInt,
+  totalFloors: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined || (typeof val === 'number' && isNaN(val))) ? undefined : val,
+    z.number().int('Must be a whole number').min(1, 'Building must have at least 1 floor').optional()
+  ),
+  ceilingHeight: optionalPositiveNumber,
 
   // Property Details - Features
-  parking: z.number().int().min(0).optional(),
+  parking: optionalNonNegativeInt,
   parkingType: z.enum(PARKING_TYPES).optional(),
-  balcony: z.number().int().min(0).optional(),
-  loggia: z.number().int().min(0).optional(),
+  balcony: optionalNonNegativeInt,
+  loggia: optionalNonNegativeInt,
 
   // Building characteristics
   buildingType: z.enum(BUILDING_TYPES).optional(),
   buildingClass: z.enum(BUILDING_CLASSES).optional(),
   buildingName: z.string().optional(),
-  elevatorPassenger: z.number().int().min(0).optional(),
-  elevatorCargo: z.number().int().min(0).optional(),
+  elevatorPassenger: optionalNonNegativeInt,
+  elevatorCargo: optionalNonNegativeInt,
   hasGarbageChute: z.boolean().optional(),
   hasConcierge: z.boolean().optional(),
   hasGatedArea: z.boolean().optional(),

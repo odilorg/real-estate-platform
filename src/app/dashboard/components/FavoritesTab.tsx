@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { PropertyCard } from '@/components/properties/PropertyCard'
 import { Button } from '@/components/ui/button'
 import { Heart, Loader2 } from 'lucide-react'
@@ -8,6 +9,8 @@ import Link from 'next/link'
 import type { Property } from '@/types'
 
 export function FavoritesTab() {
+  const t = useTranslations('dashboard')
+  const tFav = useTranslations('favorites')
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -33,7 +36,7 @@ export function FavoritesTab() {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        <span className="ml-3 text-gray-600">Loading favorites...</span>
+        <span className="ml-3 text-gray-600">{t('loadingFavorites')}</span>
       </div>
     )
   }
@@ -44,12 +47,12 @@ export function FavoritesTab() {
         <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
           <Heart className="h-10 w-10 text-gray-400" />
         </div>
-        <h3 className="text-2xl font-semibold text-gray-900 mb-2">No favorites yet</h3>
+        <h3 className="text-2xl font-semibold text-gray-900 mb-2">{tFav('noFavorites')}</h3>
         <p className="text-gray-600 mb-6 max-w-md mx-auto">
-          Browse properties and click the heart icon to save your favorites
+          {tFav('noFavoritesDesc')}
         </p>
         <Link href="/properties">
-          <Button size="lg">Browse Properties</Button>
+          <Button size="lg">{tFav('browseProperties')}</Button>
         </Link>
       </div>
     )
@@ -58,9 +61,9 @@ export function FavoritesTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">My Favorites</h2>
+        <h2 className="text-2xl font-bold">{t('favorites')}</h2>
         <p className="text-gray-600 mt-1">
-          {properties.length} {properties.length === 1 ? 'property' : 'properties'} saved
+          {t('propertiesListed', { count: properties.length })}
         </p>
       </div>
 

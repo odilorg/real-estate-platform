@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from 'next-intl'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,18 +21,19 @@ interface DeleteModalProps {
 }
 
 export function DeleteModal({ open, onOpenChange, onConfirm, isDeleting }: DeleteModalProps) {
+  const t = useTranslations('dashboard')
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Property</AlertDialogTitle>
+          <AlertDialogTitle>{t('deleteProperty')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this property? This action cannot be undone.
-            The property will be permanently removed from the platform.
+            {t('deletePropertyConfirm')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             disabled={isDeleting}
@@ -40,10 +42,10 @@ export function DeleteModal({ open, onOpenChange, onConfirm, isDeleting }: Delet
             {isDeleting ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Deleting...
+                {t('deleting')}
               </>
             ) : (
-              'Delete Property'
+              t('deleteProperty')
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

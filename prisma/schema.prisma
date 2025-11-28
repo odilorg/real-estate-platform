@@ -234,8 +234,105 @@ model UserProfile {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  // Agent relation (if user is an agent)
+  agent       Agent?
+
   @@index([clerkId])
   @@index([role])
+}
+
+// Real Estate Agency
+model Agency {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  logo            String?   // Logo URL
+  description     String?
+  website         String?
+  email           String?
+  phone           String?
+  address         String?
+  city            String?
+
+  // Stats
+  yearsOnPlatform Int       @default(0)
+  verified        Boolean   @default(false)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  agents          Agent[]
+
+  @@index([slug])
+  @@index([city])
+}
+
+// Real Estate Agent
+model Agent {
+  id              String    @id @default(cuid())
+  userId          String    @unique  // Clerk user ID
+  agencyId        String?   // Optional - can be independent agent
+
+  // Profile info
+  firstName       String
+  lastName        String
+  photo           String?   // Profile photo URL
+  bio             String?
+  phone           String?
+  email           String?
+  whatsapp        String?
+  telegram        String?
+
+  // Professional info
+  licenseNumber   String?
+  specializations String?   // JSON array: ["residential", "commercial", "luxury"]
+  languages       String?   // JSON array: ["en", "ru", "uz"]
+  areasServed     String?   // JSON array of cities/districts
+
+  // Stats & badges
+  yearsExperience Int       @default(0)
+  totalDeals      Int       @default(0)
+  verified        Boolean   @default(false)
+  superAgent      Boolean   @default(false)  // Top performer badge
+  responseTime    String?   // "fast", "medium", "slow"
+  rating          Float     @default(0)
+  reviewCount     Int       @default(0)
+
+  // Settings
+  showPhone       Boolean   @default(true)
+  showEmail       Boolean   @default(true)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  userProfile     UserProfile @relation(fields: [userId], references: [clerkId])
+  agency          Agency?     @relation(fields: [agencyId], references: [id])
+  reviews         AgentReview[]
+
+  @@index([userId])
+  @@index([agencyId])
+  @@index([superAgent])
+  @@index([verified])
+}
+
+// Agent Reviews
+model AgentReview {
+  id          String    @id @default(cuid())
+  agentId     String
+  userId      String    // Clerk user ID of reviewer
+  rating      Int       // 1-5
+  comment     String?
+  dealType    String?   // "bought", "sold", "rented"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  agent       Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, userId])
+  @@index([agentId])
+  @@index([userId])
 }
 
 // Admin action log for audit trail

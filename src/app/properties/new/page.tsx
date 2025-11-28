@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 import { MainLayout } from '@/components/layout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -40,39 +41,50 @@ import {
   FileText
 } from 'lucide-react'
 
-const AMENITIES = [
-  { value: 'PARKING', label: 'Parking' },
-  { value: 'GARAGE', label: 'Garage' },
-  { value: 'POOL', label: 'Pool' },
-  { value: 'GARDEN', label: 'Garden' },
-  { value: 'BALCONY', label: 'Balcony' },
-  { value: 'ELEVATOR', label: 'Elevator' },
-  { value: 'SECURITY', label: 'Security' },
-  { value: 'GYM', label: 'Gym' },
-  { value: 'AIR_CONDITIONING', label: 'Air Conditioning' },
-  { value: 'HEATING', label: 'Heating' },
-  { value: 'FURNISHED', label: 'Furnished' },
-  { value: 'PET_FRIENDLY', label: 'Pet Friendly' },
-  { value: 'INTERNET', label: 'High-Speed Internet' },
-  { value: 'DISHWASHER', label: 'Dishwasher' },
-  { value: 'WASHING_MACHINE', label: 'Washing Machine' },
-  { value: 'FIREPLACE', label: 'Fireplace' },
-  { value: 'STORAGE', label: 'Storage' },
+const AMENITY_KEYS = [
+  'PARKING',
+  'GARAGE',
+  'POOL',
+  'GARDEN',
+  'BALCONY',
+  'ELEVATOR',
+  'SECURITY',
+  'GYM',
+  'AIR_CONDITIONING',
+  'HEATING',
+  'FURNISHED',
+  'PET_FRIENDLY',
+  'INTERNET',
+  'DISHWASHER',
+  'WASHING_MACHINE',
+  'FIREPLACE',
+  'STORAGE',
 ] as const
 
-const STEPS = [
-  { number: 1, title: 'Basics', icon: Home },
-  { number: 2, title: 'Location', icon: MapPin },
-  { number: 3, title: 'Details', icon: Ruler },
-  { number: 4, title: 'Condition', icon: Paintbrush },
-  { number: 5, title: 'Photos', icon: Camera },
-  { number: 6, title: 'Description', icon: FileText },
-]
+const STEP_ICONS = [Home, MapPin, Ruler, Paintbrush, Camera, FileText]
 
 export default function CreatePropertyPage() {
   const router = useRouter()
+  const t = useTranslations('properties.form')
+  const tTypes = useTranslations('properties.types')
+  const tListingTypes = useTranslations('properties.listingTypes')
+  const tBuildingClasses = useTranslations('properties.buildingClasses')
+  const tRenovation = useTranslations('properties.renovationTypes')
+  const tParking = useTranslations('properties.parkingTypes')
+  const tAmenities = useTranslations('amenities')
+  const tCommon = useTranslations('common')
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Translated step titles
+  const STEPS = [
+    { number: 1, title: t('steps.basics'), desc: t('steps.basicsDesc'), icon: Home },
+    { number: 2, title: t('steps.location'), desc: t('steps.locationDesc'), icon: MapPin },
+    { number: 3, title: t('steps.details'), desc: t('steps.detailsDesc'), icon: Ruler },
+    { number: 4, title: t('steps.condition'), desc: t('steps.conditionDesc'), icon: Paintbrush },
+    { number: 5, title: t('steps.photos'), desc: t('steps.photosDesc'), icon: Camera },
+    { number: 6, title: t('steps.description'), desc: t('steps.descriptionDesc'), icon: FileText },
+  ]
 
   const {
     register,
@@ -140,12 +152,63 @@ export default function CreatePropertyPage() {
     }
   }
 
+  // Field name translations for error messages
+  const fieldLabels: Record<string, string> = {
+    title: t('title'),
+    description: t('description'),
+    propertyType: t('propertyType'),
+    listingType: t('listingType'),
+    price: t('price'),
+    address: t('address'),
+    city: t('city'),
+    state: t('state'),
+    zipCode: t('zipCode'),
+    district: t('district'),
+    latitude: t('latitude'),
+    longitude: t('longitude'),
+    nearestMetro: t('nearestMetro'),
+    metroDistance: t('metroDistance'),
+    area: t('area'),
+    livingArea: t('livingArea'),
+    kitchenArea: t('kitchenArea'),
+    rooms: t('rooms'),
+    bedrooms: t('bedrooms'),
+    bathrooms: t('bathrooms'),
+    floor: t('floor'),
+    totalFloors: t('totalFloors'),
+    yearBuilt: t('yearBuilt'),
+    ceilingHeight: t('ceilingHeight'),
+    balcony: t('balconies'),
+    loggia: t('loggia') || 'Loggia',
+    parking: t('parkingSpaces'),
+    elevatorPassenger: t('elevatorPassenger'),
+    elevatorCargo: t('elevatorCargo'),
+    images: t('images'),
+  }
+
   const onError = (formErrors: any) => {
     console.log('Form validation errors:', formErrors)
-    const errorMessages = Object.entries(formErrors)
-      .map(([field, error]: [string, any]) => `${field}: ${error?.message}`)
-      .join('\n')
-    toast.error(`Please fix validation errors:\n${errorMessages}`)
+    const errorList = Object.entries(formErrors)
+      .map(([field, error]: [string, any]) => {
+        const label = fieldLabels[field] || field
+        return `• ${label}: ${error?.message}`
+      })
+
+    // Show a more user-friendly toast with the first few errors
+    const displayErrors = errorList.slice(0, 5)
+    const remaining = errorList.length - 5
+
+    toast.error(
+      <div className="space-y-1">
+        <p className="font-medium">{tCommon('fixErrors') || 'Please fix the following errors:'}</p>
+        {displayErrors.map((err, i) => (
+          <p key={i} className="text-sm">{err}</p>
+        ))}
+        {remaining > 0 && (
+          <p className="text-sm text-gray-400">...and {remaining} more</p>
+        )}
+      </div>
+    )
   }
 
   // Define which fields to validate per step
@@ -220,15 +283,10 @@ export default function CreatePropertyPage() {
                     const Icon = STEPS[currentStep - 1].icon
                     return Icon ? <Icon className="h-5 w-5" /> : null
                   })()}
-                  Step {currentStep}: {STEPS[currentStep - 1].title}
+                  {STEPS[currentStep - 1].title}
                 </CardTitle>
                 <CardDescription>
-                  {currentStep === 1 && 'Basic property information'}
-                  {currentStep === 2 && 'Property location and address'}
-                  {currentStep === 3 && 'Property specifications and building details'}
-                  {currentStep === 4 && 'Apartment condition and features'}
-                  {currentStep === 5 && 'Upload property photos'}
-                  {currentStep === 6 && 'Description and amenities'}
+                  {STEPS[currentStep - 1].desc}
                 </CardDescription>
               </CardHeader>
 
@@ -237,11 +295,11 @@ export default function CreatePropertyPage() {
                 {currentStep === 1 && (
                   <>
                     <div>
-                      <Label htmlFor="title">Property Title *</Label>
+                      <Label htmlFor="title">{t('title')} *</Label>
                       <Input
                         id="title"
                         {...register('title')}
-                        placeholder="e.g., Modern 3-Room Apartment in City Center"
+                        placeholder={t('titlePlaceholder')}
                       />
                       {errors.title && (
                         <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>
@@ -250,18 +308,18 @@ export default function CreatePropertyPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label>Property Type *</Label>
+                        <Label>{t('propertyType')} *</Label>
                         <Select
                           value={propertyType}
                           onValueChange={(value) => setValue('propertyType', value as any)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
+                            <SelectValue placeholder={tCommon('any')} />
                           </SelectTrigger>
                           <SelectContent>
                             {PROPERTY_TYPES.map(type => (
                               <SelectItem key={type} value={type}>
-                                {LABELS.propertyType[type]}
+                                {tTypes(type.toLowerCase() as any)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -272,18 +330,18 @@ export default function CreatePropertyPage() {
                       </div>
 
                       <div>
-                        <Label>Listing Type *</Label>
+                        <Label>{t('listingType')} *</Label>
                         <Select
                           value={listingType}
                           onValueChange={(value) => setValue('listingType', value as any)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
+                            <SelectValue placeholder={tCommon('any')} />
                           </SelectTrigger>
                           <SelectContent>
                             {LISTING_TYPES.map(type => (
                               <SelectItem key={type} value={type}>
-                                {LABELS.listingType[type]}
+                                {tListingTypes(type.toLowerCase() as any)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -297,13 +355,13 @@ export default function CreatePropertyPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="price">
-                          Price ({listingType === 'RENT' ? '$ per month' : '$'}) *
+                          {t('price')} ({listingType === 'RENT' ? t('pricePerMonth') : '$'}) *
                         </Label>
                         <Input
                           id="price"
                           type="number"
                           {...register('price', { valueAsNumber: true })}
-                          placeholder="e.g., 250000"
+                          placeholder="250000"
                         />
                         {errors.price && (
                           <p className="text-sm text-red-600 mt-1">{errors.price.message}</p>
@@ -311,18 +369,18 @@ export default function CreatePropertyPage() {
                       </div>
 
                       <div>
-                        <Label>Building Class</Label>
+                        <Label>{t('buildingClass')}</Label>
                         <Select
                           value={buildingClass}
                           onValueChange={(value) => setValue('buildingClass', value as any)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select class" />
+                            <SelectValue placeholder={tCommon('any')} />
                           </SelectTrigger>
                           <SelectContent>
                             {BUILDING_CLASSES.map(cls => (
                               <SelectItem key={cls} value={cls}>
-                                {LABELS.buildingClass[cls]}
+                                {tBuildingClasses(cls.toLowerCase() as any)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -331,11 +389,11 @@ export default function CreatePropertyPage() {
                     </div>
 
                     <div>
-                      <Label htmlFor="buildingName">Building/Complex Name</Label>
+                      <Label htmlFor="buildingName">{t('buildingName')}</Label>
                       <Input
                         id="buildingName"
                         {...register('buildingName')}
-                        placeholder="e.g., Riverside Tower, Park View Residences"
+                        placeholder={t('buildingNamePlaceholder')}
                       />
                     </div>
                   </>
@@ -345,11 +403,11 @@ export default function CreatePropertyPage() {
                 {currentStep === 2 && (
                   <>
                     <div>
-                      <Label htmlFor="address">Street Address *</Label>
+                      <Label htmlFor="address">{t('address')} *</Label>
                       <Input
                         id="address"
                         {...register('address')}
-                        placeholder="123 Main Street, Apt 4B"
+                        placeholder={t('addressPlaceholder')}
                       />
                       {errors.address && (
                         <p className="text-sm text-red-600 mt-1">{errors.address.message}</p>
@@ -358,48 +416,47 @@ export default function CreatePropertyPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="city">City *</Label>
-                        <Input id="city" {...register('city')} placeholder="New York" />
+                        <Label htmlFor="city">{t('city')} *</Label>
+                        <Input id="city" {...register('city')} />
                         {errors.city && (
                           <p className="text-sm text-red-600 mt-1">{errors.city.message}</p>
                         )}
                       </div>
                       <div>
-                        <Label htmlFor="state">State/Region</Label>
-                        <Input id="state" {...register('state')} placeholder="NY" />
+                        <Label htmlFor="state">{t('state')}</Label>
+                        <Input id="state" {...register('state')} />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="zipCode">Zip/Postal Code</Label>
-                        <Input id="zipCode" {...register('zipCode')} placeholder="10001" />
+                        <Label htmlFor="zipCode">{t('zipCode')}</Label>
+                        <Input id="zipCode" {...register('zipCode')} />
                       </div>
                       <div>
-                        <Label htmlFor="district">District/Neighborhood</Label>
-                        <Input id="district" {...register('district')} placeholder="Manhattan" />
+                        <Label htmlFor="district">{t('district')}</Label>
+                        <Input id="district" {...register('district')} />
                       </div>
                     </div>
 
                     {/* Metro/Transit */}
                     <div className="border rounded-lg p-4 bg-blue-50">
-                      <Label className="font-medium text-blue-900">Public Transit</Label>
+                      <Label className="font-medium text-blue-900">{t('publicTransit')}</Label>
                       <div className="grid grid-cols-2 gap-4 mt-3">
                         <div>
-                          <Label htmlFor="nearestMetro">Nearest Metro/Station</Label>
+                          <Label htmlFor="nearestMetro">{t('nearestMetro')}</Label>
                           <Input
                             id="nearestMetro"
                             {...register('nearestMetro')}
-                            placeholder="e.g., Times Square"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="metroDistance">Walking Distance (minutes)</Label>
+                          <Label htmlFor="metroDistance">{t('metroDistance')}</Label>
                           <Input
                             id="metroDistance"
                             type="number"
                             {...register('metroDistance', { valueAsNumber: true })}
-                            placeholder="e.g., 5"
+                            placeholder="5"
                           />
                         </div>
                       </div>
@@ -407,28 +464,28 @@ export default function CreatePropertyPage() {
 
                     {/* GPS Coordinates */}
                     <div className="border rounded-lg p-4 bg-gray-50">
-                      <Label className="font-medium">GPS Coordinates (for map)</Label>
+                      <Label className="font-medium">{t('gpsCoordinates')}</Label>
                       <p className="text-sm text-gray-500 mb-3">
-                        Find coordinates on Google Maps by right-clicking on location
+                        {t('gpsHelp')}
                       </p>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="latitude">Latitude</Label>
+                          <Label htmlFor="latitude">{t('latitude')}</Label>
                           <Input
                             id="latitude"
                             type="number"
                             step="any"
-                            placeholder="e.g., 40.7128"
+                            placeholder="40.7128"
                             {...register('latitude', { valueAsNumber: true })}
                           />
                         </div>
                         <div>
-                          <Label htmlFor="longitude">Longitude</Label>
+                          <Label htmlFor="longitude">{t('longitude')}</Label>
                           <Input
                             id="longitude"
                             type="number"
                             step="any"
-                            placeholder="e.g., -74.0060"
+                            placeholder="-74.0060"
                             {...register('longitude', { valueAsNumber: true })}
                           />
                         </div>
@@ -442,10 +499,10 @@ export default function CreatePropertyPage() {
                   <>
                     {/* Areas Section */}
                     <div className="border rounded-lg p-4">
-                      <Label className="font-medium text-lg mb-4 block">Area Details</Label>
+                      <Label className="font-medium text-lg mb-4 block">{t('areaDetails')}</Label>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                          <Label htmlFor="area">Total Area (m²)</Label>
+                          <Label htmlFor="area">{t('area')}</Label>
                           <Input
                             id="area"
                             type="number"
@@ -454,7 +511,7 @@ export default function CreatePropertyPage() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="livingArea">Living Area (m²)</Label>
+                          <Label htmlFor="livingArea">{t('livingArea')}</Label>
                           <Input
                             id="livingArea"
                             type="number"
@@ -463,7 +520,7 @@ export default function CreatePropertyPage() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="kitchenArea">Kitchen Area (m²)</Label>
+                          <Label htmlFor="kitchenArea">{t('kitchenArea')}</Label>
                           <Input
                             id="kitchenArea"
                             type="number"
@@ -472,7 +529,7 @@ export default function CreatePropertyPage() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="ceilingHeight">Ceiling Height (m)</Label>
+                          <Label htmlFor="ceilingHeight">{t('ceilingHeight')}</Label>
                           <Input
                             id="ceilingHeight"
                             type="number"
@@ -486,7 +543,7 @@ export default function CreatePropertyPage() {
                       {/* Price per m² display */}
                       {pricePerSqM && (
                         <div className="mt-3 p-2 bg-green-50 rounded text-green-700 text-sm">
-                          Price per m²: <strong>${pricePerSqM.toLocaleString()}</strong>
+                          {t('pricePerSqm')}: <strong>${pricePerSqM.toLocaleString()}</strong>
                         </div>
                       )}
                     </div>
@@ -494,7 +551,7 @@ export default function CreatePropertyPage() {
                     {/* Rooms Section */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
-                        <Label htmlFor="rooms">Total Rooms</Label>
+                        <Label htmlFor="rooms">{t('rooms')}</Label>
                         <Input
                           id="rooms"
                           type="number"
@@ -503,7 +560,7 @@ export default function CreatePropertyPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="bedrooms">Bedrooms</Label>
+                        <Label htmlFor="bedrooms">{t('bedrooms')}</Label>
                         <Input
                           id="bedrooms"
                           type="number"
@@ -512,7 +569,7 @@ export default function CreatePropertyPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="bathrooms">Bathrooms</Label>
+                        <Label htmlFor="bathrooms">{t('bathrooms')}</Label>
                         <Input
                           id="bathrooms"
                           type="number"
@@ -522,7 +579,7 @@ export default function CreatePropertyPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="balcony">Balconies</Label>
+                        <Label htmlFor="balcony">{t('balconies')}</Label>
                         <Input
                           id="balcony"
                           type="number"
@@ -534,10 +591,10 @@ export default function CreatePropertyPage() {
 
                     {/* Building Section */}
                     <div className="border rounded-lg p-4">
-                      <Label className="font-medium text-lg mb-4 block">Building Info</Label>
+                      <Label className="font-medium text-lg mb-4 block">{t('buildingInfo')}</Label>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                          <Label htmlFor="floor">Floor</Label>
+                          <Label htmlFor="floor">{t('floor')}</Label>
                           <Input
                             id="floor"
                             type="number"
@@ -546,7 +603,7 @@ export default function CreatePropertyPage() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="totalFloors">Total Floors</Label>
+                          <Label htmlFor="totalFloors">{t('totalFloors')}</Label>
                           <Input
                             id="totalFloors"
                             type="number"
@@ -555,7 +612,7 @@ export default function CreatePropertyPage() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="yearBuilt">Year Built</Label>
+                          <Label htmlFor="yearBuilt">{t('yearBuilt')}</Label>
                           <Input
                             id="yearBuilt"
                             type="number"
@@ -564,13 +621,13 @@ export default function CreatePropertyPage() {
                           />
                         </div>
                         <div>
-                          <Label>Building Type</Label>
+                          <Label>{t('buildingType')}</Label>
                           <Select
                             value={buildingType}
                             onValueChange={(value) => setValue('buildingType', value as any)}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select" />
+                              <SelectValue placeholder={tCommon('any')} />
                             </SelectTrigger>
                             <SelectContent>
                               {BUILDING_TYPES.map(type => (
@@ -586,7 +643,7 @@ export default function CreatePropertyPage() {
                       {/* Elevators and Facilities */}
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                         <div>
-                          <Label htmlFor="elevatorPassenger">Passenger Elevators</Label>
+                          <Label htmlFor="elevatorPassenger">{t('elevatorPassenger')}</Label>
                           <Input
                             id="elevatorPassenger"
                             type="number"
@@ -595,7 +652,7 @@ export default function CreatePropertyPage() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="elevatorCargo">Cargo Elevators</Label>
+                          <Label htmlFor="elevatorCargo">{t('elevatorCargo')}</Label>
                           <Input
                             id="elevatorCargo"
                             type="number"
@@ -604,7 +661,7 @@ export default function CreatePropertyPage() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="parking">Parking Spaces</Label>
+                          <Label htmlFor="parking">{t('parkingSpaces')}</Label>
                           <Input
                             id="parking"
                             type="number"
@@ -613,18 +670,18 @@ export default function CreatePropertyPage() {
                           />
                         </div>
                         <div>
-                          <Label>Parking Type</Label>
+                          <Label>{t('parkingType')}</Label>
                           <Select
                             value={parkingType}
                             onValueChange={(value) => setValue('parkingType', value as any)}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select" />
+                              <SelectValue placeholder={tCommon('any')} />
                             </SelectTrigger>
                             <SelectContent>
                               {PARKING_TYPES.map(type => (
                                 <SelectItem key={type} value={type}>
-                                  {LABELS.parkingType[type]}
+                                  {tParking(type.toLowerCase() as any)}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -641,7 +698,7 @@ export default function CreatePropertyPage() {
                             onCheckedChange={(checked) => setValue('hasGarbageChute', !!checked)}
                           />
                           <Label htmlFor="hasGarbageChute" className="cursor-pointer">
-                            Garbage Chute
+                            {t('garbageChute')}
                           </Label>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -651,7 +708,7 @@ export default function CreatePropertyPage() {
                             onCheckedChange={(checked) => setValue('hasConcierge', !!checked)}
                           />
                           <Label htmlFor="hasConcierge" className="cursor-pointer">
-                            Concierge
+                            {t('concierge')}
                           </Label>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -661,7 +718,7 @@ export default function CreatePropertyPage() {
                             onCheckedChange={(checked) => setValue('hasGatedArea', !!checked)}
                           />
                           <Label htmlFor="hasGatedArea" className="cursor-pointer">
-                            Gated Community
+                            {t('gatedCommunity')}
                           </Label>
                         </div>
                       </div>
@@ -674,18 +731,18 @@ export default function CreatePropertyPage() {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label>Renovation/Condition</Label>
+                        <Label>{t('renovation')}</Label>
                         <Select
                           value={renovation}
                           onValueChange={(value) => setValue('renovation', value as any)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select condition" />
+                            <SelectValue placeholder={tCommon('any')} />
                           </SelectTrigger>
                           <SelectContent>
                             {RENOVATION_TYPES.map(type => (
                               <SelectItem key={type} value={type}>
-                                {LABELS.renovation[type]}
+                                {tRenovation(type.toLowerCase() as any)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -693,13 +750,13 @@ export default function CreatePropertyPage() {
                       </div>
 
                       <div>
-                        <Label>Bathroom Type</Label>
+                        <Label>{t('bathroomType')}</Label>
                         <Select
                           value={bathroomType}
                           onValueChange={(value) => setValue('bathroomType', value as any)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
+                            <SelectValue placeholder={tCommon('any')} />
                           </SelectTrigger>
                           <SelectContent>
                             {BATHROOM_TYPES.map(type => (
@@ -714,13 +771,13 @@ export default function CreatePropertyPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label>Window View</Label>
+                        <Label>{t('windowView')}</Label>
                         <Select
                           value={windowView}
                           onValueChange={(value) => setValue('windowView', value as any)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select view" />
+                            <SelectValue placeholder={tCommon('any')} />
                           </SelectTrigger>
                           <SelectContent>
                             {WINDOW_VIEWS.map(type => (
@@ -733,13 +790,13 @@ export default function CreatePropertyPage() {
                       </div>
 
                       <div>
-                        <Label>Furnished</Label>
+                        <Label>{t('furnished')}</Label>
                         <Select
                           value={furnished}
                           onValueChange={(value) => setValue('furnished', value as any)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select option" />
+                            <SelectValue placeholder={tCommon('any')} />
                           </SelectTrigger>
                           <SelectContent>
                             {FURNISHED_TYPES.map(type => (
@@ -757,9 +814,9 @@ export default function CreatePropertyPage() {
                 {/* Step 5: Photos */}
                 {currentStep === 5 && (
                   <div>
-                    <Label>Property Photos *</Label>
+                    <Label>{t('images')} *</Label>
                     <p className="text-sm text-gray-600 mb-4">
-                      Upload high-quality photos. The first image will be the main photo.
+                      {t('uploadImages')}
                     </p>
                     <ImageUploader
                       images={images}
@@ -776,12 +833,12 @@ export default function CreatePropertyPage() {
                 {currentStep === 6 && (
                   <>
                     <div>
-                      <Label htmlFor="description">Description *</Label>
+                      <Label htmlFor="description">{t('description')} *</Label>
                       <Textarea
                         id="description"
                         {...register('description')}
                         rows={8}
-                        placeholder="Describe your property in detail. Include information about the neighborhood, nearby amenities, and what makes this property special..."
+                        placeholder={t('descriptionPlaceholder')}
                       />
                       {errors.description && (
                         <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>
@@ -789,21 +846,21 @@ export default function CreatePropertyPage() {
                     </div>
 
                     <div>
-                      <Label>Amenities & Features</Label>
+                      <Label>{t('amenities')}</Label>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
-                        {AMENITIES.map((amenity) => (
+                        {AMENITY_KEYS.map((amenityKey) => (
                           <div
-                            key={amenity.value}
-                            onClick={() => toggleAmenity(amenity.value)}
+                            key={amenityKey}
+                            onClick={() => toggleAmenity(amenityKey)}
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all ${
-                              selectedAmenities.includes(amenity.value as any)
+                              selectedAmenities.includes(amenityKey as any)
                                 ? 'border-blue-600 bg-blue-50'
                                 : 'border-gray-200 hover:border-gray-300'
                             }`}
                           >
                             <div className="flex items-center justify-between">
-                              <span className="text-sm font-medium">{amenity.label}</span>
-                              {selectedAmenities.includes(amenity.value as any) && (
+                              <span className="text-sm font-medium">{tAmenities(amenityKey.toLowerCase().replace('_', '') as any)}</span>
+                              {selectedAmenities.includes(amenityKey as any) && (
                                 <Check className="h-4 w-4 text-blue-600" />
                               )}
                             </div>
@@ -811,7 +868,7 @@ export default function CreatePropertyPage() {
                         ))}
                       </div>
                       <p className="text-sm text-gray-500 mt-2">
-                        Selected: {selectedAmenities.length} amenities
+                        {tCommon('showing')}: {selectedAmenities.length}
                       </p>
                     </div>
                   </>
@@ -826,17 +883,17 @@ export default function CreatePropertyPage() {
                     disabled={currentStep === 1}
                   >
                     <ChevronLeft className="h-4 w-4 mr-2" />
-                    Previous
+                    {tCommon('previous')}
                   </Button>
 
                   {currentStep < 6 ? (
                     <Button type="button" onClick={nextStep}>
-                      Next
+                      {tCommon('next')}
                       <ChevronRight className="h-4 w-4 ml-2" />
                     </Button>
                   ) : (
                     <Button type="submit" disabled={isSubmitting}>
-                      {isSubmitting ? 'Creating...' : 'Create Property'}
+                      {isSubmitting ? tCommon('loading') : t('submit')}
                     </Button>
                   )}
                 </div>

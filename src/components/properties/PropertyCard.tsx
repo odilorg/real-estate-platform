@@ -15,9 +15,10 @@ import type { Property } from '@/types'
 
 interface PropertyCardProps {
   property: Property
+  compact?: boolean
 }
 
-export function PropertyCard({ property }: PropertyCardProps) {
+export function PropertyCard({ property, compact = false }: PropertyCardProps) {
   const { toggleFavorite, isFavorite } = useFavorites()
   const { user } = useUser()
   const router = useRouter()
@@ -51,6 +52,68 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
   const formatArea = (area: number) => {
     return new Intl.NumberFormat('en-US').format(area)
+  }
+
+  // Compact version for split view
+  if (compact) {
+    return (
+      <Card className="overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer">
+        <Link href={`/properties/${property.id}`}>
+          <div className="flex">
+            {/* Image */}
+            <div className="relative w-28 h-24 flex-shrink-0">
+              <Image
+                src={property.images[0]}
+                alt={property.title}
+                fill
+                className="object-cover"
+              />
+            </div>
+            {/* Content */}
+            <div className="flex-1 p-3 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-lg font-bold text-blue-600">
+                    {formatPrice(property.price)}
+                    {property.listingType === 'RENT' && <span className="text-sm font-normal">/mo</span>}
+                  </p>
+                  <h3 className="font-medium text-sm truncate">{property.title}</h3>
+                  <p className="text-xs text-gray-500 truncate flex items-center gap-1 mt-0.5">
+                    <MapPin className="h-3 w-3" />
+                    {property.city}{property.state && `, ${property.state}`}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 flex-shrink-0"
+                  onClick={handleFavoriteClick}
+                >
+                  <Heart className={`h-4 w-4 ${favorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                </Button>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-gray-600 mt-2">
+                {property.bedrooms && (
+                  <span className="flex items-center gap-1">
+                    <Bed className="h-3 w-3" /> {property.bedrooms}
+                  </span>
+                )}
+                {property.bathrooms && (
+                  <span className="flex items-center gap-1">
+                    <Bath className="h-3 w-3" /> {property.bathrooms}
+                  </span>
+                )}
+                {property.area && (
+                  <span className="flex items-center gap-1">
+                    <Maximize className="h-3 w-3" /> {formatArea(property.area)} sqft
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </Link>
+      </Card>
+    )
   }
 
   return (

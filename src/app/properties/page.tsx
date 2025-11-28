@@ -2,11 +2,13 @@
 
 import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { MainLayout } from '@/components/layout'
 import { PropertyCard } from '@/components/properties/PropertyCard'
 import { MapView } from '@/components/map/MapView'
 import { AdvancedFilters, AdvancedFilterValues } from '@/components/search/AdvancedFilters'
 import { SaveSearchDialog } from '@/components/search/SaveSearchDialog'
+import { LocationSearch } from '@/components/search/LocationSearch'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -16,8 +18,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Search, SlidersHorizontal, Loader2, Map as MapIcon, List } from 'lucide-react'
+import { Search, SlidersHorizontal, Loader2, Map as MapIcon, List, LayoutGrid, Columns } from 'lucide-react'
 import type { Property, SearchResponse } from '@/types'
+
+interface SelectedLocation {
+  name: string
+  lat: number
+  lon: number
+  city?: string
+  state?: string
+}
 
 function PropertiesLoading() {
   return (
@@ -41,6 +51,7 @@ export default function PropertiesPage() {
 function PropertiesContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('properties')
 
   // Filter states
   const [query, setQuery] = useState(searchParams.get('query') || '')
@@ -48,7 +59,10 @@ function PropertiesContent() {
   const [listingType, setListingType] = useState(searchParams.get('listingType') || 'all')
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'createdAt')
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1)
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
+  const [viewMode, setViewMode] = useState<'list' | 'map' | 'split'>('list')
+  const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([])
+  const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.006])
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>()
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterValues>({
     propertyTypes: [],
     listingTypes: [],
@@ -238,68 +252,94 @@ function PropertiesContent() {
     setListingType('all')
     setSortBy('createdAt')
     setPage(1)
+    setSelectedLocations([])
   }
 
-  const hasActiveFilters = query || propertyType !== 'all' || listingType !== 'all'
+  const handleLocationSelect = (location: SelectedLocation) => {
+    setSelectedLocations(prev => [...prev, location])
+    setMapCenter([location.lat, location.lon])
+    setPage(1)
+  }
+
+  const handleRemoveLocation = (index: number) => {
+    setSelectedLocations(prev => prev.filter((_, i) => i !== index))
+    setPage(1)
+  }
+
+  const handlePropertyHover = (propertyId: string | undefined) => {
+    setSelectedPropertyId(propertyId)
+  }
+
+  const hasActiveFilters = query || propertyType !== 'all' || listingType !== 'all' || selectedLocations.length > 0
 
   return (
     <MainLayout>
       <div className="bg-gray-50 min-h-screen">
         {/* Header */}
         <div className="bg-white border-b">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <h1 className="text-3xl font-bold mb-4">Browse Properties</h1>
-
-            {/* Search and Filters */}
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Input
-                  placeholder="Search by location, property type, or keyword..."
-                  className="pl-10"
-                  value={query}
-                  onChange={(e) => handleQueryChange(e.target.value)}
-                />
-              </div>
-
-              <Select value={propertyType} onValueChange={handlePropertyTypeChange}>
-                <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder="Property Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="APARTMENT">Apartment</SelectItem>
-                  <SelectItem value="HOUSE">House</SelectItem>
-                  <SelectItem value="CONDO">Condo</SelectItem>
-                  <SelectItem value="TOWNHOUSE">Townhouse</SelectItem>
-                  <SelectItem value="VILLA">Villa</SelectItem>
-                  <SelectItem value="STUDIO">Studio</SelectItem>
-                  <SelectItem value="LAND">Land</SelectItem>
-                  <SelectItem value="COMMERCIAL">Commercial</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={listingType} onValueChange={handleListingTypeChange}>
-                <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder="Listing Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">For Sale & Rent</SelectItem>
-                  <SelectItem value="SALE">For Sale</SelectItem>
-                  <SelectItem value="RENT">For Rent</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <div className="flex gap-2 w-full md:w-auto">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-2xl font-bold">{t('title')}</h1>
+              <div className="flex gap-2 items-center">
                 <SaveSearchDialog
                   filters={{ query, propertyType, listingType, sortBy }}
                   advancedFilters={advancedFilters}
                 />
                 {hasActiveFilters && (
-                  <Button variant="outline" onClick={handleClearFilters}>
-                    Clear Filters
+                  <Button variant="outline" size="sm" onClick={handleClearFilters}>
+                    {t('filters.resetFilters') || 'Clear Filters'}
                   </Button>
                 )}
+              </div>
+            </div>
+
+            {/* Location Search */}
+            <div className="mb-4">
+              <LocationSearch
+                onLocationSelect={handleLocationSelect}
+                selectedLocations={selectedLocations}
+                onRemoveLocation={handleRemoveLocation}
+              />
+            </div>
+
+            {/* Filters Row */}
+            <div className="flex flex-wrap gap-3 items-center">
+              <Select value={listingType} onValueChange={handleListingTypeChange}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder={t('filters.listingType')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('listingTypes.sale')} & {t('listingTypes.rent')}</SelectItem>
+                  <SelectItem value="SALE">{t('listingTypes.sale')}</SelectItem>
+                  <SelectItem value="RENT">{t('listingTypes.rent')}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={propertyType} onValueChange={handlePropertyTypeChange}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder={t('filters.propertyType')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="APARTMENT">{t('types.apartment')}</SelectItem>
+                  <SelectItem value="HOUSE">{t('types.house')}</SelectItem>
+                  <SelectItem value="CONDO">{t('types.condo')}</SelectItem>
+                  <SelectItem value="TOWNHOUSE">{t('types.townhouse')}</SelectItem>
+                  <SelectItem value="VILLA">Villa</SelectItem>
+                  <SelectItem value="STUDIO">Studio</SelectItem>
+                  <SelectItem value="LAND">{t('types.land')}</SelectItem>
+                  <SelectItem value="COMMERCIAL">{t('types.commercial')}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <div className="flex-1 relative max-w-xs">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder={t('searchPlaceholder')}
+                  className="pl-9 h-9"
+                  value={query}
+                  onChange={(e) => handleQueryChange(e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -334,8 +374,8 @@ function PropertiesContent() {
                 'Searching...'
               ) : (
                 <>
-                  <span className="font-semibold text-gray-900">{pagination.total}</span>{' '}
-                  {pagination.total === 1 ? 'property' : 'properties'} found
+                  <span className="font-semibold text-gray-900">{pagination.total.toLocaleString()}</span>{' '}
+                  {t('foundProperties')}
                 </>
               )}
             </p>
@@ -346,30 +386,39 @@ function PropertiesContent() {
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className="rounded-none"
+                  className="rounded-none px-3"
+                  title="List view"
                 >
-                  <List className="h-4 w-4 mr-2" />
-                  List
+                  <List className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'split' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('split')}
+                  className="rounded-none px-3"
+                  title="Split view"
+                >
+                  <Columns className="h-4 w-4" />
                 </Button>
                 <Button
                   variant={viewMode === 'map' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('map')}
-                  className="rounded-none"
+                  className="rounded-none px-3"
+                  title="Map view"
                 >
-                  <MapIcon className="h-4 w-4 mr-2" />
-                  Map
+                  <MapIcon className="h-4 w-4" />
                 </Button>
               </div>
 
               <Select value={sortBy} onValueChange={handleSortChange}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Sort by" />
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder={t('sort.title')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="createdAt">Newest First</SelectItem>
-                  <SelectItem value="price">Price: Low to High</SelectItem>
-                  <SelectItem value="area">Area: Largest First</SelectItem>
+                  <SelectItem value="createdAt">{t('sort.newest')}</SelectItem>
+                  <SelectItem value="price">{t('sort.priceAsc')}</SelectItem>
+                  <SelectItem value="area">{t('sort.areaDesc')}</SelectItem>
                   <SelectItem value="bedrooms">Most Bedrooms</SelectItem>
                 </SelectContent>
               </Select>
@@ -394,18 +443,72 @@ function PropertiesContent() {
             </div>
           )}
 
-          {/* Map View */}
+          {/* Split View - Map + List side by side */}
+          {!loading && !error && properties.length > 0 && viewMode === 'split' && (
+            <div className="flex gap-4 h-[calc(100vh-280px)]">
+              {/* Property List - Left Side */}
+              <div className="w-1/2 overflow-y-auto pr-2 space-y-3">
+                {properties.map((property) => (
+                  <div
+                    key={property.id}
+                    onMouseEnter={() => handlePropertyHover(property.id)}
+                    onMouseLeave={() => handlePropertyHover(undefined)}
+                  >
+                    <PropertyCard property={property} compact />
+                  </div>
+                ))}
+                {/* Pagination for split view */}
+                {pagination.totalPages > 1 && (
+                  <div className="py-4 flex items-center justify-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                    >
+                      Previous
+                    </Button>
+                    <span className="text-sm text-gray-600">
+                      Page {page} of {pagination.totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
+                      disabled={page === pagination.totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </div>
+              {/* Map - Right Side */}
+              <div className="w-1/2 sticky top-0">
+                <MapView
+                  properties={properties}
+                  height="100%"
+                  center={mapCenter}
+                  selectedPropertyId={selectedPropertyId}
+                  onMarkerClick={(property) => router.push(`/properties/${property.id}`)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Full Map View */}
           {!loading && !error && properties.length > 0 && viewMode === 'map' && (
-            <div className="mb-6">
+            <div className="h-[calc(100vh-280px)]">
               <MapView
                 properties={properties}
-                height="600px"
+                height="100%"
+                center={mapCenter}
+                selectedPropertyId={selectedPropertyId}
                 onMarkerClick={(property) => router.push(`/properties/${property.id}`)}
               />
             </div>
           )}
 
-          {/* Property Cards */}
+          {/* List View */}
           {!loading && !error && properties.length > 0 && viewMode === 'list' && (
             <>
               <div className="space-y-4">
