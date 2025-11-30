@@ -37,7 +37,13 @@
     "page": "Page",
     "send": "Send",
     "submit": "Submit",
-    "fixErrors": "Please fix the following errors:"
+    "fixErrors": "Please fix the following errors:",
+    "buy": "Buy",
+    "rent": "Rent",
+    "apartments": "Apartments",
+    "houses": "Houses",
+    "commercial": "Commercial",
+    "properties": "properties"
   },
   "nav": {
     "home": "Home",
@@ -52,20 +58,23 @@
     "forSale": "For Sale",
     "forRent": "For Rent",
     "messages": "Messages",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "becomeAgent": "Become an Agent",
+    "agentDashboard": "Agent Dashboard"
   },
   "home": {
     "hero": {
       "title": "Find Your Dream Property",
       "subtitle": "Discover the perfect home, apartment, or commercial space in your area",
-      "searchPlaceholder": "Enter city, neighborhood, or ZIP code",
+      "searchPlaceholder": "Enter city, neighborhood, or address...",
       "browseProperties": "Browse Properties",
       "listProperty": "List Your Property"
     },
     "propertyTypes": {
       "title": "Browse by Property Type",
+      "subtitle": "Find the perfect property for your needs",
       "residential": "Residential",
-      "residentialDesc": "Houses, apartments, and condos",
+      "residentialDesc": "Houses, apartments, and condos for living",
       "commercial": "Commercial",
       "commercialDesc": "Offices, retail, and business spaces",
       "land": "Land",
@@ -81,18 +90,49 @@
       "verifiedListingsDesc": "Browse through verified properties from trusted sellers and agents"
     },
     "cta": {
-      "title": "Ready to Get Started?",
-      "subtitle": "Join thousands of users finding their perfect property",
-      "createAccount": "Create Free Account"
+      "title": "Have a Property to Sell or Rent?",
+      "subtitle": "List your property on EstateHub and reach thousands of potential buyers and renters",
+      "createAccount": "Create Free Account",
+      "listProperty": "List Your Property",
+      "becomeAgent": "Become an Agent"
     },
     "featured": {
       "title": "Featured Properties",
-      "viewAll": "View All Properties"
+      "subtitle": "Handpicked properties from our collection",
+      "viewAll": "View All",
+      "noProperties": "No properties available yet"
+    },
+    "recent": {
+      "title": "Just Listed",
+      "subtitle": "Fresh properties on the market",
+      "viewAll": "View All"
+    },
+    "areas": {
+      "title": "Popular Areas",
+      "subtitle": "Explore properties in top neighborhoods",
+      "viewAll": "Explore All Areas",
+      "avgPrice": "Avg"
+    },
+    "recentlyViewed": {
+      "title": "Continue Where You Left Off",
+      "viewAll": "View All"
     },
     "stats": {
       "properties": "Properties Listed",
       "happyClients": "Happy Clients",
-      "citiesCovered": "Cities Covered"
+      "citiesCovered": "Cities Covered",
+      "activeListings": "Active Listings",
+      "verifiedAgents": "Verified Agents",
+      "happyUsers": "Happy Users"
+    },
+    "trust": {
+      "title": "Why Trust EstateHub?",
+      "verified": "Verified Listings",
+      "verifiedDesc": "All properties are verified for accuracy and authenticity",
+      "secure": "Secure Transactions",
+      "secureDesc": "Your data and transactions are protected with industry-standard security",
+      "support": "Expert Support",
+      "supportDesc": "Our team is available to help you every step of the way"
     }
   },
   "properties": {
@@ -426,6 +466,40 @@
     "typeMessage": "Type a message...",
     "send": "Send"
   },
+  "inquiry": {
+    "title": "Contact About This Property",
+    "contactingOwner": "Contacting:",
+    "inquiryType": "Inquiry Type",
+    "typeGeneral": "General Inquiry",
+    "typeViewing": "Schedule Viewing",
+    "typePrice": "Price Negotiation",
+    "typeDetails": "Request More Details",
+    "yourName": "Your Name",
+    "namePlaceholder": "Enter your name",
+    "yourEmail": "Your Email",
+    "emailPlaceholder": "Enter your email",
+    "yourPhone": "Your Phone",
+    "phonePlaceholder": "+1 (555) 000-0000",
+    "message": "Message",
+    "messagePlaceholder": "I'm interested in this property. Please contact me with more details.",
+    "sendInquiry": "Send Inquiry",
+    "sending": "Sending...",
+    "sent": "Inquiry sent successfully!",
+    "thankYou": "Thank You!",
+    "sentMessage": "Your inquiry has been sent. The property owner will contact you soon.",
+    "sendAnother": "Send Another Inquiry",
+    "privacyNote": "Your information will only be shared with the property owner.",
+    "manageInquiries": "Manage Inquiries",
+    "newInquiries": "New Inquiries",
+    "allInquiries": "All Inquiries",
+    "noInquiries": "No inquiries yet",
+    "noInquiriesDesc": "When buyers contact you about your properties, they will appear here.",
+    "respond": "Respond",
+    "markAsRead": "Mark as Read",
+    "archive": "Archive",
+    "yourResponse": "Your Response",
+    "sendResponse": "Send Response"
+  },
   "auth": {
     "signIn": "Sign In",
     "signUp": "Sign Up",
@@ -472,5 +546,92 @@
     "storage": "Storage",
     "laundry": "Laundry",
     "cableTV": "Cable TV"
+  },
+  "compare": {
+    "title": "Compare Properties",
+    "subtitle": "Comparing {count} properties",
+    "noProperties": "No Properties to Compare",
+    "noPropertiesDesc": "Add properties to comparison from the property listings page",
+    "browseProperties": "Browse Properties",
+    "addMore": "Add More",
+    "clearAll": "Clear All",
+    "clear": "Clear",
+    "compare": "Compare",
+    "comparing": "Compare Properties",
+    "propertiesSelected": "properties",
+    "viewDetails": "View Details",
+    "basicInfo": "Basic Information",
+    "amenities": "Amenities",
+    "price": "Price",
+    "location": "Location",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "totalRooms": "Total Rooms",
+    "totalArea": "Total Area",
+    "livingArea": "Living Area",
+    "kitchenArea": "Kitchen Area",
+    "floor": "Floor",
+    "buildingType": "Building Type",
+    "parking": "Parking",
+    "balcony": "Balcony",
+    "furnished": "Furnished"
+  },
+  "agent": {
+    "realEstateAgency": "Real Estate Agency",
+    "realtor": "Realtor",
+    "propertyOwner": "Property Owner",
+    "privateOwner": "Private Owner",
+    "superAgent": "Super Agent",
+    "verified": "Verified",
+    "onPlatform": "On platform",
+    "years": "years",
+    "activeListings": "Active listings",
+    "reviews": "reviews",
+    "showPhone": "Show Phone",
+    "writeMessage": "Write Message",
+    "contactOwner": "Contact Owner",
+    "responseTime": {
+      "fast": "Responds quickly to messages",
+      "medium": "Usually responds within a day",
+      "slow": "May take a few days to respond"
+    },
+    "profile": {
+      "title": "Agent Profile",
+      "about": "About",
+      "experience": "Experience",
+      "yearsExperience": "years of experience",
+      "specializations": "Specializations",
+      "languages": "Languages",
+      "areasServed": "Areas Served",
+      "listings": "Active Listings",
+      "allListings": "View All Listings",
+      "contactInfo": "Contact Information",
+      "license": "License #"
+    },
+    "dashboard": {
+      "title": "Agent Dashboard",
+      "overview": "Overview",
+      "leads": "Leads",
+      "analytics": "Analytics",
+      "settings": "Profile Settings",
+      "totalViews": "Total Views",
+      "totalLeads": "Total Leads",
+      "activeListings": "Active Listings",
+      "avgResponseTime": "Avg Response Time",
+      "recentLeads": "Recent Leads",
+      "performanceChart": "Performance",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month"
+    },
+    "become": {
+      "title": "Become an Agent",
+      "subtitle": "Join our platform as a real estate professional",
+      "benefits": "Benefits",
+      "benefit1": "Access to thousands of potential buyers",
+      "benefit2": "Professional agent profile",
+      "benefit3": "Analytics and lead management",
+      "benefit4": "Verified badge for trusted agents",
+      "apply": "Apply Now"
+    }
   }
 }

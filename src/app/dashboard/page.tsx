@@ -13,6 +13,7 @@ import { FavoritesTab } from './components/FavoritesTab'
 import { MessagesTab } from './components/MessagesTab'
 import { ViewingsTab } from './components/ViewingsTab'
 import { SettingsTab } from './components/SettingsTab'
+import { InquiriesTab } from './components/InquiriesTab'
 import { SavedSearches } from '@/components/search/SavedSearches'
 
 function DashboardLoading() {
@@ -83,9 +84,10 @@ function DashboardContent() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
             {/* Tab Navigation */}
-            <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 lg:w-auto lg:inline-flex">
+            <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 lg:w-auto lg:inline-flex">
               <TabsTrigger value="overview">{t('overview')}</TabsTrigger>
               <TabsTrigger value="properties">{t('myProperties')}</TabsTrigger>
+              <TabsTrigger value="inquiries">Inquiries</TabsTrigger>
               <TabsTrigger value="favorites">{t('favorites')}</TabsTrigger>
               <TabsTrigger value="viewings">{t('viewings')}</TabsTrigger>
               <TabsTrigger value="searches">{t('savedSearches')}</TabsTrigger>
@@ -100,6 +102,10 @@ function DashboardContent() {
 
             <TabsContent value="properties" className="space-y-6">
               <PropertiesTab />
+            </TabsContent>
+
+            <TabsContent value="inquiries" className="space-y-6">
+              <InquiriesTab />
             </TabsContent>
 
             <TabsContent value="favorites" className="space-y-6">

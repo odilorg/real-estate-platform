@@ -335,6 +335,39 @@ model AgentReview {
   @@index([userId])
 }
 
+// Agent Application - for users wanting to become agents
+model AgentApplication {
+  id              String    @id @default(cuid())
+  userId          String    @unique  // Clerk user ID
+
+  // Application info
+  firstName       String
+  lastName        String
+  email           String
+  phone           String
+
+  // Professional info
+  companyName     String?   // Agency name if they have one
+  licenseNumber   String?
+  yearsExperience Int       @default(0)
+  bio             String?
+  specializations String?   // JSON array
+  areasServed     String?   // JSON array
+
+  // Status
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  rejectionReason String?
+  reviewedBy      String?   // Admin who reviewed
+  reviewedAt      DateTime?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
 // Admin action log for audit trail
 model AdminLog {
   id          String    @id @default(cuid())
@@ -347,5 +380,49 @@ model AdminLog {
 
   @@index([adminId])
   @@index([action])
+  @@index([createdAt])
+}
+
+// Price History - track price changes for properties
+model PriceHistory {
+  id          String    @id @default(cuid())
+  propertyId  String
+  price       Float
+  changeType  String    @default("UPDATE") // INITIAL, UPDATE, REDUCTION, INCREASE
+  changedAt   DateTime  @default(now())
+
+  @@index([propertyId])
+  @@index([changedAt])
+}
+
+// Property Inquiry - for users to contact owners/agents about properties
+model PropertyInquiry {
+  id          String    @id @default(cuid())
+  propertyId  String
+  ownerId     String    // Property owner's Clerk user ID
+
+  // Inquiry sender info (can be logged in or guest)
+  senderId    String?   // Clerk user ID if logged in
+  senderName  String
+  senderEmail String
+  senderPhone String?
+
+  // Inquiry details
+  message     String
+  inquiryType String    @default("GENERAL") // GENERAL, VIEWING, PRICE, DETAILS
+
+  // Status
+  status      String    @default("NEW") // NEW, READ, RESPONDED, ARCHIVED
+  response    String?   // Owner's response
+  respondedAt DateTime?
+
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([propertyId])
+  @@index([ownerId])
+  @@index([senderId])
+  @@index([status])
   @@index([createdAt])
 }

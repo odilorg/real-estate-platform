@@ -36,7 +36,11 @@ import {
   Trash2,
 } from 'lucide-react'
 import { getPropertyById, getAllProperties, incrementPropertyViews } from '@/lib/db'
+import { getAgentByUserId, getAgentListingsCount } from '@/lib/agents'
 import { LABELS } from '@/lib/validations/property'
+import { AgentSidebar } from '@/components/agents/AgentSidebar'
+import { InquiryForm } from '@/components/property/InquiryForm'
+import { PriceHistory } from '@/components/property/PriceHistory'
 
 interface PropertyDetailPageProps {
   params: Promise<{
@@ -158,6 +162,37 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     propertyPrice={property.price}
                     propertyCity={property.city}
                     ownerId={property.userId}
+                    property={{
+                      id: property.id,
+                      title: property.title,
+                      description: property.description,
+                      price: property.price,
+                      listingType: property.listingType,
+                      propertyType: property.propertyType,
+                      address: property.address,
+                      city: property.city,
+                      state: property.state,
+                      country: property.country,
+                      bedrooms: property.bedrooms,
+                      bathrooms: property.bathrooms,
+                      area: property.area,
+                      livingArea: property.livingArea,
+                      kitchenArea: property.kitchenArea,
+                      rooms: property.rooms,
+                      floor: property.floor,
+                      totalFloors: property.totalFloors,
+                      yearBuilt: property.yearBuilt,
+                      parking: property.parking,
+                      balcony: property.balcony,
+                      buildingType: property.buildingType,
+                      buildingClass: property.buildingClass,
+                      renovation: property.renovation,
+                      furnished: property.furnished,
+                      nearestMetro: property.nearestMetro,
+                      metroDistance: property.metroDistance,
+                      images: property.images,
+                      amenities: property.amenities,
+                    }}
                   />
                 </div>
 
@@ -479,28 +514,19 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Contact Owner */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Contact Owner</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-gray-600 mb-4">
-                    Interested in this property? Send a message to the owner to get more details
-                    or schedule a viewing.
-                  </p>
-                  <ContactOwnerButton
-                    propertyId={property.id}
-                    ownerId={property.userId}
-                    currentUserId={userId || undefined}
-                  />
-                  <PropertySidebarActions
-                    propertyId={property.id}
-                    propertyTitle={property.title}
-                    ownerId={property.userId}
-                  />
-                </CardContent>
-              </Card>
+              {/* Agent/Owner Contact - CIAN style */}
+              <AgentSidebar
+                ownerId={property.userId}
+                propertyId={property.id}
+              />
+
+              {/* Inquiry Form - Only show if not owner */}
+              {userId !== property.userId && (
+                <InquiryForm
+                  propertyId={property.id}
+                  propertyTitle={property.title}
+                />
+              )}
 
               {/* Property Info */}
               <Card>
@@ -578,6 +604,9 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                   </CardContent>
                 </Card>
               )}
+
+              {/* Price History */}
+              <PriceHistory propertyId={property.id} currentPrice={property.price} />
 
               {/* Mortgage Calculator (only for properties for sale) */}
               {property.listingType === 'SALE' && (

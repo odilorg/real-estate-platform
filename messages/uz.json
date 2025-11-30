@@ -37,7 +37,13 @@
     "page": "Sahifa",
     "send": "Yuborish",
     "submit": "Yuborish",
-    "fixErrors": "Iltimos, quyidagi xatolarni tuzating:"
+    "fixErrors": "Iltimos, quyidagi xatolarni tuzating:",
+    "buy": "Sotib olish",
+    "rent": "Ijaraga olish",
+    "apartments": "Kvartiralar",
+    "houses": "Uylar",
+    "commercial": "Tijorat",
+    "properties": "mulk"
   },
   "nav": {
     "home": "Bosh sahifa",
@@ -52,20 +58,23 @@
     "forSale": "Sotish",
     "forRent": "Ijara",
     "messages": "Xabarlar",
-    "getStarted": "Boshlash"
+    "getStarted": "Boshlash",
+    "becomeAgent": "Agent bo'lish",
+    "agentDashboard": "Agent paneli"
   },
   "home": {
     "hero": {
       "title": "Ideal ko'chmas mulkni toping",
       "subtitle": "O'z hududingizda ideal uy, kvartira yoki tijorat binolarini kashf eting",
-      "searchPlaceholder": "Shahar, tuman yoki pochta indeksini kiriting",
+      "searchPlaceholder": "Shahar, tuman yoki manzilni kiriting...",
       "browseProperties": "Mulklarni ko'rish",
       "listProperty": "Mulk joylashtirish"
     },
     "propertyTypes": {
       "title": "Mulk turi bo'yicha qidirish",
+      "subtitle": "Ehtiyojlaringiz uchun ideal mulkni toping",
       "residential": "Turar-joy",
-      "residentialDesc": "Uylar, kvartiralar va apartamentlar",
+      "residentialDesc": "Yashash uchun uylar, kvartiralar va apartamentlar",
       "commercial": "Tijorat",
       "commercialDesc": "Ofislar, do'konlar va biznes binolari",
       "land": "Yer",
@@ -81,18 +90,49 @@
       "verifiedListingsDesc": "Ishonchli sotuvchilar va agentlarning tasdiqlangan mulklarini ko'ring"
     },
     "cta": {
-      "title": "Boshlashga tayyormisiz?",
-      "subtitle": "Ideal mulk topayotgan minglab foydalanuvchilarga qo'shiling",
-      "createAccount": "Bepul hisob yaratish"
+      "title": "Sotish yoki ijaraga berish uchun mulkingiz bormi?",
+      "subtitle": "EstateHub'da mulk joylashtiring va minglab potentsial xaridorlar va ijarachilarni jalb qiling",
+      "createAccount": "Bepul hisob yaratish",
+      "listProperty": "Mulk joylashtirish",
+      "becomeAgent": "Agent bo'lish"
     },
     "featured": {
       "title": "Tavsiya etilgan mulklar",
-      "viewAll": "Barcha mulklarni ko'rish"
+      "subtitle": "Bizning kollektsiyamizdan eng yaxshi takliflar",
+      "viewAll": "Hammasini ko'rish",
+      "noProperties": "Hali mulklar mavjud emas"
+    },
+    "recent": {
+      "title": "Yangi e'lonlar",
+      "subtitle": "Bozordagi yangi takliflar",
+      "viewAll": "Hammasini ko'rish"
+    },
+    "areas": {
+      "title": "Mashhur hududlar",
+      "subtitle": "Eng yaxshi tumanlardagi mulklarni o'rganing",
+      "viewAll": "Barcha hududlar",
+      "avgPrice": "O'rt."
+    },
+    "recentlyViewed": {
+      "title": "Davom eting",
+      "viewAll": "Hammasini ko'rish"
     },
     "stats": {
       "properties": "Ro'yxatdagi mulklar",
       "happyClients": "Mamnun mijozlar",
-      "citiesCovered": "Qamrab olingan shaharlar"
+      "citiesCovered": "Qamrab olingan shaharlar",
+      "activeListings": "Faol e'lonlar",
+      "verifiedAgents": "Tasdiqlangan agentlar",
+      "happyUsers": "Mamnun foydalanuvchilar"
+    },
+    "trust": {
+      "title": "Nima uchun bizga ishonishadi?",
+      "verified": "Tasdiqlangan e'lonlar",
+      "verifiedDesc": "Barcha mulklar aniqlik va haqiqiylik uchun tekshirilgan",
+      "secure": "Xavfsiz tranzaksiyalar",
+      "secureDesc": "Ma'lumotlaringiz va tranzaksiyalaringiz zamonaviy texnologiyalar bilan himoyalangan",
+      "support": "Mutaxassis yordami",
+      "supportDesc": "Jamoamiz har bir bosqichda yordam berishga tayyor"
     }
   },
   "properties": {
@@ -426,6 +466,40 @@
     "typeMessage": "Xabar yozing...",
     "send": "Yuborish"
   },
+  "inquiry": {
+    "title": "Bu mulk haqida bog'lanish",
+    "contactingOwner": "Murojaat:",
+    "inquiryType": "So'rov turi",
+    "typeGeneral": "Umumiy savol",
+    "typeViewing": "Ko'rishga yozilish",
+    "typePrice": "Narxni muhokama qilish",
+    "typeDetails": "Batafsil ma'lumot so'rash",
+    "yourName": "Ismingiz",
+    "namePlaceholder": "Ismingizni kiriting",
+    "yourEmail": "Email manzilingiz",
+    "emailPlaceholder": "Email manzilingizni kiriting",
+    "yourPhone": "Telefon raqamingiz",
+    "phonePlaceholder": "+998 90 000-00-00",
+    "message": "Xabar",
+    "messagePlaceholder": "Men bu mulkga qiziqaman. Iltimos, men bilan bog'laning.",
+    "sendInquiry": "So'rov yuborish",
+    "sending": "Yuborilmoqda...",
+    "sent": "So'rov muvaffaqiyatli yuborildi!",
+    "thankYou": "Rahmat!",
+    "sentMessage": "So'rovingiz yuborildi. Mulk egasi tez orada siz bilan bog'lanadi.",
+    "sendAnother": "Yana so'rov yuborish",
+    "privacyNote": "Ma'lumotlaringiz faqat mulk egasiga yuboriladi.",
+    "manageInquiries": "So'rovlarni boshqarish",
+    "newInquiries": "Yangi so'rovlar",
+    "allInquiries": "Barcha so'rovlar",
+    "noInquiries": "Hali so'rovlar yo'q",
+    "noInquiriesDesc": "Xaridorlar sizning mulklaringiz haqida murojaat qilganda, ular shu yerda ko'rinadi.",
+    "respond": "Javob berish",
+    "markAsRead": "O'qilgan deb belgilash",
+    "archive": "Arxivga",
+    "yourResponse": "Javobingiz",
+    "sendResponse": "Javob yuborish"
+  },
   "auth": {
     "signIn": "Kirish",
     "signUp": "Ro'yxatdan o'tish",
@@ -472,5 +546,92 @@
     "storage": "Omborxona",
     "laundry": "Kir yuvish",
     "cableTV": "Kabel TV"
+  },
+  "compare": {
+    "title": "Mulklarni solishtirish",
+    "subtitle": "{count} ta mulk solishtirilmoqda",
+    "noProperties": "Solishtirish uchun mulk yo'q",
+    "noPropertiesDesc": "Mulklar ro'yxati sahifasidan solishtirish uchun mulklar qo'shing",
+    "browseProperties": "Mulklarni ko'rish",
+    "addMore": "Yana qo'shish",
+    "clearAll": "Hammasini tozalash",
+    "clear": "Tozalash",
+    "compare": "Solishtirish",
+    "comparing": "Mulklarni solishtirish",
+    "propertiesSelected": "mulk",
+    "viewDetails": "Batafsil ko'rish",
+    "basicInfo": "Asosiy ma'lumotlar",
+    "amenities": "Qulayliklar",
+    "price": "Narx",
+    "location": "Joylashuv",
+    "bedrooms": "Yotoqxonalar",
+    "bathrooms": "Hammomlar",
+    "totalRooms": "Jami xonalar",
+    "totalArea": "Umumiy maydon",
+    "livingArea": "Yashash maydoni",
+    "kitchenArea": "Oshxona maydoni",
+    "floor": "Qavat",
+    "buildingType": "Bino turi",
+    "parking": "Avtoturargoh",
+    "balcony": "Balkon",
+    "furnished": "Mebel"
+  },
+  "agent": {
+    "realEstateAgency": "Ko'chmas mulk agentligi",
+    "realtor": "Rieltor",
+    "propertyOwner": "Mulk egasi",
+    "privateOwner": "Xususiy shaxs",
+    "superAgent": "Super agent",
+    "verified": "Tasdiqlangan",
+    "onPlatform": "Platformada",
+    "years": "yil",
+    "activeListings": "Faol e'lonlar",
+    "reviews": "sharhlar",
+    "showPhone": "Telefonni ko'rsatish",
+    "writeMessage": "Xabar yozish",
+    "contactOwner": "Egasi bilan bog'lanish",
+    "responseTime": {
+      "fast": "Xabarlarga tez javob beradi",
+      "medium": "Odatda kun ichida javob beradi",
+      "slow": "Bir necha kun ichida javob berishi mumkin"
+    },
+    "profile": {
+      "title": "Agent profili",
+      "about": "Haqida",
+      "experience": "Tajriba",
+      "yearsExperience": "yillik tajriba",
+      "specializations": "Mutaxassisliklar",
+      "languages": "Tillar",
+      "areasServed": "Ish hududlari",
+      "listings": "Faol e'lonlar",
+      "allListings": "Barcha e'lonlar",
+      "contactInfo": "Aloqa ma'lumotlari",
+      "license": "Litsenziya №"
+    },
+    "dashboard": {
+      "title": "Agent paneli",
+      "overview": "Umumiy ko'rinish",
+      "leads": "So'rovlar",
+      "analytics": "Tahlil",
+      "settings": "Profil sozlamalari",
+      "totalViews": "Jami ko'rishlar",
+      "totalLeads": "Jami so'rovlar",
+      "activeListings": "Faol obyektlar",
+      "avgResponseTime": "O'rtacha javob vaqti",
+      "recentLeads": "So'nggi so'rovlar",
+      "performanceChart": "Samaradorlik",
+      "thisMonth": "Bu oy",
+      "lastMonth": "O'tgan oy"
+    },
+    "become": {
+      "title": "Agent bo'lish",
+      "subtitle": "Platformamizga professional sifatida qo'shiling",
+      "benefits": "Afzalliklar",
+      "benefit1": "Minglab potentsial xaridorlarga kirish",
+      "benefit2": "Professional agent profili",
+      "benefit3": "Tahlil va so'rovlarni boshqarish",
+      "benefit4": "Tasdiqlangan agent nishoni",
+      "apply": "Ariza topshirish"
+    }
   }
 }

@@ -7,8 +7,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PropertyRating } from './PropertyRating'
-import { Heart, MapPin, Bed, Bath, Maximize, Calendar } from 'lucide-react'
+import { Heart, MapPin, Bed, Bath, Maximize, Calendar, GitCompare, Check } from 'lucide-react'
 import { useFavorites } from '@/contexts/FavoritesContext'
+import { useComparison } from '@/contexts/ComparisonContext'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import type { Property } from '@/types'
@@ -20,9 +21,11 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property, compact = false }: PropertyCardProps) {
   const { toggleFavorite, isFavorite } = useFavorites()
+  const { addToComparison, removeFromComparison, isInComparison } = useComparison()
   const { user } = useUser()
   const router = useRouter()
   const favorite = isFavorite(property.id)
+  const inComparison = isInComparison(property.id)
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -40,6 +43,43 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
     }
 
     await toggleFavorite(property.id)
+  }
+
+  const handleCompareClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (inComparison) {
+      removeFromComparison(property.id)
+    } else {
+      addToComparison({
+        id: property.id,
+        title: property.title,
+        price: property.price,
+        listingType: property.listingType,
+        propertyType: property.propertyType,
+        address: property.address,
+        city: property.city,
+        state: property.state,
+        bedrooms: property.bedrooms,
+        bathrooms: property.bathrooms,
+        area: property.area,
+        livingArea: property.livingArea,
+        kitchenArea: property.kitchenArea,
+        rooms: property.rooms,
+        floor: property.floor,
+        totalFloors: property.totalFloors,
+        yearBuilt: property.yearBuilt,
+        parking: property.parking,
+        balcony: property.balcony,
+        buildingType: property.buildingType,
+        buildingClass: property.buildingClass,
+        renovation: property.renovation,
+        furnished: property.furnished,
+        images: property.images,
+        amenities: property.amenities,
+      })
+    }
   }
 
   const formatPrice = (price: number) => {
@@ -143,18 +183,33 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
               {property.propertyType}
             </Badge>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleFavoriteClick}
-            className={`absolute top-2 right-2 transition-colors ${
-              favorite
-                ? 'bg-red-500 hover:bg-red-600 text-white'
-                : 'bg-white/90 hover:bg-white text-gray-600'
-            }`}
-          >
-            <Heart className={`h-5 w-5 ${favorite ? 'fill-current' : ''}`} />
-          </Button>
+          <div className="absolute top-2 right-2 flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCompareClick}
+              className={`transition-colors ${
+                inComparison
+                  ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                  : 'bg-white/90 hover:bg-white text-gray-600'
+              }`}
+              title={inComparison ? 'Remove from comparison' : 'Add to comparison'}
+            >
+              {inComparison ? <Check className="h-5 w-5" /> : <GitCompare className="h-5 w-5" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleFavoriteClick}
+              className={`transition-colors ${
+                favorite
+                  ? 'bg-red-500 hover:bg-red-600 text-white'
+                  : 'bg-white/90 hover:bg-white text-gray-600'
+              }`}
+            >
+              <Heart className={`h-5 w-5 ${favorite ? 'fill-current' : ''}`} />
+            </Button>
+          </div>
         </div>
 
         {/* Content Section */}

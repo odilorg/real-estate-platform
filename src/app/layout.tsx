@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 import { FavoritesProvider } from '@/contexts/FavoritesContext'
+import { ComparisonProvider } from '@/contexts/ComparisonContext'
 import { Toaster } from 'sonner'
 import "./globals.css";
 
@@ -38,7 +39,9 @@ export default async function RootLayout({
         >
           <NextIntlClientProvider messages={messages}>
             <FavoritesProvider>
-              {children}
+              <ComparisonProvider>
+                {children}
+              </ComparisonProvider>
             </FavoritesProvider>
           </NextIntlClientProvider>
           <Toaster position="top-right" richColors />

@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Share2, Facebook, Twitter, Linkedin, Link, Mail, Check } from 'lucide-react'
+import { Share2, Facebook, Twitter, Linkedin, Link, Mail, Check, MessageCircle, Send } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface SharePropertyProps {
@@ -47,6 +47,12 @@ export function ShareProperty({
     let url = ''
 
     switch (platform) {
+      case 'whatsapp':
+        url = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`
+        break
+      case 'telegram':
+        url = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`
+        break
       case 'facebook':
         url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
         break
@@ -75,6 +81,14 @@ export function ShareProperty({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onClick={() => handleShare('whatsapp')}>
+          <MessageCircle className="h-4 w-4 mr-2 text-green-500" />
+          WhatsApp
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleShare('telegram')}>
+          <Send className="h-4 w-4 mr-2 text-blue-500" />
+          Telegram
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleShare('facebook')}>
           <Facebook className="h-4 w-4 mr-2 text-blue-600" />
           Facebook

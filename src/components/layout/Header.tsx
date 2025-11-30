@@ -1,14 +1,26 @@
 "use client"
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { SignInButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
-import { Home, PlusCircle, Heart, MessageSquare, LayoutDashboard } from 'lucide-react'
+import { Home, PlusCircle, Heart, MessageSquare, LayoutDashboard, Briefcase, Shield } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 export function Header() {
   const t = useTranslations('nav')
+  const { user } = useUser()
+  const [userRole, setUserRole] = useState<{ isAgent: boolean; isAdmin: boolean }>({ isAgent: false, isAdmin: false })
+
+  useEffect(() => {
+    if (user) {
+      fetch('/api/users/me/role')
+        .then(res => res.json())
+        .then(data => setUserRole({ isAgent: data.isAgent, isAdmin: data.isAdmin }))
+        .catch(() => {})
+    }
+  }, [user])
 
   return (
     <header className="border-b bg-white sticky top-0 z-50">
@@ -48,12 +60,29 @@ export function Header() {
           <div className="flex items-center space-x-4">
             <LanguageSwitcher />
             <SignedIn>
-              <Link href="/dashboard">
-                <Button variant="ghost" size="sm">
-                  <LayoutDashboard className="h-5 w-5" />
-                  <span className="ml-2 hidden sm:inline">{t('dashboard')}</span>
-                </Button>
-              </Link>
+              {userRole.isAgent ? (
+                <Link href="/agent/dashboard">
+                  <Button variant="ghost" size="sm">
+                    <Briefcase className="h-5 w-5" />
+                    <span className="ml-2 hidden sm:inline">{t('agentDashboard') || 'Agent Dashboard'}</span>
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/dashboard">
+                  <Button variant="ghost" size="sm">
+                    <LayoutDashboard className="h-5 w-5" />
+                    <span className="ml-2 hidden sm:inline">{t('dashboard')}</span>
+                  </Button>
+                </Link>
+              )}
+              {userRole.isAdmin && (
+                <Link href="/admin">
+                  <Button variant="ghost" size="sm">
+                    <Shield className="h-5 w-5" />
+                    <span className="ml-2 hidden sm:inline">Admin</span>
+                  </Button>
+                </Link>
+              )}
               <Link href="/favorites">
                 <Button variant="ghost" size="sm">
                   <Heart className="h-5 w-5" />
