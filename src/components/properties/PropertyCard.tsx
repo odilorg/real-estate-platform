@@ -323,7 +323,7 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
               </div>
 
               {/* Description - Hidden on very small screens */}
-              <p className="hidden sm:block text-sm text-gray-600 line-clamp-2 mb-3 flex-grow">
+              <p className="hidden sm:block text-sm text-gray-600 line-clamp-3 mb-3 overflow-hidden">
                 {property.description}
               </p>
 

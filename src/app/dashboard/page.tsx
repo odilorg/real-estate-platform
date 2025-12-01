@@ -14,6 +14,7 @@ import { MessagesTab } from './components/MessagesTab'
 import { ViewingsTab } from './components/ViewingsTab'
 import { SettingsTab } from './components/SettingsTab'
 import { InquiriesTab } from './components/InquiriesTab'
+import { NotesTab } from './components/NotesTab'
 import { SavedSearches } from '@/components/search/SavedSearches'
 
 function DashboardLoading() {
@@ -92,6 +93,7 @@ function DashboardContent() {
               <TabsTrigger value="inquiries">{t('inquiries')}</TabsTrigger>
               <TabsTrigger value="favorites">{t('favorites')}</TabsTrigger>
               <TabsTrigger value="viewings">{t('viewings')}</TabsTrigger>
+              <TabsTrigger value="notes">{t('notes')}</TabsTrigger>
               <TabsTrigger value="searches">{t('savedSearches')}</TabsTrigger>
               <TabsTrigger value="messages">{t('messages')}</TabsTrigger>
               <TabsTrigger value="settings">{t('settings')}</TabsTrigger>
@@ -116,6 +118,10 @@ function DashboardContent() {
 
             <TabsContent value="viewings" className="space-y-6">
               <ViewingsTab />
+            </TabsContent>
+
+            <TabsContent value="notes" className="space-y-6">
+              <NotesTab />
             </TabsContent>
 
             <TabsContent value="searches" className="space-y-6">
