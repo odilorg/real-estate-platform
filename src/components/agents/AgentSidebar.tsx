@@ -1,3 +1,4 @@
+import { clerkClient } from '@clerk/nextjs/server'
 import { getAgentByUserId, getAgentListingsCount } from '@/lib/agents'
 import { AgentCard, OwnerContactCard } from './AgentCard'
 
@@ -18,13 +19,25 @@ export async function AgentSidebar({ ownerId, propertyId }: AgentSidebarProps) {
   // Get agent's listing count
   const listingsCount = await getAgentListingsCount(ownerId)
 
+  // Get photo from agent record or fallback to Clerk user image
+  let photo = agent.photo
+  if (!photo && agent.userId) {
+    try {
+      const client = await clerkClient()
+      const clerkUser = await client.users.getUser(agent.userId)
+      photo = clerkUser.imageUrl || null
+    } catch {
+      // User might not exist in Clerk
+    }
+  }
+
   return (
     <AgentCard
       agent={{
         id: agent.id,
         firstName: agent.firstName,
         lastName: agent.lastName,
-        photo: agent.photo,
+        photo,
         phone: agent.phone,
         email: agent.email,
         whatsapp: agent.whatsapp,

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { clerkClient } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(
@@ -6,6 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const client = await clerkClient()
     const { id } = await params
 
     const agent = await prisma.agent.findUnique({
@@ -64,9 +66,21 @@ export async function GET(
     const languages = agent.languages ? JSON.parse(agent.languages) : []
     const areasServed = agent.areasServed ? JSON.parse(agent.areasServed) : []
 
+    // Get photo from agent record or fallback to Clerk user image
+    let photo = agent.photo
+    if (!photo && agent.userId) {
+      try {
+        const clerkUser = await client.users.getUser(agent.userId)
+        photo = clerkUser.imageUrl || null
+      } catch {
+        // User might not exist in Clerk
+      }
+    }
+
     return NextResponse.json({
       agent: {
         ...agent,
+        photo,
         specializations,
         languages,
         areasServed,

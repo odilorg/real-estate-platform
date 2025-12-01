@@ -67,16 +67,26 @@ export function ViewingsTab() {
         setViewings(prev =>
           prev.map(v => (v.id === id ? { ...v, status } : v))
         )
-        toast.success(`Viewing ${status.toLowerCase()}`)
+        toast.success(t('viewingStatusUpdated'))
       } else {
         const error = await response.json()
-        toast.error(error.error || 'Failed to update viewing')
+        toast.error(error.error || t('viewingUpdateFailed'))
       }
     } catch (error) {
-      toast.error('Failed to update viewing')
+      toast.error(t('viewingUpdateFailed'))
     } finally {
       setUpdating(null)
     }
+  }
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      PENDING: t('statusPending'),
+      CONFIRMED: t('statusConfirmed'),
+      CANCELLED: t('statusCancelled'),
+      COMPLETED: t('statusCompleted'),
+    }
+    return labels[status] || status
   }
 
   const getStatusBadge = (status: string) => {
@@ -88,7 +98,7 @@ export function ViewingsTab() {
     }
     return (
       <Badge className={variants[status] || 'bg-gray-100 text-gray-800'}>
-        {status}
+        {getStatusLabel(status)}
       </Badge>
     )
   }
@@ -124,7 +134,7 @@ export function ViewingsTab() {
               href={`/properties/${viewing.propertyId}`}
               className="font-semibold text-lg hover:text-blue-600"
             >
-              Property #{viewing.propertyId.slice(0, 8)}...
+              {t('property')} #{viewing.propertyId.slice(0, 8)}...
             </Link>
 
             <div className="flex items-center gap-4 text-sm text-gray-600">

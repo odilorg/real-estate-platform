@@ -87,7 +87,7 @@ function DashboardContent() {
             <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 lg:w-auto lg:inline-flex">
               <TabsTrigger value="overview">{t('overview')}</TabsTrigger>
               <TabsTrigger value="properties">{t('myProperties')}</TabsTrigger>
-              <TabsTrigger value="inquiries">Inquiries</TabsTrigger>
+              <TabsTrigger value="inquiries">{t('inquiries')}</TabsTrigger>
               <TabsTrigger value="favorites">{t('favorites')}</TabsTrigger>
               <TabsTrigger value="viewings">{t('viewings')}</TabsTrigger>
               <TabsTrigger value="searches">{t('savedSearches')}</TabsTrigger>

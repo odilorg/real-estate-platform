@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ImageUploader } from '@/components/properties/ImageUploader'
+import { LocationPicker } from '@/components/property/LocationPicker'
 import {
   propertySchema,
   type PropertyFormData,
@@ -27,7 +28,6 @@ import {
   WINDOW_VIEWS,
   BATHROOM_TYPES,
   FURNISHED_TYPES,
-  LABELS
 } from '@/lib/validations/property'
 import {
   regions,
@@ -86,6 +86,10 @@ export default function CreatePropertyPage() {
   const tBuildingClasses = useTranslations('properties.buildingClasses')
   const tRenovation = useTranslations('properties.renovationTypes')
   const tParking = useTranslations('properties.parkingTypes')
+  const tBuildingTypes = useTranslations('properties.buildingTypes')
+  const tBathroomTypes = useTranslations('properties.bathroomTypes')
+  const tWindowViews = useTranslations('properties.windowViews')
+  const tFurnished = useTranslations('properties.furnishedTypes')
   const tAmenities = useTranslations('amenities')
   const tCommon = useTranslations('common')
   const [currentStep, setCurrentStep] = useState(1)
@@ -263,7 +267,7 @@ export default function CreatePropertyPage() {
     yearBuilt: t('yearBuilt'),
     ceilingHeight: t('ceilingHeight'),
     balcony: t('balconies'),
-    loggia: t('loggia') || 'Loggia',
+    loggia: t('loggia'),
     parking: t('parkingSpaces'),
     elevatorPassenger: t('elevatorPassenger'),
     elevatorCargo: t('elevatorCargo'),
@@ -608,35 +612,16 @@ export default function CreatePropertyPage() {
                       </div>
                     )}
 
-                    {/* GPS Coordinates */}
-                    <div className="border rounded-lg p-4 bg-gray-50">
-                      <Label className="font-medium">{t('gpsCoordinates')}</Label>
-                      <p className="text-sm text-gray-500 mb-3">
-                        {t('gpsHelp')}
-                      </p>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="latitude">{t('latitude')}</Label>
-                          <Input
-                            id="latitude"
-                            type="number"
-                            step="any"
-                            placeholder="40.7128"
-                            {...register('latitude', { valueAsNumber: true })}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="longitude">{t('longitude')}</Label>
-                          <Input
-                            id="longitude"
-                            type="number"
-                            step="any"
-                            placeholder="-74.0060"
-                            {...register('longitude', { valueAsNumber: true })}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    {/* Interactive Map Location Picker */}
+                    <LocationPicker
+                      latitude={watch('latitude')}
+                      longitude={watch('longitude')}
+                      onLocationChange={(lat, lng) => {
+                        setValue('latitude', lat)
+                        setValue('longitude', lng)
+                      }}
+                      defaultCenter={{ lat: 41.2995, lng: 69.2401 }}
+                    />
                   </>
                 )}
 
@@ -778,7 +763,7 @@ export default function CreatePropertyPage() {
                             <SelectContent>
                               {BUILDING_TYPES.map(type => (
                                 <SelectItem key={type} value={type}>
-                                  {LABELS.buildingType[type]}
+                                  {tBuildingTypes(type.toLowerCase() as any)}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -907,7 +892,7 @@ export default function CreatePropertyPage() {
                           <SelectContent>
                             {BATHROOM_TYPES.map(type => (
                               <SelectItem key={type} value={type}>
-                                {LABELS.bathroomType[type]}
+                                {tBathroomTypes(type.toLowerCase() as any)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -928,7 +913,7 @@ export default function CreatePropertyPage() {
                           <SelectContent>
                             {WINDOW_VIEWS.map(type => (
                               <SelectItem key={type} value={type}>
-                                {LABELS.windowView[type]}
+                                {tWindowViews(type.toLowerCase() as any)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -947,7 +932,7 @@ export default function CreatePropertyPage() {
                           <SelectContent>
                             {FURNISHED_TYPES.map(type => (
                               <SelectItem key={type} value={type}>
-                                {LABELS.furnished[type]}
+                                {tFurnished(type.toLowerCase() as any)}
                               </SelectItem>
                             ))}
                           </SelectContent>

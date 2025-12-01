@@ -371,6 +371,25 @@ export async function updateProperty(
     await prisma.propertyAmenity.deleteMany({ where: { propertyId: id } })
   }
 
+  // Track price changes in history
+  if (data.price !== undefined) {
+    const currentProperty = await prisma.property.findUnique({
+      where: { id },
+      select: { price: true },
+    })
+
+    if (currentProperty && currentProperty.price !== data.price) {
+      const changeType = data.price > currentProperty.price ? 'INCREASE' : 'DECREASE'
+      await prisma.priceHistory.create({
+        data: {
+          propertyId: id,
+          price: data.price,
+          changeType,
+        },
+      })
+    }
+  }
+
   const property = await prisma.property.update({
     where: { id },
     data: {

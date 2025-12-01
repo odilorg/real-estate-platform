@@ -76,11 +76,11 @@ export function PropertiesTab() {
         setDeleteModalOpen(false)
         setPropertyToDelete(null)
       } else {
-        alert('Failed to delete property. Please try again.')
+        alert(t('deletePropertyFailed'))
       }
     } catch (error) {
       console.error('Error deleting property:', error)
-      alert('An error occurred. Please try again.')
+      alert(t('errorOccurred'))
     } finally {
       setDeleting(false)
     }
@@ -166,7 +166,7 @@ export function PropertiesTab() {
                 <div className="text-xl font-bold text-blue-600 mb-1">
                   {formatPrice(property.price)}
                   {property.listingType === 'RENT' && (
-                    <span className="text-sm text-gray-600 font-normal">/mo</span>
+                    <span className="text-sm text-gray-600 font-normal">/{t('perMonth')}</span>
                   )}
                 </div>
                 <h3 className="font-semibold text-lg line-clamp-2 mb-1">
@@ -195,7 +195,7 @@ export function PropertiesTab() {
                 {property.area && (
                   <div className="flex items-center">
                     <Maximize className="h-4 w-4 mr-1" />
-                    {property.area} sq ft
+                    {property.area} {t('sqm')}
                   </div>
                 )}
               </div>

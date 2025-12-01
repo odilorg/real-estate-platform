@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useUploadThing } from '@/lib/uploadthing'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface ImageFile {
   url: string
@@ -22,6 +23,7 @@ interface ImageUploaderProps {
 }
 
 export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploaderProps) {
+  const t = useTranslations('properties.form.imageUploader')
   const [uploading, setUploading] = useState(false)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
 
@@ -29,7 +31,7 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
     onClientUploadComplete: (files) => {
       const newUrls = files.map(file => file.url)
       onChange([...images, ...newUrls])
-      toast.success(`${files.length} image(s) uploaded successfully!`)
+      toast.success(t('uploadSuccess', { count: files.length }))
       setUploading(false)
     },
     onUploadError: (error) => {
@@ -40,13 +42,13 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (images.length + acceptedFiles.length > maxImages) {
-      toast.error(`Maximum ${maxImages} images allowed`)
+      toast.error(t('maxImagesError', { max: maxImages }))
       return
     }
 
     setUploading(true)
     await startUpload(acceptedFiles)
-  }, [images, maxImages, startUpload])
+  }, [images, maxImages, startUpload, t])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -60,7 +62,7 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
   const removeImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index)
     onChange(newImages)
-    toast.success('Image removed')
+    toast.success(t('imageRemoved'))
   }
 
   const setPrimaryImage = (index: number) => {
@@ -69,7 +71,7 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
     const primaryImage = newImages.splice(index, 1)[0]
     newImages.unshift(primaryImage)
     onChange(newImages)
-    toast.success('Primary image updated')
+    toast.success(t('primaryUpdated'))
   }
 
   const handleDragStart = (index: number) => {
@@ -110,17 +112,17 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
             {uploading || isUploading ? (
               <>
                 <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
-                <p className="text-sm text-gray-600">Uploading images...</p>
+                <p className="text-sm text-gray-600">{t('uploading')}</p>
               </>
             ) : (
               <>
                 <Upload className="h-10 w-10 text-gray-400" />
                 <div>
                   <p className="text-sm font-medium text-gray-700">
-                    {isDragActive ? 'Drop images here' : 'Drag & drop images, or click to select'}
+                    {isDragActive ? t('dropHere') : t('dragOrClick')}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    PNG, JPG, JPEG, WEBP up to 4MB ({images.length}/{maxImages} images)
+                    {t('fileTypes')} ({images.length}/{maxImages})
                   </p>
                 </div>
               </>
@@ -158,7 +160,7 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
                       variant="secondary"
                       onClick={() => setPrimaryImage(index)}
                       className="h-8 w-8 p-0"
-                      title="Set as primary image"
+                      title={t('setPrimary')}
                     >
                       <Star className="h-4 w-4" />
                     </Button>
@@ -170,7 +172,7 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
                     variant="destructive"
                     onClick={() => removeImage(index)}
                     className="h-8 w-8 p-0"
-                    title="Remove image"
+                    title={t('removeImage')}
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -180,7 +182,7 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
                 {index === 0 && (
                   <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
                     <Star className="h-3 w-3 fill-current" />
-                    Primary
+                    {t('primary')}
                   </div>
                 )}
 
@@ -204,7 +206,7 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
       {/* Helper Text */}
       {images.length > 0 && (
         <p className="text-xs text-gray-500 text-center">
-          Drag images to reorder • First image is the primary image • Click star to set as primary
+          {t('helperText')}
         </p>
       )}
     </div>

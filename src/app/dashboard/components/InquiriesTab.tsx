@@ -57,7 +57,7 @@ interface InquiryStats {
 }
 
 export function InquiriesTab() {
-  const t = useTranslations('inquiry')
+  const t = useTranslations('dashboard.inquiriesTab')
   const [inquiries, setInquiries] = useState<Inquiry[]>([])
   const [stats, setStats] = useState<InquiryStats>({ total: 0, new: 0, read: 0, responded: 0 })
   const [isLoading, setIsLoading] = useState(true)
@@ -116,14 +116,14 @@ export function InquiriesTab() {
       })
 
       if (res.ok) {
-        toast.success('Response sent!')
+        toast.success(t('responseSent'))
         setSelectedInquiry(null)
         loadInquiries()
       } else {
-        toast.error('Failed to send response')
+        toast.error(t('responseFailed'))
       }
     } catch (error) {
-      toast.error('Failed to send response')
+      toast.error(t('responseFailed'))
     } finally {
       setIsResponding(false)
     }
@@ -136,23 +136,23 @@ export function InquiriesTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'ARCHIVED' }),
       })
-      toast.success('Inquiry archived')
+      toast.success(t('inquiryArchived'))
       loadInquiries()
     } catch (error) {
-      toast.error('Failed to archive inquiry')
+      toast.error(t('archiveFailed'))
     }
   }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'NEW':
-        return <Badge className="bg-blue-100 text-blue-800"><Clock className="h-3 w-3 mr-1" />{t('newInquiries') || 'New'}</Badge>
+        return <Badge className="bg-blue-100 text-blue-800"><Clock className="h-3 w-3 mr-1" />{t('new')}</Badge>
       case 'READ':
-        return <Badge variant="outline"><Eye className="h-3 w-3 mr-1" />Read</Badge>
+        return <Badge variant="outline"><Eye className="h-3 w-3 mr-1" />{t('read')}</Badge>
       case 'RESPONDED':
-        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" />Responded</Badge>
+        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" />{t('responded')}</Badge>
       case 'ARCHIVED':
-        return <Badge variant="secondary"><Archive className="h-3 w-3 mr-1" />Archived</Badge>
+        return <Badge variant="secondary"><Archive className="h-3 w-3 mr-1" />{t('archived')}</Badge>
       default:
         return <Badge variant="outline">{status}</Badge>
     }
@@ -196,7 +196,7 @@ export function InquiriesTab() {
           <CardContent className="pt-4">
             <div className="text-center">
               <p className="text-3xl font-bold text-blue-600">{stats.new}</p>
-              <p className="text-sm text-gray-500">{t('newInquiries') || 'New Inquiries'}</p>
+              <p className="text-sm text-gray-500">{t('newInquiries')}</p>
             </div>
           </CardContent>
         </Card>
@@ -204,7 +204,7 @@ export function InquiriesTab() {
           <CardContent className="pt-4">
             <div className="text-center">
               <p className="text-3xl font-bold text-gray-600">{stats.read}</p>
-              <p className="text-sm text-gray-500">Read</p>
+              <p className="text-sm text-gray-500">{t('read')}</p>
             </div>
           </CardContent>
         </Card>
@@ -212,7 +212,7 @@ export function InquiriesTab() {
           <CardContent className="pt-4">
             <div className="text-center">
               <p className="text-3xl font-bold text-green-600">{stats.responded}</p>
-              <p className="text-sm text-gray-500">Responded</p>
+              <p className="text-sm text-gray-500">{t('responded')}</p>
             </div>
           </CardContent>
         </Card>
@@ -220,7 +220,7 @@ export function InquiriesTab() {
           <CardContent className="pt-4">
             <div className="text-center">
               <p className="text-3xl font-bold">{stats.total}</p>
-              <p className="text-sm text-gray-500">Total</p>
+              <p className="text-sm text-gray-500">{t('total')}</p>
             </div>
           </CardContent>
         </Card>
@@ -230,11 +230,11 @@ export function InquiriesTab() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="new">
-            New {stats.new > 0 && <Badge className="ml-2 bg-blue-500">{stats.new}</Badge>}
+            {t('new')} {stats.new > 0 && <Badge className="ml-2 bg-blue-500">{stats.new}</Badge>}
           </TabsTrigger>
-          <TabsTrigger value="read">Read</TabsTrigger>
-          <TabsTrigger value="responded">Responded</TabsTrigger>
-          <TabsTrigger value="all">{t('allInquiries') || 'All'}</TabsTrigger>
+          <TabsTrigger value="read">{t('read')}</TabsTrigger>
+          <TabsTrigger value="responded">{t('responded')}</TabsTrigger>
+          <TabsTrigger value="all">{t('all')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-4">
@@ -243,9 +243,9 @@ export function InquiriesTab() {
               <CardContent className="pt-6">
                 <div className="text-center py-8">
                   <MessageSquare className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-500">{t('noInquiries') || 'No inquiries yet'}</p>
+                  <p className="text-gray-500">{t('noInquiries')}</p>
                   <p className="text-sm text-gray-400 mt-1">
-                    {t('noInquiriesDesc') || 'When buyers contact you about your properties, they will appear here.'}
+                    {t('noInquiriesDesc')}
                   </p>
                 </div>
               </CardContent>
@@ -277,7 +277,7 @@ export function InquiriesTab() {
                           <div>
                             <h4 className="font-semibold">{inquiry.senderName}</h4>
                             <p className="text-sm text-gray-500 truncate">
-                              {inquiry.property?.title || 'Property'}
+                              {inquiry.property?.title || t('property')}
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
@@ -315,7 +315,7 @@ export function InquiriesTab() {
                           onClick={() => handleViewInquiry(inquiry)}
                         >
                           <Eye className="h-4 w-4 mr-1" />
-                          {inquiry.status === 'RESPONDED' ? 'View' : t('respond') || 'Respond'}
+                          {inquiry.status === 'RESPONDED' ? t('view') : t('respond')}
                         </Button>
                         {inquiry.status !== 'ARCHIVED' && (
                           <Button
@@ -324,7 +324,7 @@ export function InquiriesTab() {
                             onClick={() => handleArchive(inquiry.id)}
                           >
                             <Archive className="h-4 w-4 mr-1" />
-                            {t('archive') || 'Archive'}
+                            {t('archive')}
                           </Button>
                         )}
                       </div>
@@ -341,7 +341,7 @@ export function InquiriesTab() {
       <Dialog open={!!selectedInquiry} onOpenChange={() => setSelectedInquiry(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Inquiry from {selectedInquiry?.senderName}</DialogTitle>
+            <DialogTitle>{t('inquiryFrom', { name: selectedInquiry?.senderName })}</DialogTitle>
             <DialogDescription>
               {selectedInquiry?.property?.title}
             </DialogDescription>
@@ -386,7 +386,7 @@ export function InquiriesTab() {
               {selectedInquiry.status === 'RESPONDED' && selectedInquiry.response ? (
                 <div>
                   <label className="text-sm font-medium text-gray-500 mb-1 block">
-                    Your Response ({new Date(selectedInquiry.respondedAt!).toLocaleString()})
+                    {t('yourResponseAt', { date: new Date(selectedInquiry.respondedAt!).toLocaleString() })}
                   </label>
                   <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                     <p className="text-sm whitespace-pre-wrap">{selectedInquiry.response}</p>
@@ -395,12 +395,12 @@ export function InquiriesTab() {
               ) : (
                 <div>
                   <label className="text-sm font-medium mb-1 block">
-                    {t('yourResponse') || 'Your Response'}
+                    {t('yourResponse')}
                   </label>
                   <Textarea
                     value={responseText}
                     onChange={(e) => setResponseText(e.target.value)}
-                    placeholder="Type your response here..."
+                    placeholder={t('responsePlaceholder')}
                     rows={4}
                   />
                 </div>
@@ -410,7 +410,7 @@ export function InquiriesTab() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedInquiry(null)}>
-              Close
+              {t('close')}
             </Button>
             {selectedInquiry?.status !== 'RESPONDED' && (
               <Button
@@ -422,7 +422,7 @@ export function InquiriesTab() {
                 ) : (
                   <Send className="h-4 w-4 mr-2" />
                 )}
-                {t('sendResponse') || 'Send Response'}
+                {t('sendResponse')}
               </Button>
             )}
           </DialogFooter>
