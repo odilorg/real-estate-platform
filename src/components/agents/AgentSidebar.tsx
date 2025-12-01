@@ -13,7 +13,7 @@ export async function AgentSidebar({ ownerId, propertyId }: AgentSidebarProps) {
 
   if (!agent) {
     // Owner is not a registered agent, show simple contact card
-    return <OwnerContactCard ownerId={ownerId} />
+    return <OwnerContactCard ownerId={ownerId} propertyId={propertyId} />
   }
 
   // Get agent's listing count

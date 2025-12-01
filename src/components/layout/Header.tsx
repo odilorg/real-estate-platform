@@ -20,7 +20,14 @@ export function Header() {
   const { data: session, status } = useSession()
   const [userRole, setUserRole] = useState<{ isAgent: boolean; isAdmin: boolean }>({ isAgent: false, isAdmin: false })
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
+  // Prevent hydration mismatch by only rendering auth state after mount
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const isLoading = status === "loading" || !mounted
   const isAuthenticated = status === "authenticated"
   const user = session?.user
 
@@ -73,7 +80,9 @@ export function Header() {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <LanguageSwitcher />
-            {isAuthenticated ? (
+            {isLoading ? (
+              <div className="h-8 w-20 bg-gray-100 animate-pulse rounded" />
+            ) : isAuthenticated ? (
               <>
                 {userRole.isAgent ? (
                   <Link href="/agent/dashboard">
@@ -172,7 +181,9 @@ export function Header() {
           {/* Mobile Actions */}
           <div className="flex md:hidden items-center space-x-2">
             <LanguageSwitcher />
-            {isAuthenticated ? (
+            {isLoading ? (
+              <div className="h-8 w-8 bg-gray-100 animate-pulse rounded-full" />
+            ) : isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0">
@@ -248,7 +259,12 @@ export function Header() {
               </Link>
             </nav>
 
-            {isAuthenticated ? (
+            {isLoading ? (
+              <div className="border-t pt-4 space-y-2">
+                <div className="h-10 bg-gray-100 animate-pulse rounded" />
+                <div className="h-10 bg-gray-100 animate-pulse rounded" />
+              </div>
+            ) : isAuthenticated ? (
               <div className="border-t pt-4 space-y-2">
                 {userRole.isAgent ? (
                   <Link

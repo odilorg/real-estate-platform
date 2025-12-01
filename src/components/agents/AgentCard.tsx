@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -53,6 +55,47 @@ interface AgentCardProps {
 export function AgentCard({ agent, listingsCount, onContact, propertyId }: AgentCardProps) {
   const t = useTranslations('agent')
   const [showPhone, setShowPhone] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const { data: session } = useSession()
+
+  const handleContact = async () => {
+    if (onContact) {
+      onContact()
+      return
+    }
+
+    // Default behavior: start a conversation
+    if (!session?.user?.id) {
+      router.push('/sign-in')
+      return
+    }
+
+    if (!propertyId) {
+      return
+    }
+
+    setLoading(true)
+    try {
+      const res = await fetch('/api/messages/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          propertyId,
+          message: "Здравствуйте! Интересует ваш объект. Можете предоставить больше информации?",
+        }),
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        router.push(`/messages/${data.conversationId}`)
+      }
+    } catch (error) {
+      console.error('Error starting conversation:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const fullName = `${agent.firstName} ${agent.lastName}`
 
@@ -212,10 +255,11 @@ export function AgentCard({ agent, listingsCount, onContact, propertyId }: Agent
             <Button
               variant="outline"
               className="w-full"
-              onClick={onContact}
+              onClick={handleContact}
+              disabled={loading}
             >
               <MessageCircle className="h-4 w-4 mr-2" />
-              {t('writeMessage')}
+              {loading ? t('loading') || 'Loading...' : t('writeMessage')}
             </Button>
           </div>
 
@@ -253,12 +297,61 @@ export function AgentCard({ agent, listingsCount, onContact, propertyId }: Agent
 // Simple version for when there's no agent (just show owner contact)
 export function OwnerContactCard({
   ownerId,
-  onContact,
+  propertyId,
 }: {
   ownerId: string
-  onContact?: () => void
+  propertyId?: string
 }) {
   const t = useTranslations('agent')
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const { data: session } = useSession()
+
+  const handleContact = () => {
+    console.log('Contact button clicked', { session, ownerId, propertyId })
+
+    // Check if user is authenticated
+    if (!session?.user?.id) {
+      router.push('/sign-in')
+      return
+    }
+
+    // Check if trying to message own property
+    if (ownerId === session.user.id) {
+      console.log('Cannot message own property')
+      return
+    }
+
+    if (!propertyId) {
+      console.log('No propertyId')
+      return
+    }
+
+    setLoading(true)
+    fetch('/api/messages/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        propertyId,
+        message: "Здравствуйте! Интересует ваш объект. Можете предоставить больше информации?",
+      }),
+    })
+      .then(res => {
+        if (res.ok) {
+          return res.json()
+        }
+        throw new Error('Failed to start conversation')
+      })
+      .then(data => {
+        router.push(`/messages/${data.conversationId}`)
+      })
+      .catch(error => {
+        console.error('Error starting conversation:', error)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
 
   return (
     <Card>
@@ -275,9 +368,14 @@ export function OwnerContactCard({
           </div>
         </div>
 
-        <Button className="w-full" onClick={onContact}>
+        <Button
+          type="button"
+          className="w-full"
+          onClick={handleContact}
+          disabled={loading}
+        >
           <MessageCircle className="h-4 w-4 mr-2" />
-          {t('contactOwner')}
+          {loading ? t('loading') || 'Loading...' : t('contactOwner')}
         </Button>
       </CardContent>
     </Card>
