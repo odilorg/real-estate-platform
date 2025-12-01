@@ -25,6 +25,7 @@ export interface Property {
   propertyType: string
   listingType: string
   status: string
+  // Location details
   address: string
   city: string
   state: string | null
@@ -32,15 +33,44 @@ export interface Property {
   zipCode: string | null
   latitude: number | null
   longitude: number | null
+  district: string | null
+  nearestMetro: string | null
+  metroDistance: number | null
+  // Property details - Areas
   bedrooms: number | null
   bathrooms: number | null
   area: number | null
+  livingArea: number | null
+  kitchenArea: number | null
+  rooms: number | null
+  // Property details - Building info
   yearBuilt: number | null
   floor: number | null
   totalFloors: number | null
+  ceilingHeight: number | null
+  // Property details - Features
   parking: number | null
+  parkingType: string | null
+  balcony: number | null
+  loggia: number | null
+  // Building characteristics
+  buildingType: string | null
+  buildingClass: string | null
+  buildingName: string | null
+  elevatorPassenger: number | null
+  elevatorCargo: number | null
+  hasGarbageChute: boolean
+  hasConcierge: boolean
+  hasGatedArea: boolean
+  // Apartment condition
+  renovation: string | null
+  windowView: string | null
+  bathroomType: string | null
+  furnished: string | null
+  // Metadata
   views: number
   featured: boolean
+  verified: boolean
   createdAt: Date
   updatedAt: Date
   images: string[]

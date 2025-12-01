@@ -32,6 +32,7 @@ export interface PropertyWithRelations {
   propertyType: PropertyType
   listingType: ListingType
   status: string
+  // Location details
   address: string
   city: string
   state: string | null
@@ -39,15 +40,44 @@ export interface PropertyWithRelations {
   zipCode: string | null
   latitude: number | null
   longitude: number | null
+  district: string | null
+  nearestMetro: string | null
+  metroDistance: number | null
+  // Property details - Areas
   bedrooms: number | null
   bathrooms: number | null
   area: number | null
+  livingArea: number | null
+  kitchenArea: number | null
+  rooms: number | null
+  // Property details - Building info
   yearBuilt: number | null
   floor: number | null
   totalFloors: number | null
+  ceilingHeight: number | null
+  // Property details - Features
   parking: number | null
+  parkingType: string | null
+  balcony: number | null
+  loggia: number | null
+  // Building characteristics
+  buildingType: string | null
+  buildingClass: string | null
+  buildingName: string | null
+  elevatorPassenger: number | null
+  elevatorCargo: number | null
+  hasGarbageChute: boolean
+  hasConcierge: boolean
+  hasGatedArea: boolean
+  // Apartment condition
+  renovation: string | null
+  windowView: string | null
+  bathroomType: string | null
+  furnished: string | null
+  // Metadata
   views: number
   featured: boolean
+  verified: boolean
   createdAt: Date
   updatedAt: Date
   images: string[]
@@ -935,55 +965,60 @@ function toRad(deg: number): number {
 
 // ============ Admin Operations ============
 
-export async function getUserProfile(clerkId: string) {
-  return prisma.userProfile.findUnique({ where: { clerkId } })
+export async function getUserById(userId: string) {
+  return prisma.user.findUnique({ where: { id: userId } })
 }
 
-export async function getOrCreateUserProfile(clerkId: string) {
-  return prisma.userProfile.upsert({
-    where: { clerkId },
-    update: {},
-    create: { clerkId },
+export async function updateUserRole(userId: string, role: string) {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { role },
   })
 }
 
-export async function updateUserRole(clerkId: string, role: string) {
-  return prisma.userProfile.upsert({
-    where: { clerkId },
-    update: { role },
-    create: { clerkId, role },
+export async function banUser(userId: string, reason?: string) {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { banned: true, banReason: reason },
   })
 }
 
-export async function banUser(clerkId: string, reason?: string) {
-  return prisma.userProfile.upsert({
-    where: { clerkId },
-    update: { banned: true, banReason: reason },
-    create: { clerkId, banned: true, banReason: reason },
-  })
-}
-
-export async function unbanUser(clerkId: string) {
-  return prisma.userProfile.update({
-    where: { clerkId },
+export async function unbanUser(userId: string) {
+  return prisma.user.update({
+    where: { id: userId },
     data: { banned: false, banReason: null },
   })
 }
 
-export async function isUserAdmin(clerkId: string): Promise<boolean> {
-  const profile = await prisma.userProfile.findUnique({ where: { clerkId } })
-  return profile?.role === 'ADMIN'
+export async function isUserAdmin(userId: string): Promise<boolean> {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  return user?.role === 'ADMIN'
 }
 
-export async function isUserBanned(clerkId: string): Promise<boolean> {
-  const profile = await prisma.userProfile.findUnique({ where: { clerkId } })
-  return profile?.banned ?? false
+export async function isUserBanned(userId: string): Promise<boolean> {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  return user?.banned ?? false
 }
 
-export async function getAllUserProfiles() {
-  return prisma.userProfile.findMany({
+export async function getAllUsers() {
+  return prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      emailVerified: true,
+      image: true,
+      role: true,
+      banned: true,
+      banReason: true,
+      createdAt: true,
+    },
   })
+}
+
+export async function getUserCount() {
+  return prisma.user.count()
 }
 
 export async function logAdminAction(data: {
@@ -1017,7 +1052,7 @@ export async function getAdminStats() {
     prisma.property.count(),
     prisma.review.count(),
     prisma.review.count({ where: { approved: false } }),
-    prisma.userProfile.count(),
+    prisma.user.count(),
     prisma.viewing.count(),
     prisma.message.count(),
     prisma.property.count({

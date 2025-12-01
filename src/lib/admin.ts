@@ -1,55 +1,36 @@
-import { auth, clerkClient } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
-export type UserRole = 'admin' | 'moderator' | 'user'
+export type UserRole = 'ADMIN' | 'AGENT' | 'USER'
 
 /**
  * Check if the current user is an admin
  */
 export async function isAdmin(): Promise<boolean> {
-  const { userId } = await auth()
-  if (!userId) return false
+  const session = await getSession()
+  if (!session?.user?.id) return false
 
-  try {
-    const user = await (await clerkClient()).users.getUser(userId)
-    const role = user.publicMetadata?.role as UserRole
-    return role === 'admin'
-  } catch (error) {
-    console.error('Error checking admin status:', error)
-    return false
-  }
+  return session.user.role === 'ADMIN'
 }
 
 /**
- * Check if the current user is an admin or moderator
+ * Check if the current user is an admin or agent (moderator-level)
  */
 export async function isModerator(): Promise<boolean> {
-  const { userId } = await auth()
-  if (!userId) return false
+  const session = await getSession()
+  if (!session?.user?.id) return false
 
-  try {
-    const user = await (await clerkClient()).users.getUser(userId)
-    const role = user.publicMetadata?.role as UserRole
-    return role === 'admin' || role === 'moderator'
-  } catch (error) {
-    console.error('Error checking moderator status:', error)
-    return false
-  }
+  return session.user.role === 'ADMIN' || session.user.role === 'AGENT'
 }
 
 /**
  * Get the current user's role
  */
 export async function getUserRole(): Promise<UserRole> {
-  const { userId } = await auth()
-  if (!userId) return 'user'
+  const session = await getSession()
+  if (!session?.user?.id) return 'USER'
 
-  try {
-    const user = await (await clerkClient()).users.getUser(userId)
-    return (user.publicMetadata?.role as UserRole) || 'user'
-  } catch (error) {
-    console.error('Error getting user role:', error)
-    return 'user'
-  }
+  return (session.user.role as UserRole) || 'USER'
 }
 
 /**
@@ -62,8 +43,9 @@ export async function setUserRole(targetUserId: string, role: UserRole): Promise
   }
 
   try {
-    await (await clerkClient()).users.updateUser(targetUserId, {
-      publicMetadata: { role },
+    await prisma.user.update({
+      where: { id: targetUserId },
+      data: { role },
     })
     return true
   } catch (error) {

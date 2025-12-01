@@ -11,7 +11,7 @@ import { PropertyRating } from './PropertyRating'
 import { Heart, MapPin, Bed, Bath, Maximize, Calendar, GitCompare, Check, Map, Printer, Flag, Phone, Building2, Shield, Eye, EyeOff } from 'lucide-react'
 import { useFavorites } from '@/contexts/FavoritesContext'
 import { useComparison } from '@/contexts/ComparisonContext'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import type { Property } from '@/types'
@@ -24,7 +24,8 @@ interface PropertyCardProps {
 export function PropertyCard({ property, compact = false }: PropertyCardProps) {
   const { toggleFavorite, isFavorite } = useFavorites()
   const { addToComparison, removeFromComparison, isInComparison } = useComparison()
-  const { user } = useUser()
+  const { data: session } = useSession()
+  const user = session?.user
   const router = useRouter()
   const t = useTranslations('property')
   const tAgent = useTranslations('agent')
@@ -100,22 +101,22 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
         propertyType: property.propertyType,
         address: property.address,
         city: property.city,
-        state: property.state,
-        bedrooms: property.bedrooms,
-        bathrooms: property.bathrooms,
-        area: property.area,
-        livingArea: property.livingArea,
-        kitchenArea: property.kitchenArea,
-        rooms: property.rooms,
-        floor: property.floor,
-        totalFloors: property.totalFloors,
-        yearBuilt: property.yearBuilt,
-        parking: property.parking,
-        balcony: property.balcony,
-        buildingType: property.buildingType,
-        buildingClass: property.buildingClass,
-        renovation: property.renovation,
-        furnished: property.furnished,
+        state: property.state ?? undefined,
+        bedrooms: property.bedrooms ?? undefined,
+        bathrooms: property.bathrooms ?? undefined,
+        area: property.area ?? undefined,
+        livingArea: property.livingArea ?? undefined,
+        kitchenArea: property.kitchenArea ?? undefined,
+        rooms: property.rooms ?? undefined,
+        floor: property.floor ?? undefined,
+        totalFloors: property.totalFloors ?? undefined,
+        yearBuilt: property.yearBuilt ?? undefined,
+        parking: property.parking ?? undefined,
+        balcony: property.balcony ?? undefined,
+        buildingType: property.buildingType ?? undefined,
+        buildingClass: property.buildingClass ?? undefined,
+        renovation: property.renovation ?? undefined,
+        furnished: property.furnished ?? undefined,
         images: property.images,
         amenities: property.amenities,
       })

@@ -1,5 +1,6 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next"
-import { auth } from "@clerk/nextjs/server"
+import { getSession } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
 
 const f = createUploadthing()
 
@@ -11,8 +12,8 @@ export const ourFileRouter = {
     },
   })
     .middleware(async () => {
-      // Authenticate user
-      const { userId } = await auth()
+      const session = await getSession()
+      const userId = session?.user?.id
 
       if (!userId) {
         throw new Error("Unauthorized")
@@ -24,6 +25,33 @@ export const ourFileRouter = {
       console.log("Upload complete for userId:", metadata.userId)
       console.log("File URL:", file.url)
 
+      return { uploadedBy: metadata.userId, url: file.url }
+    }),
+
+  profileImage: f({
+    image: {
+      maxFileSize: "2MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      const session = await getSession()
+      const userId = session?.user?.id
+
+      if (!userId) {
+        throw new Error("Unauthorized")
+      }
+
+      return { userId }
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      // Update user's profile image in database
+      await prisma.user.update({
+        where: { id: metadata.userId },
+        data: { image: file.url },
+      })
+
+      console.log("Profile image updated for userId:", metadata.userId)
       return { uploadedBy: metadata.userId, url: file.url }
     }),
 } satisfies FileRouter

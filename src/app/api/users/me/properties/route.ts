@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { getPropertiesByUserId } from '@/lib/db'
 
 // GET /api/users/me/properties - Get all properties for current user
 export async function GET() {
   try {
     // Check authentication
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(

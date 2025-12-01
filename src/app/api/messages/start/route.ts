@@ -1,10 +1,11 @@
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { getPropertyById, getOrCreateConversation, sendMessage } from '@/lib/db'
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

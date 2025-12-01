@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
@@ -74,7 +74,9 @@ export function PropertyPageActions({
   amenities,
   variant = 'default',
 }: PropertyPageActionsProps) {
-  const { isSignedIn, user } = useUser()
+  const { data: session, status } = useSession()
+  const isSignedIn = status === 'authenticated'
+  const user = session?.user
   const router = useRouter()
   const t = useTranslations('property')
   const { addToComparison, removeFromComparison, isInComparison } = useComparison()
@@ -131,22 +133,22 @@ export function PropertyPageActions({
         propertyType: propertyType || 'APARTMENT',
         address: address || '',
         city: propertyCity,
-        state: state || null,
-        bedrooms: bedrooms || null,
-        bathrooms: bathrooms || null,
-        area: area || null,
-        livingArea: livingArea || null,
-        kitchenArea: kitchenArea || null,
-        rooms: rooms || null,
-        floor: floor || null,
-        totalFloors: totalFloors || null,
-        yearBuilt: yearBuilt || null,
-        parking: parking || null,
-        balcony: balcony || null,
-        buildingType: buildingType || null,
-        buildingClass: buildingClass || null,
-        renovation: renovation || null,
-        furnished: furnished || null,
+        state: state ?? undefined,
+        bedrooms: bedrooms ?? undefined,
+        bathrooms: bathrooms ?? undefined,
+        area: area ?? undefined,
+        livingArea: livingArea ?? undefined,
+        kitchenArea: kitchenArea ?? undefined,
+        rooms: rooms ?? undefined,
+        floor: floor ?? undefined,
+        totalFloors: totalFloors ?? undefined,
+        yearBuilt: yearBuilt ?? undefined,
+        parking: parking ?? undefined,
+        balcony: balcony ?? undefined,
+        buildingType: buildingType ?? undefined,
+        buildingClass: buildingClass ?? undefined,
+        renovation: renovation ?? undefined,
+        furnished: furnished ?? undefined,
         images: images || [],
         amenities: amenities || [],
       })

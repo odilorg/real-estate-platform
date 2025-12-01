@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { MainLayout } from '@/components/layout'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -29,9 +29,12 @@ export default function BecomeAgentPage() {
   const t = useTranslations('agent.become')
   const tCommon = useTranslations('common')
   const router = useRouter()
-  const { user, isLoaded, isSignedIn } = useUser()
+  const { data: session, status: sessionStatus } = useSession()
+  const isLoaded = sessionStatus !== 'loading'
+  const isSignedIn = sessionStatus === 'authenticated'
+  const user = session?.user
 
-  const [status, setStatus] = useState<ApplicationStatus>('none')
+  const [applicationStatus, setApplicationStatus] = useState<ApplicationStatus>('none')
   const [rejectionReason, setRejectionReason] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -54,11 +57,12 @@ export default function BecomeAgentPage() {
     if (isLoaded && isSignedIn) {
       checkApplicationStatus()
       // Pre-fill from user data
+      const nameParts = user?.name?.split(' ') || []
       setFormData(prev => ({
         ...prev,
-        firstName: user?.firstName || '',
-        lastName: user?.lastName || '',
-        email: user?.emailAddresses?.[0]?.emailAddress || '',
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        email: user?.email || '',
       }))
     } else if (isLoaded && !isSignedIn) {
       setIsLoading(false)
@@ -70,7 +74,7 @@ export default function BecomeAgentPage() {
       const res = await fetch('/api/agent-application/status')
       if (res.ok) {
         const data = await res.json()
-        setStatus(data.status || 'none')
+        setApplicationStatus(data.status || 'none')
         setRejectionReason(data.rejectionReason)
       }
     } catch (error) {
@@ -103,7 +107,7 @@ export default function BecomeAgentPage() {
       })
 
       if (res.ok) {
-        setStatus('PENDING')
+        setApplicationStatus('PENDING')
         toast.success('Application submitted successfully!')
       } else {
         const error = await res.json()
@@ -134,7 +138,7 @@ export default function BecomeAgentPage() {
   }
 
   // If user is already an approved agent, redirect
-  if (status === 'APPROVED') {
+  if (applicationStatus === 'APPROVED') {
     return (
       <MainLayout>
         <div className="container mx-auto px-4 py-16 max-w-2xl">
@@ -156,7 +160,7 @@ export default function BecomeAgentPage() {
   }
 
   // If application is pending
-  if (status === 'PENDING') {
+  if (applicationStatus === 'PENDING') {
     return (
       <MainLayout>
         <div className="container mx-auto px-4 py-16 max-w-2xl">
@@ -179,7 +183,7 @@ export default function BecomeAgentPage() {
   }
 
   // If application was rejected
-  if (status === 'REJECTED') {
+  if (applicationStatus === 'REJECTED') {
     return (
       <MainLayout>
         <div className="container mx-auto px-4 py-16 max-w-2xl">

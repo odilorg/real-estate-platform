@@ -832,12 +832,25 @@
   "auth": {
     "signIn": "Kirish",
     "signUp": "Ro'yxatdan o'tish",
+    "signOut": "Chiqish",
+    "signInDescription": "Tizimga kirish uchun email va parolingizni kiriting",
+    "signUpDescription": "Hisob yaratish uchun ma'lumotlaringizni kiriting",
     "email": "Elektron pochta",
     "password": "Parol",
+    "confirmPassword": "Parolni tasdiqlash",
+    "name": "Ism",
+    "namePlaceholder": "Ismingizni kiriting",
     "forgotPassword": "Parolni unutdingizmi?",
     "noAccount": "Hisobingiz yo'qmi?",
+    "haveAccount": "Hisobingiz bormi?",
     "hasAccount": "Hisobingiz bormi?",
-    "orContinueWith": "Yoki davom eting"
+    "orContinueWith": "Yoki davom eting",
+    "invalidCredentials": "Noto'g'ri email yoki parol",
+    "somethingWentWrong": "Xatolik yuz berdi",
+    "registrationFailed": "Ro'yxatdan o'tish muvaffaqiyatsiz",
+    "signInAfterRegisterFailed": "Ro'yxatdan o'tdingiz, lekin tizimga kirish muvaffaqiyatsiz bo'ldi",
+    "passwordsDontMatch": "Parollar mos kelmaydi",
+    "passwordTooShort": "Parol kamida 6 ta belgidan iborat bo'lishi kerak"
   },
   "footer": {
     "about": "Biz haqimizda",

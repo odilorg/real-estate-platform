@@ -29,11 +29,10 @@ async function main() {
 
   console.log('Creating agent for user:', mainUserId)
 
-  // Create user profile if not exists
-  await prisma.userProfile.upsert({
-    where: { clerkId: mainUserId },
-    update: { role: 'AGENT' },
-    create: { clerkId: mainUserId, role: 'AGENT' },
+  // Update user role to AGENT
+  await prisma.user.update({
+    where: { id: mainUserId },
+    data: { role: 'AGENT' },
   })
 
   // Create agency first

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { propertySchema } from '@/lib/validations/property'
 import { getAllProperties, createProperty } from '@/lib/db'
 
@@ -21,7 +21,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(

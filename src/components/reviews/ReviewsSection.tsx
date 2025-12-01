@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useAuth } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { StarRating } from './StarRating'
 import { ReviewForm } from './ReviewForm'
@@ -28,7 +28,8 @@ interface ReviewsSectionProps {
 }
 
 export function ReviewsSection({ propertyId }: ReviewsSectionProps) {
-  const { userId } = useAuth()
+  const { data: session } = useSession()
+  const userId = session?.user?.id
   const [reviews, setReviews] = useState<Review[]>([])
   const [averageRating, setAverageRating] = useState(0)
   const [reviewCount, setReviewCount] = useState(0)

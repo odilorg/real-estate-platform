@@ -2,8 +2,7 @@ import { redirect } from 'next/navigation'
 import { AdminLayout } from '@/components/admin/AdminLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { isAdmin } from '@/lib/admin'
-import { getAllProperties, getAllFavorites } from '@/lib/db'
-import { clerkClient } from '@clerk/nextjs/server'
+import { getAllProperties, getAllFavorites, getUserCount } from '@/lib/db'
 import {
   Users,
   Home,
@@ -24,10 +23,8 @@ export default async function AdminDashboardPage() {
   const properties = await getAllProperties()
   const favorites = await getAllFavorites()
 
-  // Get total users from Clerk
-  const client = await clerkClient()
-  const usersResponse = await client.users.getUserList({ limit: 1 })
-  const totalUsers = usersResponse.totalCount
+  // Get total users from database
+  const totalUsers = await getUserCount()
 
   // Calculate stats
   const stats = {

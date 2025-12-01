@@ -1,21 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
-import { getAllUserProfiles, isUserAdmin, banUser, unbanUser, updateUserRole, logAdminAction } from '@/lib/db'
+import { getSession } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { logAdminAction } from '@/lib/db'
 
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = await isUserAdmin(userId)
-    if (!isAdmin) {
+    if (session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const users = await getAllUserProfiles()
+    const users = await prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        role: true,
+        banned: true,
+        banReason: true,
+        createdAt: true,
+      },
+    })
     return NextResponse.json(users)
   } catch (error) {
     console.error('Error fetching users:', error)
@@ -28,14 +41,14 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = await isUserAdmin(userId)
-    if (!isAdmin) {
+    if (session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -52,7 +65,10 @@ export async function PATCH(request: NextRequest) {
 
     switch (action) {
       case 'ban':
-        await banUser(targetUserId, reason)
+        await prisma.user.update({
+          where: { id: targetUserId },
+          data: { banned: true, banReason: reason },
+        })
         await logAdminAction({
           adminId: userId,
           action: 'BAN_USER',
@@ -62,7 +78,10 @@ export async function PATCH(request: NextRequest) {
         })
         break
       case 'unban':
-        await unbanUser(targetUserId)
+        await prisma.user.update({
+          where: { id: targetUserId },
+          data: { banned: false, banReason: null },
+        })
         await logAdminAction({
           adminId: userId,
           action: 'UNBAN_USER',
@@ -74,7 +93,10 @@ export async function PATCH(request: NextRequest) {
         if (!role) {
           return NextResponse.json({ error: 'Role required' }, { status: 400 })
         }
-        await updateUserRole(targetUserId, role)
+        await prisma.user.update({
+          where: { id: targetUserId },
+          data: { role },
+        })
         await logAdminAction({
           adminId: userId,
           action: 'UPDATE_ROLE',

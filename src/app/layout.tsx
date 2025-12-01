@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ClerkProvider } from '@clerk/nextjs'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
+import { AuthProvider } from '@/components/providers/AuthProvider'
 import { FavoritesProvider } from '@/contexts/FavoritesContext'
 import { ComparisonProvider } from '@/contexts/ComparisonContext'
 import { Toaster } from 'sonner'
@@ -32,11 +32,11 @@ export default async function RootLayout({
   const messages = await getMessages()
 
   return (
-    <ClerkProvider>
-      <html lang={locale}>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+    <html lang={locale}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <AuthProvider>
           <NextIntlClientProvider messages={messages}>
             <FavoritesProvider>
               <ComparisonProvider>
@@ -45,8 +45,8 @@ export default async function RootLayout({
             </FavoritesProvider>
           </NextIntlClientProvider>
           <Toaster position="top-right" richColors />
-        </body>
-      </html>
-    </ClerkProvider>
+        </AuthProvider>
+      </body>
+    </html>
   );
 }

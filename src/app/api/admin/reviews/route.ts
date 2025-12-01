@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
-import { getAdminReviews, isUserAdmin, approveReview, rejectReview, logAdminAction } from '@/lib/db'
+import { getSession } from '@/lib/auth'
+import { getAdminReviews, approveReview, rejectReview, logAdminAction } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = await isUserAdmin(userId)
-    if (!isAdmin) {
+    if (session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -32,14 +32,14 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = await isUserAdmin(userId)
-    if (!isAdmin) {
+    if (session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 
 interface FavoritesContextType {
   favorites: Set<string>
@@ -14,7 +14,9 @@ interface FavoritesContextType {
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined)
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const { user, isLoaded } = useUser()
+  const { data: session, status } = useSession()
+  const isLoaded = status !== 'loading'
+  const user = session?.user
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
 

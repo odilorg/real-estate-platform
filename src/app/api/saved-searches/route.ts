@@ -1,11 +1,12 @@
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { getSavedSearchesByUserId, createSavedSearch } from '@/lib/db'
 
 // GET all saved searches for current user
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -25,7 +26,8 @@ export async function GET() {
 // POST create a new saved search
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

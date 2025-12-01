@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -30,7 +30,8 @@ interface ViewingWithProperty extends Viewing {
 }
 
 export function ViewingsTab() {
-  const { user } = useUser()
+  const { data: session } = useSession()
+  const user = session?.user
   const t = useTranslations('dashboard')
   const [viewings, setViewings] = useState<ViewingWithProperty[]>([])
   const [loading, setLoading] = useState(true)

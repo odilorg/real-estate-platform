@@ -1,7 +1,7 @@
 "use client"
 
 import { Suspense, useState, useEffect } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { MainLayout } from '@/components/layout'
@@ -37,7 +37,9 @@ export default function DashboardPage() {
 }
 
 function DashboardContent() {
-  const { user, isLoaded } = useUser()
+  const { data: session, status } = useSession()
+  const isLoaded = status !== 'loading'
+  const user = session?.user
   const router = useRouter()
   const searchParams = useSearchParams()
   const t = useTranslations('dashboard')
@@ -75,7 +77,7 @@ function DashboardContent() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
             <p className="text-gray-600">
-              {t('welcomeUser', { name: user.firstName || user.username || 'User' })}
+              {t('welcomeUser', { name: user?.name?.split(' ')[0] || 'User' })}
             </p>
           </div>
         </div>

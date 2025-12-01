@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useTranslations } from 'next-intl'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -64,7 +64,9 @@ export function HomePage() {
   const t = useTranslations('home')
   const tCommon = useTranslations('common')
   const router = useRouter()
-  const { user, isSignedIn } = useUser()
+  const { data: session, status } = useSession()
+  const isSignedIn = status === 'authenticated'
+  const user = session?.user
 
   const [listingType, setListingType] = useState<'buy' | 'rent'>('buy')
   const [searchQuery, setSearchQuery] = useState('')

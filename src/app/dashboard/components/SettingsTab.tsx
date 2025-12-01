@@ -1,15 +1,14 @@
 "use client"
 
 import { useTranslations } from 'next-intl'
-import { useUser } from '@clerk/nextjs'
+import { useSession, signOut } from 'next-auth/react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { User, Mail, LogOut } from 'lucide-react'
-import { useClerk } from '@clerk/nextjs'
 
 export function SettingsTab() {
-  const { user } = useUser()
-  const { signOut } = useClerk()
+  const { data: session } = useSession()
+  const user = session?.user
   const t = useTranslations('dashboard')
 
   return (
@@ -31,9 +30,9 @@ export function SettingsTab() {
             </div>
             <div>
               <p className="font-semibold text-lg">
-                {user?.firstName} {user?.lastName}
+                {user?.name || 'User'}
               </p>
-              <p className="text-gray-600">{user?.username || t('noUsernameSet')}</p>
+              <p className="text-gray-600">{user?.email || t('noUsernameSet')}</p>
             </div>
           </div>
 
@@ -42,7 +41,7 @@ export function SettingsTab() {
               <Mail className="h-5 w-5 text-gray-400" />
               <div>
                 <p className="text-sm text-gray-600">{t('email')}</p>
-                <p className="font-medium">{user?.primaryEmailAddress?.emailAddress}</p>
+                <p className="font-medium">{user?.email}</p>
               </div>
             </div>
           </div>
@@ -64,7 +63,7 @@ export function SettingsTab() {
           <Button
             variant="outline"
             className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-            onClick={() => signOut()}
+            onClick={() => signOut({ callbackUrl: '/' })}
           >
             <LogOut className="h-4 w-4 mr-2" />
             {t('signOut')}

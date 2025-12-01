@@ -95,11 +95,10 @@ export async function upsertAgent(
     agencyId?: string
   }
 ) {
-  // Ensure user profile exists with AGENT role
-  await prisma.userProfile.upsert({
-    where: { clerkId: userId },
-    update: { role: 'AGENT' },
-    create: { clerkId: userId, role: 'AGENT' },
+  // Ensure user has AGENT role
+  await prisma.user.update({
+    where: { id: userId },
+    data: { role: 'AGENT' },
   })
 
   return prisma.agent.upsert({

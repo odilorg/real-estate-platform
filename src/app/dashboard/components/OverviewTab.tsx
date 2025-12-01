@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Home, Heart, DollarSign, TrendingUp, PlusCircle, Eye, MessageSquare, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 
 interface PropertyStats {
   id: string
@@ -33,7 +33,8 @@ interface Stats {
 }
 
 export function OverviewTab() {
-  const { user } = useUser()
+  const { data: session } = useSession()
+  const user = session?.user
   const t = useTranslations('dashboard')
   const [stats, setStats] = useState<Stats>({
     totalProperties: 0,
@@ -149,7 +150,7 @@ export function OverviewTab() {
       <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
         <CardContent className="pt-6">
           <h2 className="text-2xl font-bold mb-2">
-            {t('welcomeUser', { name: user?.firstName || 'User' })} 👋
+            {t('welcomeUser', { name: user?.name?.split(' ')[0] || 'User' })} 👋
           </h2>
           <p className="text-blue-100 mb-4">
             {t('heresWhatsHappening')}

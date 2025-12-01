@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { addRecentlyViewed, getRecentlyViewed } from '@/lib/db'
 
 // GET /api/recently-viewed - Get user's recently viewed properties
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(
@@ -29,7 +30,8 @@ export async function GET() {
 // POST /api/recently-viewed - Add a property to recently viewed
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(

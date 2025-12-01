@@ -1,10 +1,11 @@
-import { auth, clerkClient } from '@clerk/nextjs/server'
+import { getSession, getUserById } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 import { getConversationsByUserId, getMessagesByConversationId, getPropertyById } from '@/lib/db'
 
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -24,13 +25,14 @@ export async function GET() {
 
         if (otherParticipantId) {
           try {
-            const client = await clerkClient()
-            const user = await client.users.getUser(otherParticipantId)
-            otherParticipant = {
-              id: user.id,
-              name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Anonymous',
-              email: user.emailAddresses[0]?.emailAddress || '',
-              imageUrl: user.imageUrl,
+            const user = await getUserById(otherParticipantId)
+            if (user) {
+              otherParticipant = {
+                id: user.id,
+                name: user.name || 'Anonymous',
+                email: user.email || '',
+                imageUrl: user.image,
+              }
             }
           } catch (error) {
             // User might not exist

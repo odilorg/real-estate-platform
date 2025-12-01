@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { AdminLayout } from '@/components/admin/AdminLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { isAdmin } from '@/lib/admin'
-import { clerkClient } from '@clerk/nextjs/server'
+import { getAllUsers } from '@/lib/db'
 import { UserRoleSelect } from '@/components/admin/UserRoleSelect'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -21,10 +21,8 @@ export default async function AdminUsersPage() {
     redirect('/')
   }
 
-  // Get all users from Clerk
-  const client = await clerkClient()
-  const usersResponse = await client.users.getUserList({ limit: 100 })
-  const users = usersResponse.data
+  // Get all users from database
+  const users = await getAllUsers()
 
   return (
     <AdminLayout>
@@ -37,7 +35,7 @@ export default async function AdminUsersPage() {
             </p>
           </div>
           <div className="text-sm text-gray-600">
-            Total Users: <span className="font-semibold">{usersResponse.totalCount}</span>
+            Total Users: <span className="font-semibold">{users.length}</span>
           </div>
         </div>
 
@@ -59,48 +57,48 @@ export default async function AdminUsersPage() {
               </TableHeader>
               <TableBody>
                 {users.map((user) => {
-                  const role = (user.publicMetadata?.role as string) || 'user'
+                  const role = user.role || 'user'
                   return (
                     <TableRow key={user.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          {user.imageUrl && (
+                          {user.image && (
                             <img
-                              src={user.imageUrl}
-                              alt={user.firstName || 'User'}
+                              src={user.image}
+                              alt={user.name || 'User'}
                               className="h-10 w-10 rounded-full"
                             />
                           )}
                           <div>
                             <div className="font-medium text-gray-900">
-                              {user.firstName} {user.lastName}
+                              {user.name || 'Unknown User'}
                             </div>
                             <div className="text-sm text-gray-500">
-                              {user.username || 'No username'}
+                              {user.email || 'No email'}
                             </div>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        {user.emailAddresses[0]?.emailAddress || 'No email'}
+                        {user.email || 'No email'}
                       </TableCell>
                       <TableCell>
                         <UserRoleSelect userId={user.id} currentRole={role} />
                       </TableCell>
                       <TableCell className="text-sm text-gray-600">
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                       </TableCell>
                       <TableCell className="text-sm text-gray-600">
-                        {user.lastSignInAt
-                          ? new Date(user.lastSignInAt).toLocaleDateString()
+                        {user.emailVerified
+                          ? new Date(user.emailVerified).toLocaleDateString()
                           : 'Never'}
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={user.banned ? 'destructive' : 'secondary'}
+                          variant="secondary"
                           className="text-xs"
                         >
-                          {user.banned ? 'Banned' : 'Active'}
+                          Active
                         </Badge>
                       </TableCell>
                     </TableRow>

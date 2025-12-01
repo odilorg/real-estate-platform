@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Heart, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -14,7 +14,8 @@ interface FavoriteButtonProps {
 }
 
 export function FavoriteButton({ propertyId, variant = 'icon', className }: FavoriteButtonProps) {
-  const { isSignedIn } = useUser()
+  const { data: session, status } = useSession()
+  const isSignedIn = status === 'authenticated'
   const [isFavorite, setIsFavorite] = useState(false)
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)

@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { ChatView } from '@/components/messages/ChatView'
 import { getConversationById, getPropertyById } from '@/lib/db'
@@ -10,7 +10,8 @@ interface PageProps {
 }
 
 export default async function ConversationPage({ params }: PageProps) {
-  const { userId } = await auth()
+  const session = await getSession()
+  const userId = session?.user?.id
   if (!userId) {
     redirect('/sign-in')
   }

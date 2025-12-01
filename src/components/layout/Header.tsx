@@ -2,26 +2,36 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { SignInButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
+import { useSession, signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
-import { Home, PlusCircle, Heart, MessageSquare, LayoutDashboard, Briefcase, Shield, Menu, X, Building, Key } from 'lucide-react'
+import { Home, PlusCircle, Heart, MessageSquare, LayoutDashboard, Briefcase, Shield, Menu, X, Building, Key, User, LogOut } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function Header() {
   const t = useTranslations('nav')
-  const { user } = useUser()
+  const { data: session, status } = useSession()
   const [userRole, setUserRole] = useState<{ isAgent: boolean; isAdmin: boolean }>({ isAgent: false, isAdmin: false })
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  const isAuthenticated = status === "authenticated"
+  const user = session?.user
+
   useEffect(() => {
-    if (user) {
+    if (isAuthenticated) {
       fetch('/api/users/me/role')
         .then(res => res.json())
         .then(data => setUserRole({ isAgent: data.isAgent, isAdmin: data.isAdmin }))
         .catch(() => {})
     }
-  }, [user])
+  }, [isAuthenticated])
 
   // Close mobile menu when route changes
   const closeMobileMenu = () => setMobileMenuOpen(false)
@@ -63,77 +73,137 @@ export function Header() {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <LanguageSwitcher />
-            <SignedIn>
-              {userRole.isAgent ? (
-                <Link href="/agent/dashboard">
+            {isAuthenticated ? (
+              <>
+                {userRole.isAgent ? (
+                  <Link href="/agent/dashboard">
+                    <Button variant="ghost" size="sm">
+                      <Briefcase className="h-5 w-5" />
+                      <span className="ml-2 hidden lg:inline">{t('agentDashboard') || 'Agent Dashboard'}</span>
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/dashboard">
+                    <Button variant="ghost" size="sm">
+                      <LayoutDashboard className="h-5 w-5" />
+                      <span className="ml-2 hidden lg:inline">{t('dashboard')}</span>
+                    </Button>
+                  </Link>
+                )}
+                {userRole.isAdmin && (
+                  <Link href="/admin">
+                    <Button variant="ghost" size="sm">
+                      <Shield className="h-5 w-5" />
+                      <span className="ml-2 hidden lg:inline">Admin</span>
+                    </Button>
+                  </Link>
+                )}
+                <Link href="/favorites">
                   <Button variant="ghost" size="sm">
-                    <Briefcase className="h-5 w-5" />
-                    <span className="ml-2 hidden lg:inline">{t('agentDashboard') || 'Agent Dashboard'}</span>
+                    <Heart className="h-5 w-5" />
+                    <span className="ml-2 hidden lg:inline">{t('favorites')}</span>
                   </Button>
                 </Link>
-              ) : (
-                <Link href="/dashboard">
+                <Link href="/messages">
                   <Button variant="ghost" size="sm">
-                    <LayoutDashboard className="h-5 w-5" />
-                    <span className="ml-2 hidden lg:inline">{t('dashboard')}</span>
+                    <MessageSquare className="h-5 w-5" />
+                    <span className="ml-2 hidden lg:inline">{t('messages')}</span>
                   </Button>
                 </Link>
-              )}
-              {userRole.isAdmin && (
-                <Link href="/admin">
-                  <Button variant="ghost" size="sm">
-                    <Shield className="h-5 w-5" />
-                    <span className="ml-2 hidden lg:inline">Admin</span>
+                <Link href="/properties/new">
+                  <Button size="sm">
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    <span className="hidden lg:inline">{t('addProperty')}</span>
+                    <span className="lg:hidden">Add</span>
                   </Button>
                 </Link>
-              )}
-              <Link href="/favorites">
-                <Button variant="ghost" size="sm">
-                  <Heart className="h-5 w-5" />
-                  <span className="ml-2 hidden lg:inline">{t('favorites')}</span>
-                </Button>
-              </Link>
-              <Link href="/messages">
-                <Button variant="ghost" size="sm">
-                  <MessageSquare className="h-5 w-5" />
-                  <span className="ml-2 hidden lg:inline">{t('messages')}</span>
-                </Button>
-              </Link>
-              <Link href="/properties/new">
-                <Button size="sm">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  <span className="hidden lg:inline">{t('addProperty')}</span>
-                  <span className="lg:hidden">Add</span>
-                </Button>
-              </Link>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
-
-            <SignedOut>
-              <SignInButton mode="modal">
-                <Button variant="ghost" size="sm">
-                  {t('signIn')}
-                </Button>
-              </SignInButton>
-              <Link href="/sign-up">
-                <Button size="sm">{t('getStarted')}</Button>
-              </Link>
-            </SignedOut>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0">
+                      {user?.image ? (
+                        <img src={user.image} alt="" className="h-8 w-8 rounded-full" />
+                      ) : (
+                        <User className="h-5 w-5" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <div className="px-2 py-1.5 text-sm font-medium">
+                      {user?.name || user?.email}
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard" className="cursor-pointer">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        {t('dashboard')}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        {t('profile')}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => signOut({ callbackUrl: '/' })}
+                      className="cursor-pointer text-red-600"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {t('signOut')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Link href="/sign-in">
+                  <Button variant="ghost" size="sm">
+                    {t('signIn')}
+                  </Button>
+                </Link>
+                <Link href="/sign-up">
+                  <Button size="sm">{t('getStarted')}</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Actions */}
           <div className="flex md:hidden items-center space-x-2">
             <LanguageSwitcher />
-            <SignedIn>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
-            <SignedOut>
-              <SignInButton mode="modal">
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0">
+                    {user?.image ? (
+                      <img src={user.image} alt="" className="h-8 w-8 rounded-full" />
+                    ) : (
+                      <User className="h-5 w-5" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <div className="px-2 py-1.5 text-sm font-medium">
+                    {user?.name || user?.email}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => signOut({ callbackUrl: '/' })}
+                    className="cursor-pointer text-red-600"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {t('signOut')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link href="/sign-in">
                 <Button variant="ghost" size="sm">
                   {t('signIn')}
                 </Button>
-              </SignInButton>
-            </SignedOut>
+              </Link>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -178,7 +248,7 @@ export function Header() {
               </Link>
             </nav>
 
-            <SignedIn>
+            {isAuthenticated ? (
               <div className="border-t pt-4 space-y-2">
                 {userRole.isAgent ? (
                   <Link
@@ -233,16 +303,27 @@ export function Header() {
                   <PlusCircle className="h-5 w-5" />
                   {t('addProperty')}
                 </Link>
+                <button
+                  onClick={() => {
+                    closeMobileMenu()
+                    signOut({ callbackUrl: '/' })
+                  }}
+                  className="flex items-center gap-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg w-full"
+                >
+                  <LogOut className="h-5 w-5" />
+                  {t('signOut')}
+                </button>
               </div>
-            </SignedIn>
-
-            <SignedOut>
-              <div className="border-t pt-4">
+            ) : (
+              <div className="border-t pt-4 space-y-2">
+                <Link href="/sign-in" onClick={closeMobileMenu}>
+                  <Button variant="outline" className="w-full">{t('signIn')}</Button>
+                </Link>
                 <Link href="/sign-up" onClick={closeMobileMenu}>
                   <Button className="w-full">{t('getStarted')}</Button>
                 </Link>
               </div>
-            </SignedOut>
+            )}
           </div>
         </div>
       )}

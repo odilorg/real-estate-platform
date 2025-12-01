@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { MainLayout } from '@/components/layout'
 import { PropertyCard } from '@/components/properties/PropertyCard'
@@ -11,7 +11,9 @@ import Link from 'next/link'
 import type { Property } from '@/types'
 
 export default function FavoritesPage() {
-  const { user, isLoaded } = useUser()
+  const { data: session, status } = useSession()
+  const isLoaded = status !== 'loading'
+  const user = session?.user
   const router = useRouter()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)

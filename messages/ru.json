@@ -1,4 +1,24 @@
 {
+  "auth": {
+    "signIn": "Войти",
+    "signUp": "Регистрация",
+    "signOut": "Выйти",
+    "signInDescription": "Введите email и пароль для входа",
+    "signUpDescription": "Введите данные для создания аккаунта",
+    "email": "Email",
+    "password": "Пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "name": "Имя",
+    "namePlaceholder": "Иван Иванов",
+    "noAccount": "Нет аккаунта?",
+    "haveAccount": "Уже есть аккаунт?",
+    "invalidCredentials": "Неверный email или пароль",
+    "somethingWentWrong": "Что-то пошло не так",
+    "passwordsDontMatch": "Пароли не совпадают",
+    "passwordTooShort": "Пароль должен быть не менее 6 символов",
+    "registrationFailed": "Ошибка регистрации",
+    "signInAfterRegisterFailed": "Регистрация прошла успешно, но войти не удалось"
+  },
   "common": {
     "search": "Поиск",
     "filter": "Фильтр",

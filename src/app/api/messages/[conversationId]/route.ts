@@ -1,4 +1,4 @@
-import { auth, clerkClient } from '@clerk/nextjs/server'
+import { getSession, getUserById } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { getConversationById, getMessagesByConversationId, markMessagesAsRead, sendMessage } from '@/lib/db'
 
@@ -8,7 +8,8 @@ export async function GET(
   { params }: { params: Promise<{ conversationId: string }> }
 ) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -31,14 +32,23 @@ export async function GET(
     const enrichedMessages = await Promise.all(
       messages.map(async (msg) => {
         try {
-          const client = await clerkClient()
-          const user = await client.users.getUser(msg.senderId)
+          const user = await getUserById(msg.senderId)
+          if (user) {
+            return {
+              ...msg,
+              sender: {
+                id: user.id,
+                name: user.name || 'Anonymous',
+                imageUrl: user.image,
+              },
+            }
+          }
           return {
             ...msg,
             sender: {
-              id: user.id,
-              name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Anonymous',
-              imageUrl: user.imageUrl,
+              id: msg.senderId,
+              name: 'Unknown User',
+              imageUrl: '',
             },
           }
         } catch (error) {
@@ -73,7 +83,8 @@ export async function POST(
   { params }: { params: Promise<{ conversationId: string }> }
 ) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

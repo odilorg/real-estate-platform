@@ -341,7 +341,7 @@ export function InquiriesTab() {
       <Dialog open={!!selectedInquiry} onOpenChange={() => setSelectedInquiry(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{t('inquiryFrom', { name: selectedInquiry?.senderName })}</DialogTitle>
+            <DialogTitle>{t('inquiryFrom', { name: selectedInquiry?.senderName || '' })}</DialogTitle>
             <DialogDescription>
               {selectedInquiry?.property?.title}
             </DialogDescription>

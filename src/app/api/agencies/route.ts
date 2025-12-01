@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server'
-import { clerkClient } from '@clerk/nextjs/server'
+import { getUserById } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   try {
-    const client = await clerkClient()
     const { searchParams } = new URL(request.url)
     const city = searchParams.get('city')
     const verified = searchParams.get('verified') === 'true'
@@ -95,16 +94,16 @@ export async function GET(request: Request) {
         // Total reviews across all agents
         const totalReviews = agency.agents.reduce((sum, a) => sum + (a.reviewCount || 0), 0)
 
-        // Fetch Clerk images for agents without photos
+        // Fetch user images for agents without photos
         const agentsWithPhotos = await Promise.all(
           agency.agents.slice(0, 5).map(async (agent) => {
             let photo = agent.photo
             if (!photo && agent.userId) {
               try {
-                const clerkUser = await client.users.getUser(agent.userId)
-                photo = clerkUser.imageUrl || null
+                const user = await getUserById(agent.userId)
+                photo = user?.image || null
               } catch {
-                // User might not exist in Clerk
+                // User might not exist
               }
             }
             return {

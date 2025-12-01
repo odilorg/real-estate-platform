@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { MessageSquare } from 'lucide-react'
 import { toast } from 'sonner'
@@ -16,7 +16,8 @@ interface ContactOwnerButtonProps {
 export function ContactOwnerButton({ propertyId, ownerId, currentUserId }: ContactOwnerButtonProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const { userId } = useAuth()
+  const { data: session } = useSession()
+  const userId = session?.user?.id
 
   const handleContact = async () => {
     // Check if user is authenticated

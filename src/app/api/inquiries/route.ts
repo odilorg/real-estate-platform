@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 // POST - Create a new inquiry
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     const body = await request.json()
 
     const {
@@ -77,7 +78,8 @@ export async function POST(request: NextRequest) {
 // GET - Get inquiries for the current user (owner's properties)
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })

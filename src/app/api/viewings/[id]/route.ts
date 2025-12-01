@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { getViewingById, updateViewingStatus } from '@/lib/db'
 
 interface RouteParams {
@@ -14,7 +14,8 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(
@@ -57,7 +58,8 @@ export async function PATCH(
   { params }: RouteParams
 ) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(

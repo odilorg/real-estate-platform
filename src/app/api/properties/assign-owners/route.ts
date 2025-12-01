@@ -1,21 +1,24 @@
-import { auth, clerkClient } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 import { getAllProperties, updateProperty } from '@/lib/db'
+import { prisma } from '@/lib/prisma'
 
 // This is a one-time utility endpoint to assign owners to properties
 export async function POST() {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const properties = await getAllProperties()
 
-    // Get some random user IDs from Clerk (or use current user for all)
-    const client = await clerkClient()
-    const usersResponse = await client.users.getUserList({ limit: 10 })
-    const users = usersResponse.data
+    // Get some users from the database (or use current user for all)
+    const users = await prisma.user.findMany({
+      take: 10,
+      select: { id: true },
+    })
 
     if (users.length === 0) {
       return NextResponse.json({ error: 'No users found' }, { status: 400 })

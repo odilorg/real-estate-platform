@@ -65,7 +65,7 @@ export async function GET() {
         where: { status: 'ACTIVE' },
       }),
       prisma.agent.count(),
-      prisma.userProfile.count(),
+      prisma.user.count(),
     ])
 
     // Get unique cities count

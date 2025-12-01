@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,7 +22,8 @@ interface Property {
 }
 
 export function RecentlyViewed() {
-  const { isSignedIn } = useUser()
+  const { status } = useSession()
+  const isSignedIn = status === 'authenticated'
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
 

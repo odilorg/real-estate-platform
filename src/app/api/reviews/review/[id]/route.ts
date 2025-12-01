@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { getReviewById, updateReview, deleteReview } from '@/lib/db'
 import { isAdmin } from '@/lib/admin'
@@ -9,7 +9,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -65,7 +66,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

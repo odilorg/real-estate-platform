@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { MainLayout } from '@/components/layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -86,7 +86,9 @@ interface AgentStats {
 }
 
 export default function AgentDashboardPage() {
-  const { user, isLoaded } = useUser()
+  const { data: session, status } = useSession()
+  const isLoaded = status !== 'loading'
+  const user = session?.user
   const router = useRouter()
   const t = useTranslations('agent.dashboard')
   const [data, setData] = useState<AgentStats | null>(null)

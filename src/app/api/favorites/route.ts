@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { getFavoritesByUserId, getPropertyById, addFavorite, removeFavorite } from '@/lib/db'
 
 // GET /api/favorites - Get all favorites for current user
 export async function GET() {
   try {
     // Check authentication
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(
@@ -31,7 +32,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(
@@ -84,7 +86,8 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     // Check authentication
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(

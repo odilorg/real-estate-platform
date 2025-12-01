@@ -2,7 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
+import { signOut, useSession } from 'next-auth/react'
+import { Button } from '@/components/ui/button'
+import { LogOut } from 'lucide-react'
 import {
   LayoutDashboard,
   Users,
@@ -13,6 +15,7 @@ import {
   Wrench,
   Star,
   UserCheck,
+  LogOut as LogOutIcon,
 } from 'lucide-react'
 
 const navigation = [
@@ -84,7 +87,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </h2>
           </div>
           <div className="flex items-center gap-4">
-            <UserButton afterSignOutUrl="/" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => signOut({ callbackUrl: '/' })}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              <LogOutIcon className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
           </div>
         </div>
 

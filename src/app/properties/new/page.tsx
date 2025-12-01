@@ -121,8 +121,9 @@ export default function CreatePropertyPage() {
     setValue,
     trigger,
     formState: { errors },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } = useForm<PropertyFormData>({
-    resolver: zodResolver(propertySchema),
+    resolver: zodResolver(propertySchema) as any,
     defaultValues: {
       country: 'Узбекистан',
       amenities: [],

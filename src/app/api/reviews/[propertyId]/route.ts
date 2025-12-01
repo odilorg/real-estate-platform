@@ -1,4 +1,4 @@
-import { auth, clerkClient } from '@clerk/nextjs/server'
+import { getSession, getUserById } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { getReviewsByPropertyId, getAverageRating, getPropertyById, hasUserReviewedProperty, createReview } from '@/lib/db'
 
@@ -17,14 +17,23 @@ export async function GET(
     const enrichedReviews = await Promise.all(
       reviews.map(async (review) => {
         try {
-          const client = await clerkClient()
-          const user = await client.users.getUser(review.userId)
+          const user = await getUserById(review.userId)
+          if (user) {
+            return {
+              ...review,
+              user: {
+                id: user.id,
+                name: user.name || 'Anonymous',
+                imageUrl: user.image,
+              },
+            }
+          }
           return {
             ...review,
             user: {
-              id: user.id,
-              name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Anonymous',
-              imageUrl: user.imageUrl,
+              id: review.userId,
+              name: 'Unknown User',
+              imageUrl: '',
             },
           }
         } catch (error) {
@@ -60,7 +69,8 @@ export async function POST(
   { params }: { params: Promise<{ propertyId: string }> }
 ) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

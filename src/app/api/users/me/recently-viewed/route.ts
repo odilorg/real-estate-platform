@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 // GET - Get user's recently viewed properties
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ properties: [] })
     }
 
-    // Get recently viewed properties for this user (userId is Clerk ID)
+    // Get recently viewed properties for this user
     const recentlyViewed = await prisma.recentlyViewed.findMany({
       where: { userId },
       orderBy: { viewedAt: 'desc' },
@@ -63,7 +64,8 @@ export async function GET() {
 // POST - Track a property view
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ success: false }, { status: 401 })

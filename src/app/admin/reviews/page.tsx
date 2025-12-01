@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { isAdmin } from '@/lib/admin'
 import { getAllReviews, getPropertyById } from '@/lib/db'
-import { clerkClient } from '@clerk/nextjs/server'
+import { getUserById } from '@/lib/auth'
 import { AdminLayout } from '@/components/admin/AdminLayout'
 import { StarRating } from '@/components/reviews/StarRating'
 import { DeleteReviewButton } from '@/components/admin/DeleteReviewButton'
@@ -29,14 +29,13 @@ export default async function AdminReviewsPage() {
       const property = await getPropertyById(review.propertyId)
 
       try {
-        const client = await clerkClient()
-        const user = await client.users.getUser(review.userId)
+        const dbUser = await getUserById(review.userId)
         return {
           ...review,
           user: {
-            id: user.id,
-            name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Anonymous',
-            email: user.emailAddresses[0]?.emailAddress || '',
+            id: review.userId,
+            name: dbUser?.name || 'Anonymous',
+            email: dbUser?.email || '',
           },
           property: property ? {
             id: property.id,

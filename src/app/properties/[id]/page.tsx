@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { getTranslations } from 'next-intl/server'
 import { MainLayout } from '@/components/layout'
 import { ImageGallery } from '@/components/properties/ImageGallery'
@@ -66,7 +66,8 @@ interface PropertyDetailPageProps {
 
 export default async function PropertyDetailPage({ params }: PropertyDetailPageProps) {
   const { id } = await params
-  const { userId } = await auth()
+  const session = await getSession()
+  const userId = session?.user?.id
   const property = await getPropertyById(id)
   const t = await getTranslations('properties.details')
   const tAmenities = await getTranslations('amenities')

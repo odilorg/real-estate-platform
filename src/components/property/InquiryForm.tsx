@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -25,7 +25,9 @@ interface InquiryFormProps {
 }
 
 export function InquiryForm({ propertyId, propertyTitle, ownerName }: InquiryFormProps) {
-  const { user, isLoaded } = useUser()
+  const { data: session, status } = useSession()
+  const isLoaded = status !== 'loading'
+  const user = session?.user
   const t = useTranslations('inquiry')
 
   const [formData, setFormData] = useState({
@@ -44,8 +46,8 @@ export function InquiryForm({ propertyId, propertyTitle, ownerName }: InquiryFor
     if (user) {
       setFormData(prev => ({
         ...prev,
-        senderName: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || prev.senderName,
-        senderEmail: user.primaryEmailAddress?.emailAddress || prev.senderEmail,
+        senderName: user.name || prev.senderName,
+        senderEmail: user.email || prev.senderEmail,
       }))
     }
   })

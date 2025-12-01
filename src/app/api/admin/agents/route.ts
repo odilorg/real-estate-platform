@@ -1,22 +1,19 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 // GET - List all agents (admin only)
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user is admin
-    const userProfile = await prisma.userProfile.findUnique({
-      where: { clerkId: userId },
-    })
-
-    if (userProfile?.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN') {
       return NextResponse.json({ message: 'Admin access required' }, { status: 403 })
     }
 

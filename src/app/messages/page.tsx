@@ -1,10 +1,9 @@
-import { auth } from '@clerk/nextjs/server'
+import { getSession, getUserById } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { MessageSquare } from 'lucide-react'
 import { getConversationsByUserId, getPropertyById, getMessagesByConversationId } from '@/lib/db'
-import { clerkClient } from '@clerk/nextjs/server'
 
 interface ConversationData {
   id: string
@@ -33,7 +32,8 @@ interface ConversationData {
 }
 
 export default async function MessagesPage() {
-  const { userId } = await auth()
+  const session = await getSession()
+  const userId = session?.user?.id
   if (!userId) {
     redirect('/sign-in')
   }
@@ -51,12 +51,11 @@ export default async function MessagesPage() {
       const otherParticipantId = conv.participant1 === userId ? conv.participant2 : conv.participant1
       let otherParticipant = null
       try {
-        const client = await clerkClient()
-        const user = await client.users.getUser(otherParticipantId)
+        const dbUser = await getUserById(otherParticipantId)
         otherParticipant = {
-          id: user.id,
-          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User',
-          imageUrl: user.imageUrl || '',
+          id: otherParticipantId,
+          name: dbUser?.name || 'User',
+          imageUrl: dbUser?.image || '',
         }
       } catch {
         otherParticipant = {

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { createViewing, getViewingsByUserId, getPropertyById } from '@/lib/db'
 
 // GET /api/viewings - Get user's viewings
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(
@@ -29,7 +30,8 @@ export async function GET() {
 // POST /api/viewings - Create a new viewing request
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(

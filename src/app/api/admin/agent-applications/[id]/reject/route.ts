@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 // POST - Reject agent application
@@ -8,7 +8,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth()
+    const session = await getSession()
+    const userId = session?.user?.id
     const { id } = await params
 
     if (!userId) {
@@ -16,11 +17,7 @@ export async function POST(
     }
 
     // Check if user is admin
-    const userProfile = await prisma.userProfile.findUnique({
-      where: { clerkId: userId },
-    })
-
-    if (userProfile?.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN') {
       return NextResponse.json({ message: 'Admin access required' }, { status: 403 })
     }
 

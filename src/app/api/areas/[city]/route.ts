@@ -12,7 +12,7 @@ export async function GET(
     // Get all properties in this city
     const properties = await prisma.property.findMany({
       where: {
-        city: { equals: decodedCity, mode: 'insensitive' },
+        city: decodedCity,
         status: 'ACTIVE',
       },
       include: {
