@@ -43,7 +43,12 @@
     "apartments": "Kvartiralar",
     "houses": "Uylar",
     "commercial": "Tijorat",
-    "properties": "mulk"
+    "properties": "mulk",
+    "messageSent": "Xabar yuborildi",
+    "messageSentDescription": "Xabaringiz muvaffaqiyatli yuborildi",
+    "contactDescription": "Ushbu mulk haqida xabar yuboring",
+    "messageDelivered": "Xabaringiz yetkazildi. Qabul qiluvchi tez orada javob beradi.",
+    "viewConversation": "Yozishmani ko'rish"
   },
   "nav": {
     "home": "Bosh sahifa",
@@ -850,7 +855,8 @@
     "registrationFailed": "Ro'yxatdan o'tish muvaffaqiyatsiz",
     "signInAfterRegisterFailed": "Ro'yxatdan o'tdingiz, lekin tizimga kirish muvaffaqiyatsiz bo'ldi",
     "passwordsDontMatch": "Parollar mos kelmaydi",
-    "passwordTooShort": "Parol kamida 6 ta belgidan iborat bo'lishi kerak"
+    "passwordTooShort": "Parol kamida 6 ta belgidan iborat bo'lishi kerak",
+    "continueWithGoogle": "Google orqali davom eting"
   },
   "footer": {
     "about": "Biz haqimizda",
@@ -1029,6 +1035,10 @@
       "medium": "Odatda kun ichida javob beradi",
       "slow": "Bir necha kun ichida javob berishi mumkin"
     },
+    "messagePlaceholder": "Xabaringizni yozing...",
+    "sending": "Yuborilmoqda...",
+    "send": "Yuborish",
+    "loading": "Yuklanmoqda...",
     "profile": {
       "title": "Agent profili",
       "about": "Haqida",

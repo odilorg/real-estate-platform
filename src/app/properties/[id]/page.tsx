@@ -743,6 +743,12 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               <AgentSidebar
                 ownerId={property.userId}
                 propertyId={property.id}
+                property={{
+                  title: property.title,
+                  price: property.price,
+                  currency: 'USD',
+                  image: property.images?.[0] || null,
+                }}
               />
 
               {/* Inquiry Form - Only show if not owner */}

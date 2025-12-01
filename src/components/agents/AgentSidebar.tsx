@@ -5,15 +5,21 @@ import { AgentCard, OwnerContactCard } from './AgentCard'
 interface AgentSidebarProps {
   ownerId: string
   propertyId: string
+  property?: {
+    title: string
+    price: number
+    currency: string
+    image?: string | null
+  }
 }
 
-export async function AgentSidebar({ ownerId, propertyId }: AgentSidebarProps) {
+export async function AgentSidebar({ ownerId, propertyId, property }: AgentSidebarProps) {
   // Try to get agent profile for this owner
   const agent = await getAgentByUserId(ownerId)
 
   if (!agent) {
     // Owner is not a registered agent, show simple contact card
-    return <OwnerContactCard ownerId={ownerId} propertyId={propertyId} />
+    return <OwnerContactCard ownerId={ownerId} propertyId={propertyId} property={property} />
   }
 
   // Get agent's listing count
@@ -58,6 +64,7 @@ export async function AgentSidebar({ ownerId, propertyId }: AgentSidebarProps) {
       }}
       listingsCount={listingsCount}
       propertyId={propertyId}
+      property={property}
     />
   )
 }

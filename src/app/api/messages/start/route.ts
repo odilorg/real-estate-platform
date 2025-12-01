@@ -1,11 +1,14 @@
 import { getSession } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { getPropertyById, getOrCreateConversation, sendMessage } from '@/lib/db'
+import { prisma } from '@/lib/prisma'
+import { sendNewMessageNotification } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession()
     const userId = session?.user?.id
+    const senderName = session?.user?.name || 'Someone'
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -43,6 +46,26 @@ export async function POST(request: NextRequest) {
     // Send initial message if provided
     if (message && typeof message === 'string' && message.trim().length > 0) {
       await sendMessage(conversation.id, userId, message.trim())
+
+      // Send email notification to property owner (non-blocking)
+      const owner = await prisma.user.findUnique({
+        where: { id: property.userId },
+        select: { name: true, email: true },
+      })
+
+      if (owner?.email) {
+        sendNewMessageNotification({
+          recipientName: owner.name || 'User',
+          recipientEmail: owner.email,
+          senderName,
+          propertyTitle: property.title,
+          propertyUrl: `/properties/${property.id}`,
+          messagePreview: message.trim().slice(0, 200),
+          conversationUrl: `/messages/${conversation.id}`,
+        }).catch((err) => {
+          console.error('Failed to send email notification:', err)
+        })
+      }
     }
 
     return NextResponse.json({ conversationId: conversation.id }, { status: 201 })

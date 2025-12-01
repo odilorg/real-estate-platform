@@ -1,6 +1,8 @@
 import { getSession, getUserById } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { getConversationById, getMessagesByConversationId, markMessagesAsRead, sendMessage } from '@/lib/db'
+import { getConversationById, getMessagesByConversationId, markMessagesAsRead, sendMessage, getPropertyById } from '@/lib/db'
+import { prisma } from '@/lib/prisma'
+import { sendNewMessageNotification } from '@/lib/email'
 
 // GET messages for a conversation
 export async function GET(
@@ -85,6 +87,7 @@ export async function POST(
   try {
     const session = await getSession()
     const userId = session?.user?.id
+    const senderName = session?.user?.name || 'Someone'
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -110,6 +113,33 @@ export async function POST(
 
     if (!message) {
       return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
+    }
+
+    // Send email notification to the other participant (non-blocking)
+    const recipientId = conversation.participant1 === userId
+      ? conversation.participant2
+      : conversation.participant1
+
+    const recipient = await prisma.user.findUnique({
+      where: { id: recipientId },
+      select: { name: true, email: true },
+    })
+
+    if (recipient?.email && conversation.propertyId) {
+      const property = await getPropertyById(conversation.propertyId)
+      if (property) {
+        sendNewMessageNotification({
+          recipientName: recipient.name || 'User',
+          recipientEmail: recipient.email,
+          senderName,
+          propertyTitle: property.title,
+          propertyUrl: `/properties/${property.id}`,
+          messagePreview: content.trim().slice(0, 200),
+          conversationUrl: `/messages/${conversationId}`,
+        }).catch((err) => {
+          console.error('Failed to send email notification:', err)
+        })
+      }
     }
 
     return NextResponse.json({ message }, { status: 201 })

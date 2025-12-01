@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useState, useEffect } from 'react'
+import { Suspense, useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { MainLayout } from '@/components/layout'
@@ -20,6 +20,22 @@ import {
 } from '@/components/ui/select'
 import { Search, SlidersHorizontal, Loader2, Map as MapIcon, List, LayoutGrid, Columns } from 'lucide-react'
 import type { Property, SearchResponse } from '@/types'
+
+// Custom hook to detect mobile viewport
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  return isMobile
+}
 
 interface SelectedLocation {
   name: string
@@ -52,6 +68,7 @@ function PropertiesContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const t = useTranslations('properties')
+  const isMobile = useIsMobile()
 
   // Filter states
   const [query, setQuery] = useState(searchParams.get('query') || '')
@@ -60,6 +77,13 @@ function PropertiesContent() {
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'createdAt')
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1)
   const [viewMode, setViewMode] = useState<'list' | 'map' | 'split'>('list')
+
+  // Auto-switch to list view on mobile
+  useEffect(() => {
+    if (isMobile && viewMode === 'split') {
+      setViewMode('list')
+    }
+  }, [isMobile, viewMode])
   const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([])
   const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.006])
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>()
@@ -278,8 +302,8 @@ function PropertiesContent() {
         {/* Header */}
         <div className="bg-white border-b">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold">{t('title')}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <h1 className="text-xl sm:text-2xl font-bold">{t('title')}</h1>
               <div className="flex gap-2 items-center">
                 <SaveSearchDialog
                   filters={{ query, propertyType, listingType, sortBy }}
@@ -302,10 +326,10 @@ function PropertiesContent() {
               />
             </div>
 
-            {/* Filters Row */}
-            <div className="flex flex-wrap gap-3 items-center">
+            {/* Filters Row - Mobile Stacked, Desktop Inline */}
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 items-center">
               <Select value={listingType} onValueChange={handleListingTypeChange}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-full sm:w-32">
                   <SelectValue placeholder={t('filters.listingType')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -316,7 +340,7 @@ function PropertiesContent() {
               </Select>
 
               <Select value={propertyType} onValueChange={handlePropertyTypeChange}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-full sm:w-40">
                   <SelectValue placeholder={t('filters.propertyType')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -332,11 +356,11 @@ function PropertiesContent() {
                 </SelectContent>
               </Select>
 
-              <div className="flex-1 relative max-w-xs">
+              <div className="col-span-2 sm:col-span-1 sm:flex-1 relative sm:max-w-xs">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder={t('searchPlaceholder')}
-                  className="pl-9 h-9"
+                  className="pl-9 h-9 w-full"
                   value={query}
                   onChange={(e) => handleQueryChange(e.target.value)}
                 />
@@ -346,7 +370,7 @@ function PropertiesContent() {
         </div>
 
         {/* Results */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
           {/* Advanced Filters */}
           <div className="mb-6">
             <AdvancedFilters
@@ -368,8 +392,8 @@ function PropertiesContent() {
           </div>
 
           {/* Results Count, View Toggle and Sort */}
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-gray-600">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <p className="text-sm sm:text-base text-gray-600">
               {loading ? (
                 'Searching...'
               ) : (
@@ -379,23 +403,24 @@ function PropertiesContent() {
                 </>
               )}
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
               {/* View Mode Toggle */}
               <div className="flex border rounded-lg overflow-hidden">
                 <Button
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className="rounded-none px-3"
+                  className="rounded-none px-2 sm:px-3"
                   title="List view"
                 >
                   <List className="h-4 w-4" />
                 </Button>
+                {/* Hide split view on mobile */}
                 <Button
                   variant={viewMode === 'split' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('split')}
-                  className="rounded-none px-3"
+                  className="rounded-none px-2 sm:px-3 hidden md:flex"
                   title="Split view"
                 >
                   <Columns className="h-4 w-4" />
@@ -404,7 +429,7 @@ function PropertiesContent() {
                   variant={viewMode === 'map' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('map')}
-                  className="rounded-none px-3"
+                  className="rounded-none px-2 sm:px-3"
                   title="Map view"
                 >
                   <MapIcon className="h-4 w-4" />
@@ -412,7 +437,7 @@ function PropertiesContent() {
               </div>
 
               <Select value={sortBy} onValueChange={handleSortChange}>
-                <SelectTrigger className="w-44">
+                <SelectTrigger className="w-32 sm:w-44">
                   <SelectValue placeholder={t('sort.title')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -497,7 +522,7 @@ function PropertiesContent() {
 
           {/* Full Map View */}
           {!loading && !error && properties.length > 0 && viewMode === 'map' && (
-            <div className="h-[calc(100vh-280px)]">
+            <div className="h-[60vh] sm:h-[calc(100vh-280px)]">
               <MapView
                 properties={properties}
                 height="100%"
@@ -519,34 +544,39 @@ function PropertiesContent() {
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="mt-8 flex items-center justify-center gap-2">
+                <div className="mt-6 sm:mt-8 flex items-center justify-center gap-1 sm:gap-2">
                   <Button
                     variant="outline"
+                    size="sm"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
+                    className="px-2 sm:px-4"
                   >
-                    Previous
+                    <span className="hidden sm:inline">Previous</span>
+                    <span className="sm:hidden">&lt;</span>
                   </Button>
 
-                  <div className="flex items-center gap-2">
-                    {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    {Array.from({ length: Math.min(isMobile ? 3 : 5, pagination.totalPages) }, (_, i) => {
                       let pageNum
-                      if (pagination.totalPages <= 5) {
+                      const maxPages = isMobile ? 3 : 5
+                      if (pagination.totalPages <= maxPages) {
                         pageNum = i + 1
-                      } else if (page <= 3) {
+                      } else if (page <= Math.ceil(maxPages / 2)) {
                         pageNum = i + 1
-                      } else if (page >= pagination.totalPages - 2) {
-                        pageNum = pagination.totalPages - 4 + i
+                      } else if (page >= pagination.totalPages - Math.floor(maxPages / 2)) {
+                        pageNum = pagination.totalPages - maxPages + 1 + i
                       } else {
-                        pageNum = page - 2 + i
+                        pageNum = page - Math.floor(maxPages / 2) + i
                       }
 
                       return (
                         <Button
                           key={pageNum}
                           variant={page === pageNum ? 'default' : 'outline'}
+                          size="sm"
                           onClick={() => setPage(pageNum)}
-                          className="w-10 h-10"
+                          className="w-8 h-8 sm:w-10 sm:h-10 p-0"
                         >
                           {pageNum}
                         </Button>
@@ -556,10 +586,13 @@ function PropertiesContent() {
 
                   <Button
                     variant="outline"
+                    size="sm"
                     onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
                     disabled={page === pagination.totalPages}
+                    className="px-2 sm:px-4"
                   >
-                    Next
+                    <span className="hidden sm:inline">Next</span>
+                    <span className="sm:hidden">&gt;</span>
                   </Button>
                 </div>
               )}

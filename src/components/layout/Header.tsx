@@ -19,6 +19,7 @@ export function Header() {
   const t = useTranslations('nav')
   const { data: session, status } = useSession()
   const [userRole, setUserRole] = useState<{ isAgent: boolean; isAdmin: boolean }>({ isAgent: false, isAdmin: false })
+  const [unreadCount, setUnreadCount] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -37,6 +38,23 @@ export function Header() {
         .then(res => res.json())
         .then(data => setUserRole({ isAgent: data.isAgent, isAdmin: data.isAdmin }))
         .catch(() => {})
+    }
+  }, [isAuthenticated])
+
+  // Fetch unread message count
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchUnreadCount = () => {
+        fetch('/api/messages/unread-count')
+          .then(res => res.json())
+          .then(data => setUnreadCount(data.count || 0))
+          .catch(() => {})
+      }
+
+      fetchUnreadCount()
+      // Poll every 30 seconds for new messages
+      const interval = setInterval(fetchUnreadCount, 30000)
+      return () => clearInterval(interval)
     }
   }, [isAuthenticated])
 
@@ -114,9 +132,14 @@ export function Header() {
                   </Button>
                 </Link>
                 <Link href="/messages">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="relative">
                     <MessageSquare className="h-5 w-5" />
                     <span className="ml-2 hidden lg:inline">{t('messages')}</span>
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 min-w-5 flex items-center justify-center px-1">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
                   </Button>
                 </Link>
                 <Link href="/properties/new">
@@ -308,7 +331,14 @@ export function Header() {
                   onClick={closeMobileMenu}
                   className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
                 >
-                  <MessageSquare className="h-5 w-5" />
+                  <div className="relative">
+                    <MessageSquare className="h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-4 min-w-4 flex items-center justify-center px-0.5 text-[10px]">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </div>
                   {t('messages')}
                 </Link>
                 <Link

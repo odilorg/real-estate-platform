@@ -201,9 +201,9 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <div className="flex flex-col lg:flex-row">
         {/* Left Section: Image + Property Info */}
-        <div className="flex flex-col md:flex-row flex-1">
+        <div className="flex flex-col sm:flex-row flex-1">
           {/* Image Section */}
-          <div className="relative w-full md:w-56 lg:w-64 h-48 md:h-auto flex-shrink-0">
+          <div className="relative w-full sm:w-40 md:w-56 lg:w-64 h-48 sm:h-auto flex-shrink-0">
             <Link href={`/properties/${property.id}`}>
               <Image
                 src={property.images[0]}
@@ -250,14 +250,14 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
           </div>
 
           {/* Content Section */}
-          <CardContent className="flex-1 p-4">
+          <CardContent className="flex-1 p-3 sm:p-4">
             <div className="flex flex-col h-full">
               {/* Title - Cian style */}
               <Link
                 href={`/properties/${property.id}`}
                 className="block hover:text-blue-600 transition-colors mb-1"
               >
-                <h3 className="text-base font-medium line-clamp-1">
+                <h3 className="text-sm sm:text-base font-medium line-clamp-1">
                   {property.rooms ? `${property.rooms}-${t('room')} ` : ''}
                   {property.propertyType.toLowerCase()}
                   {property.area ? `, ${property.area} ${t('sqm')}` : ''}
@@ -266,7 +266,7 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
               </Link>
 
               {/* Property specs */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mb-2">
+              <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-600 mb-2">
                 {property.bedrooms && (
                   <span className="flex items-center gap-1">
                     <Bed className="h-3.5 w-3.5" /> {property.bedrooms}
@@ -290,12 +290,12 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
               </div>
 
               {/* Location with map link */}
-              <div className="flex items-center text-sm text-gray-600 mb-2">
-                <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+              <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-2">
+                <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
                 <span className="truncate">{property.address}, {property.city}</span>
                 <button
                   onClick={handleMapClick}
-                  className="ml-2 text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 flex-shrink-0"
+                  className="ml-2 text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 flex-shrink-0 text-xs sm:text-sm"
                 >
                   {t('onMap')}
                 </button>
@@ -303,60 +303,60 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
 
               {/* Price - prominent */}
               <div className="mb-2">
-                <span className="text-xl font-bold text-gray-900">
+                <span className="text-lg sm:text-xl font-bold text-gray-900">
                   {formatPrice(property.price)}
                   {property.listingType === 'RENT' && (
-                    <span className="text-sm text-gray-600 font-normal">/{t('perMonth') || 'mo'}</span>
+                    <span className="text-xs sm:text-sm text-gray-600 font-normal">/{t('perMonth') || 'mo'}</span>
                   )}
                 </span>
                 {property.area && (
-                  <span className="text-sm text-gray-500 ml-2">
+                  <span className="text-xs sm:text-sm text-gray-500 ml-2 hidden sm:inline">
                     {formatPrice(Math.round(property.price / property.area))}/{t('sqm')}
                   </span>
                 )}
               </div>
 
-              {/* Description */}
-              <p className="text-sm text-gray-600 line-clamp-2 mb-3 flex-grow">
+              {/* Description - Hidden on very small screens */}
+              <p className="hidden sm:block text-sm text-gray-600 line-clamp-2 mb-3 flex-grow">
                 {property.description}
               </p>
 
-              {/* Action buttons */}
-              <div className="flex items-center gap-2 pt-2 border-t mt-auto">
+              {/* Action buttons - Icons only on mobile, with text on larger screens */}
+              <div className="flex items-center gap-1 sm:gap-2 pt-2 border-t mt-auto">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleCompareClick}
-                  className={`text-xs ${inComparison ? 'text-blue-600' : 'text-gray-500'}`}
+                  className={`text-xs px-2 sm:px-3 ${inComparison ? 'text-blue-600' : 'text-gray-500'}`}
                 >
-                  <GitCompare className="h-3.5 w-3.5 mr-1" />
-                  {t('compare')}
+                  <GitCompare className="h-3.5 w-3.5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('compare')}</span>
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handlePrint}
-                  className="text-xs text-gray-500"
+                  className="text-xs text-gray-500 px-2 sm:px-3"
                 >
-                  <Printer className="h-3.5 w-3.5 mr-1" />
-                  {t('print')}
+                  <Printer className="h-3.5 w-3.5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('print')}</span>
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleReport}
-                  className="text-xs text-gray-500"
+                  className="text-xs text-gray-500 px-2 sm:px-3"
                 >
-                  <Flag className="h-3.5 w-3.5 mr-1" />
-                  {t('report')}
+                  <Flag className="h-3.5 w-3.5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('report')}</span>
                 </Button>
               </div>
             </div>
           </CardContent>
         </div>
 
-        {/* Right Section: Seller/Agent Info */}
-        <div className="lg:w-56 xl:w-64 border-t lg:border-t-0 lg:border-l p-4 bg-gray-50/50">
+        {/* Right Section: Seller/Agent Info - Hidden on small mobile */}
+        <div className="hidden sm:block lg:w-56 xl:w-64 border-t lg:border-t-0 lg:border-l p-4 bg-gray-50/50">
           {property.agent ? (
             <div className="space-y-3">
               {/* Agency info */}

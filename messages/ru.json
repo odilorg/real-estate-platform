@@ -17,7 +17,9 @@
     "passwordsDontMatch": "Пароли не совпадают",
     "passwordTooShort": "Пароль должен быть не менее 6 символов",
     "registrationFailed": "Ошибка регистрации",
-    "signInAfterRegisterFailed": "Регистрация прошла успешно, но войти не удалось"
+    "signInAfterRegisterFailed": "Регистрация прошла успешно, но войти не удалось",
+    "continueWithGoogle": "Продолжить с Google",
+    "orContinueWith": "или продолжить с"
   },
   "common": {
     "search": "Поиск",
@@ -63,7 +65,12 @@
     "apartments": "Квартиры",
     "houses": "Дома",
     "commercial": "Коммерческая",
-    "properties": "объектов"
+    "properties": "объектов",
+    "messageSent": "Сообщение отправлено",
+    "messageSentDescription": "Ваше сообщение успешно отправлено",
+    "contactDescription": "Отправьте сообщение по этому объекту",
+    "messageDelivered": "Ваше сообщение доставлено. Получатель ответит в ближайшее время.",
+    "viewConversation": "Открыть переписку"
   },
   "nav": {
     "home": "Главная",
@@ -849,16 +856,6 @@
     "yourResponse": "Ваш ответ",
     "sendResponse": "Отправить ответ"
   },
-  "auth": {
-    "signIn": "Войти",
-    "signUp": "Регистрация",
-    "email": "Электронная почта",
-    "password": "Пароль",
-    "forgotPassword": "Забыли пароль?",
-    "noAccount": "Нет аккаунта?",
-    "hasAccount": "Уже есть аккаунт?",
-    "orContinueWith": "Или продолжить через"
-  },
   "footer": {
     "about": "О нас",
     "contact": "Контакты",
@@ -1036,6 +1033,10 @@
       "medium": "Обычно отвечает в течение дня",
       "slow": "Может ответить в течение нескольких дней"
     },
+    "messagePlaceholder": "Напишите ваше сообщение...",
+    "sending": "Отправка...",
+    "send": "Отправить",
+    "loading": "Загрузка...",
     "profile": {
       "title": "Профиль агента",
       "about": "О себе",

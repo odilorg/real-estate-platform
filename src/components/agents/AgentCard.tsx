@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { ContactModal } from './ContactModal'
 import {
   Phone,
   MessageCircle,
@@ -50,22 +51,28 @@ interface AgentCardProps {
   listingsCount: number
   onContact?: () => void
   propertyId?: string
+  property?: {
+    title: string
+    price: number
+    currency: string
+    image?: string | null
+  }
 }
 
-export function AgentCard({ agent, listingsCount, onContact, propertyId }: AgentCardProps) {
+export function AgentCard({ agent, listingsCount, onContact, propertyId, property }: AgentCardProps) {
   const t = useTranslations('agent')
   const [showPhone, setShowPhone] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [showContactModal, setShowContactModal] = useState(false)
   const router = useRouter()
   const { data: session } = useSession()
 
-  const handleContact = async () => {
+  const handleContact = () => {
     if (onContact) {
       onContact()
       return
     }
 
-    // Default behavior: start a conversation
+    // Check if user is authenticated
     if (!session?.user?.id) {
       router.push('/sign-in')
       return
@@ -75,26 +82,8 @@ export function AgentCard({ agent, listingsCount, onContact, propertyId }: Agent
       return
     }
 
-    setLoading(true)
-    try {
-      const res = await fetch('/api/messages/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          propertyId,
-          message: "Здравствуйте! Интересует ваш объект. Можете предоставить больше информации?",
-        }),
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        router.push(`/messages/${data.conversationId}`)
-      }
-    } catch (error) {
-      console.error('Error starting conversation:', error)
-    } finally {
-      setLoading(false)
-    }
+    // Open contact modal
+    setShowContactModal(true)
   }
 
   const fullName = `${agent.firstName} ${agent.lastName}`
@@ -256,10 +245,9 @@ export function AgentCard({ agent, listingsCount, onContact, propertyId }: Agent
               variant="outline"
               className="w-full"
               onClick={handleContact}
-              disabled={loading}
             >
               <MessageCircle className="h-4 w-4 mr-2" />
-              {loading ? t('loading') || 'Loading...' : t('writeMessage')}
+              {t('writeMessage')}
             </Button>
           </div>
 
@@ -290,6 +278,21 @@ export function AgentCard({ agent, listingsCount, onContact, propertyId }: Agent
           )}
         </CardContent>
       </Card>
+
+      {/* Contact Modal */}
+      {propertyId && (
+        <ContactModal
+          isOpen={showContactModal}
+          onClose={() => setShowContactModal(false)}
+          propertyId={propertyId}
+          property={property}
+          recipient={{
+            name: fullName,
+            photo: agent.photo,
+            isAgent: true,
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -298,18 +301,23 @@ export function AgentCard({ agent, listingsCount, onContact, propertyId }: Agent
 export function OwnerContactCard({
   ownerId,
   propertyId,
+  property,
 }: {
   ownerId: string
   propertyId?: string
+  property?: {
+    title: string
+    price: number
+    currency: string
+    image?: string | null
+  }
 }) {
   const t = useTranslations('agent')
-  const [loading, setLoading] = useState(false)
+  const [showContactModal, setShowContactModal] = useState(false)
   const router = useRouter()
   const { data: session } = useSession()
 
   const handleContact = () => {
-    console.log('Contact button clicked', { session, ownerId, propertyId })
-
     // Check if user is authenticated
     if (!session?.user?.id) {
       router.push('/sign-in')
@@ -323,61 +331,53 @@ export function OwnerContactCard({
     }
 
     if (!propertyId) {
-      console.log('No propertyId')
       return
     }
 
-    setLoading(true)
-    fetch('/api/messages/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        propertyId,
-        message: "Здравствуйте! Интересует ваш объект. Можете предоставить больше информации?",
-      }),
-    })
-      .then(res => {
-        if (res.ok) {
-          return res.json()
-        }
-        throw new Error('Failed to start conversation')
-      })
-      .then(data => {
-        router.push(`/messages/${data.conversationId}`)
-      })
-      .catch(error => {
-        console.error('Error starting conversation:', error)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+    // Open contact modal
+    setShowContactModal(true)
   }
 
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-            <Building2 className="h-6 w-6 text-gray-500" />
+    <>
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+              <Building2 className="h-6 w-6 text-gray-500" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wider">
+                {t('propertyOwner')}
+              </p>
+              <p className="font-semibold text-gray-900">{t('privateOwner')}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 uppercase tracking-wider">
-              {t('propertyOwner')}
-            </p>
-            <p className="font-semibold text-gray-900">{t('privateOwner')}</p>
-          </div>
-        </div>
 
-        <Button
-          type="button"
-          className="w-full"
-          onClick={handleContact}
-          disabled={loading}
-        >
-          <MessageCircle className="h-4 w-4 mr-2" />
-          {loading ? t('loading') || 'Loading...' : t('contactOwner')}
-        </Button>
-      </CardContent>
-    </Card>
+          <Button
+            type="button"
+            className="w-full"
+            onClick={handleContact}
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            {t('contactOwner')}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Contact Modal */}
+      {propertyId && (
+        <ContactModal
+          isOpen={showContactModal}
+          onClose={() => setShowContactModal(false)}
+          propertyId={propertyId}
+          property={property}
+          recipient={{
+            name: t('privateOwner') || 'Private Owner',
+            isAgent: false,
+          }}
+        />
+      )}
+    </>
   )
 }
