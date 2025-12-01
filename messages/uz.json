@@ -220,9 +220,42 @@
   "properties": {
     "title": "Ko'chmas mulk",
     "searchPlaceholder": "Joylashuv, nom bo'yicha qidirish...",
-    "foundProperties": "mulk topildi",
+    "foundProperties": "e'lon",
+    "found": "Topildi",
     "noProperties": "Mulklar topilmadi",
     "noPropertiesDesc": "Qidiruv parametrlarini o'zgartirib ko'ring",
+    "pageTitle": {
+      "sale": "Sotish",
+      "rent": "Ijara",
+      "allProperties": "Barcha ko'chmas mulk",
+      "apartments": "kvartiralar",
+      "houses": "uylar",
+      "newBuildings": "yangi binolar",
+      "townhouses": "taunxauslar",
+      "land": "yer uchastkalar",
+      "rooms": "xonalar",
+      "commercial": "tijorat ko'chmas mulk",
+      "studio": "studiyalar",
+      "oneRoom": "bir xonali",
+      "twoRoom": "ikki xonali",
+      "threeRoom": "uch xonali",
+      "fourPlusRoom": "ko'p xonali",
+      "from": "dan",
+      "inCity": "Toshkentda",
+      "currency": "so'm"
+    },
+    "sortOptions": {
+      "default": "Odatiy",
+      "priceAsc": "Arzonroq",
+      "priceDesc": "Qimmatroq",
+      "newest": "Yangi",
+      "areaAsc": "Maydon ↑",
+      "areaDesc": "Maydon ↓"
+    },
+    "viewMode": {
+      "list": "Ro'yxat",
+      "map": "Xaritada"
+    },
     "filters": {
       "propertyType": "Mulk turi",
       "listingType": "Bitim turi",

@@ -242,9 +242,42 @@
   "properties": {
     "title": "Недвижимость",
     "searchPlaceholder": "Поиск по местоположению, названию...",
-    "foundProperties": "объектов найдено",
+    "foundProperties": "объявлений",
+    "found": "Найдено",
     "noProperties": "Объекты не найдены",
     "noPropertiesDesc": "Попробуйте изменить параметры поиска",
+    "pageTitle": {
+      "sale": "Продажа",
+      "rent": "Аренда",
+      "allProperties": "Вся недвижимость",
+      "apartments": "квартир",
+      "houses": "домов",
+      "newBuildings": "новостроек",
+      "townhouses": "таунхаусов",
+      "land": "участков",
+      "rooms": "комнат",
+      "commercial": "коммерческой недвижимости",
+      "studio": "студий",
+      "oneRoom": "однокомнатных",
+      "twoRoom": "двухкомнатных",
+      "threeRoom": "трёхкомнатных",
+      "fourPlusRoom": "многокомнатных",
+      "from": "от",
+      "inCity": "в Ташкенте",
+      "currency": "сум"
+    },
+    "sortOptions": {
+      "default": "По умолчанию",
+      "priceAsc": "Сначала дешевле",
+      "priceDesc": "Сначала дороже",
+      "newest": "Сначала новые",
+      "areaAsc": "По площади ↑",
+      "areaDesc": "По площади ↓"
+    },
+    "viewMode": {
+      "list": "Списком",
+      "map": "На карте"
+    },
     "filters": {
       "propertyType": "Тип недвижимости",
       "listingType": "Тип сделки",

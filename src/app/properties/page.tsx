@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Search, SlidersHorizontal, Loader2, Map as MapIcon, List, LayoutGrid, Columns } from 'lucide-react'
+import { Search, SlidersHorizontal, Loader2, Map as MapIcon } from 'lucide-react'
 import type { Property, SearchResponse } from '@/types'
 
 // Custom hook to detect mobile viewport
@@ -144,6 +144,17 @@ function PropertiesContent() {
         // Build query params
         const params = new URLSearchParams()
         if (debouncedQuery) params.append('query', debouncedQuery)
+
+        // Add selected location filter - use coordinates only (city names may be in different scripts)
+        if (selectedLocations.length > 0) {
+          const location = selectedLocations[0]
+          // Use coordinates for radius search (handles Latin/Cyrillic mismatch)
+          if (location.lat && location.lon) {
+            params.append('latitude', location.lat.toString())
+            params.append('longitude', location.lon.toString())
+            params.append('radius', '50') // 50km radius for city search
+          }
+        }
 
         // Determine listingType: UI filters > URL param > state
         const urlListingType = searchParams.get('listingType')
@@ -296,7 +307,7 @@ function PropertiesContent() {
     }
 
     fetchProperties()
-  }, [debouncedQuery, propertyType, listingType, sortBy, page, advancedFilters, quickFilters, searchParams])
+  }, [debouncedQuery, propertyType, listingType, sortBy, page, advancedFilters, quickFilters, searchParams, selectedLocations])
 
   // Handle filter changes
   const handleQueryChange = (value: string) => {
@@ -351,6 +362,75 @@ function PropertiesContent() {
   const hasActiveFilters = query || propertyType !== 'all' || listingType !== 'all' || selectedLocations.length > 0 ||
     quickFilters.listingType || quickFilters.propertyTypes.length > 0 || quickFilters.rooms.length > 0 ||
     quickFilters.minPrice || quickFilters.maxPrice || quickFilters.minArea || quickFilters.maxArea
+
+  // Generate dynamic page title like Cian
+  const generatePageTitle = () => {
+    const urlListingType = searchParams.get('listingType')
+    const urlPropertyType = searchParams.get('propertyType')
+    const activeListingType = quickFilters.listingType || urlListingType
+    const activePropertyType = quickFilters.propertyTypes[0] || urlPropertyType
+
+    // Listing type part
+    let titleParts: string[] = []
+    if (activeListingType === 'SALE') {
+      titleParts.push(t('pageTitle.sale'))
+    } else if (activeListingType === 'RENT') {
+      titleParts.push(t('pageTitle.rent'))
+    }
+
+    // Room count part
+    const rooms = quickFilters.rooms
+    if (rooms.length === 1) {
+      if (rooms[0] === 1) titleParts.push(t('pageTitle.oneRoom'))
+      else if (rooms[0] === 2) titleParts.push(t('pageTitle.twoRoom'))
+      else if (rooms[0] === 3) titleParts.push(t('pageTitle.threeRoom'))
+      else if (rooms[0] >= 4) titleParts.push(t('pageTitle.fourPlusRoom'))
+    }
+
+    // Property type part
+    if (activePropertyType === 'APARTMENT') {
+      titleParts.push(t('pageTitle.apartments'))
+    } else if (activePropertyType === 'HOUSE') {
+      titleParts.push(t('pageTitle.houses'))
+    } else if (activePropertyType === 'NEW_BUILDING') {
+      titleParts.push(t('pageTitle.newBuildings'))
+    } else if (activePropertyType === 'TOWNHOUSE') {
+      titleParts.push(t('pageTitle.townhouses'))
+    } else if (activePropertyType === 'LAND') {
+      titleParts.push(t('pageTitle.land'))
+    } else if (activePropertyType === 'ROOM') {
+      titleParts.push(t('pageTitle.rooms'))
+    } else if (activePropertyType === 'COMMERCIAL') {
+      titleParts.push(t('pageTitle.commercial'))
+    }
+
+    // City part - use selected location or default
+    if (selectedLocations.length > 0) {
+      const cityName = selectedLocations[0].city || selectedLocations[0].name
+      titleParts.push(`в ${cityName}`)
+    } else {
+      titleParts.push(t('pageTitle.inCity'))
+    }
+
+    // Price part
+    const minPrice = quickFilters.minPrice
+    if (minPrice) {
+      const formattedPrice = minPrice >= 1000000
+        ? `${(minPrice / 1000000).toFixed(1)} млн`
+        : minPrice.toLocaleString()
+      titleParts.push(`${t('pageTitle.from')} ${formattedPrice} ${t('pageTitle.currency')}`)
+    }
+
+    // If no filters, show default
+    if (titleParts.length === 1) {
+      const cityPart = selectedLocations.length > 0
+        ? `в ${selectedLocations[0].city || selectedLocations[0].name}`
+        : t('pageTitle.inCity')
+      return t('pageTitle.allProperties') + ' ' + cityPart
+    }
+
+    return titleParts.join(' ')
+  }
 
   return (
     <MainLayout>
@@ -418,62 +498,48 @@ function PropertiesContent() {
         {/* Results */}
         <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
 
-          {/* Results Count, View Toggle and Sort */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          {/* Dynamic Page Title - Cian Style */}
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            {generatePageTitle()}
+          </h1>
+
+          {/* Results Count, Sort and Map Toggle - Cian Style */}
+          <div className="flex items-center justify-between gap-4 mb-6">
             <p className="text-sm sm:text-base text-gray-600">
               {loading ? (
-                'Searching...'
+                <span className="text-gray-400">{t('found')}...</span>
               ) : (
                 <>
+                  {t('found')}{' '}
                   <span className="font-semibold text-gray-900">{pagination.total.toLocaleString()}</span>{' '}
                   {t('foundProperties')}
                 </>
               )}
             </p>
-            <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
-              {/* View Mode Toggle */}
-              <div className="flex border rounded-lg overflow-hidden">
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="rounded-none px-2 sm:px-3"
-                  title="List view"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-                {/* Hide split view on mobile */}
-                <Button
-                  variant={viewMode === 'split' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('split')}
-                  className="rounded-none px-2 sm:px-3 hidden md:flex"
-                  title="Split view"
-                >
-                  <Columns className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'map' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('map')}
-                  className="rounded-none px-2 sm:px-3"
-                  title="Map view"
-                >
-                  <MapIcon className="h-4 w-4" />
-                </Button>
-              </div>
-
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Sort Dropdown */}
               <Select value={sortBy} onValueChange={handleSortChange}>
-                <SelectTrigger className="w-32 sm:w-44">
-                  <SelectValue placeholder={t('sort.title')} />
+                <SelectTrigger className="w-auto border-0 shadow-none gap-1 text-blue-600 hover:text-blue-700 font-medium px-0">
+                  <SelectValue placeholder={t('sortOptions.default')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="createdAt">{t('sort.newest')}</SelectItem>
-                  <SelectItem value="price">{t('sort.priceAsc')}</SelectItem>
-                  <SelectItem value="area">{t('sort.areaDesc')}</SelectItem>
-                  <SelectItem value="bedrooms">Most Bedrooms</SelectItem>
+                  <SelectItem value="createdAt">{t('sortOptions.newest')}</SelectItem>
+                  <SelectItem value="price">{t('sortOptions.priceAsc')}</SelectItem>
+                  <SelectItem value="priceDesc">{t('sortOptions.priceDesc')}</SelectItem>
+                  <SelectItem value="area">{t('sortOptions.areaDesc')}</SelectItem>
                 </SelectContent>
               </Select>
+
+              {/* Map Toggle Button - Cian Style */}
+              <Button
+                variant={viewMode === 'map' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
+                className="flex items-center gap-2"
+              >
+                <MapIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('viewMode.map')}</span>
+              </Button>
             </div>
           </div>
 

@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PropertyRating } from './PropertyRating'
-import { Heart, MapPin, Bed, Bath, Maximize, Calendar, GitCompare, Check, Map, Printer, Flag, Phone, Building2, Shield, Eye, EyeOff } from 'lucide-react'
+import { Heart, MapPin, Bed, Bath, Maximize, Calendar, GitCompare, Check, Map, Printer, Flag, Phone, Building2, Shield, Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useFavorites } from '@/contexts/FavoritesContext'
 import { useComparison } from '@/contexts/ComparisonContext'
 import { useSession } from 'next-auth/react'
@@ -30,8 +30,28 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
   const t = useTranslations('property')
   const tAgent = useTranslations('agent')
   const [showPhone, setShowPhone] = useState(false)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const favorite = isFavorite(property.id)
   const inComparison = isInComparison(property.id)
+
+  // Image gallery navigation
+  const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setCurrentImageIndex((prev) => (prev + 1) % property.images.length)
+  }
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length)
+  }
+
+  const selectImage = (index: number, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setCurrentImageIndex(index)
+  }
 
   // Handle print - open property page and trigger print
   const handlePrint = (e: React.MouseEvent) => {
@@ -204,55 +224,117 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
   }
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <Card className="group overflow-hidden hover:shadow-md transition-shadow duration-200">
       <div className="flex flex-col lg:flex-row">
-        {/* Left Section: Image + Property Info */}
+        {/* Left Section: Image Gallery + Property Info */}
         <div className="flex flex-col sm:flex-row flex-1">
-          {/* Image Section */}
-          <div className="relative w-full sm:w-40 md:w-56 lg:w-64 h-48 sm:h-auto flex-shrink-0">
-            <Link href={`/properties/${property.id}`}>
-              <Image
-                src={property.images[0]}
-                alt={property.title}
-                fill
-                className="object-cover"
-              />
-            </Link>
-            <div className="absolute top-2 left-2 flex gap-2">
-              <Badge
-                variant="secondary"
-                className="bg-white/90 text-gray-900 hover:bg-white text-xs"
-              >
-                {property.listingType === 'SALE' ? t('forSale') : t('forRent')}
-              </Badge>
+          {/* Image Gallery Section - Cian style large */}
+          <div className="relative w-full sm:w-64 md:w-80 lg:w-96 flex-shrink-0">
+            {/* Main Image */}
+            <div className="relative h-52 sm:h-48 md:h-56 lg:h-60">
+              <Link href={`/properties/${property.id}`}>
+                <Image
+                  src={property.images[currentImageIndex] || property.images[0]}
+                  alt={property.title}
+                  fill
+                  className="object-cover"
+                />
+              </Link>
+
+              {/* Navigation Arrows */}
+              {property.images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </>
+              )}
+
+              {/* Badges */}
+              <div className="absolute top-2 left-2 flex gap-1">
+                <Badge
+                  variant="secondary"
+                  className="bg-white/90 text-gray-900 hover:bg-white text-xs px-1.5 py-0.5"
+                >
+                  {property.listingType === 'SALE' ? t('forSale') : t('forRent')}
+                </Badge>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="absolute top-2 right-2 flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCompareClick}
+                  className={`h-7 w-7 transition-colors ${
+                    inComparison
+                      ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                      : 'bg-white/90 hover:bg-white text-gray-600'
+                  }`}
+                  title={inComparison ? 'Remove from comparison' : 'Add to comparison'}
+                >
+                  {inComparison ? <Check className="h-3.5 w-3.5" /> : <GitCompare className="h-3.5 w-3.5" />}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleFavoriteClick}
+                  className={`h-7 w-7 transition-colors ${
+                    favorite
+                      ? 'bg-red-500 hover:bg-red-600 text-white'
+                      : 'bg-white/90 hover:bg-white text-gray-600'
+                  }`}
+                >
+                  <Heart className={`h-3.5 w-3.5 ${favorite ? 'fill-current' : ''}`} />
+                </Button>
+              </div>
+
+              {/* Image Counter */}
+              {property.images.length > 1 && (
+                <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+                  {currentImageIndex + 1}/{property.images.length}
+                </div>
+              )}
             </div>
-            <div className="absolute top-2 right-2 flex gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleCompareClick}
-                className={`h-8 w-8 transition-colors ${
-                  inComparison
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                    : 'bg-white/90 hover:bg-white text-gray-600'
-                }`}
-                title={inComparison ? 'Remove from comparison' : 'Add to comparison'}
-              >
-                {inComparison ? <Check className="h-4 w-4" /> : <GitCompare className="h-4 w-4" />}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleFavoriteClick}
-                className={`h-8 w-8 transition-colors ${
-                  favorite
-                    ? 'bg-red-500 hover:bg-red-600 text-white'
-                    : 'bg-white/90 hover:bg-white text-gray-600'
-                }`}
-              >
-                <Heart className={`h-4 w-4 ${favorite ? 'fill-current' : ''}`} />
-              </Button>
-            </div>
+
+            {/* Thumbnail Strip */}
+            {property.images.length > 1 && (
+              <div className="hidden sm:flex gap-1 p-1.5 bg-gray-100">
+                {property.images.slice(0, 4).map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={(e) => selectImage(index, e)}
+                    className={`relative flex-1 h-14 md:h-16 overflow-hidden rounded-sm ${
+                      currentImageIndex === index ? 'ring-2 ring-blue-500' : 'opacity-80 hover:opacity-100'
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${property.title} - ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                    {/* "More photos" overlay on last thumbnail */}
+                    {index === 3 && property.images.length > 4 && (
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                        <span className="text-white text-sm font-medium">
+                          +{property.images.length - 4}
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Content Section */}
@@ -322,8 +404,8 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
                 )}
               </div>
 
-              {/* Description - Hidden on very small screens */}
-              <p className="hidden sm:block text-sm text-gray-600 line-clamp-3 mb-3 overflow-hidden">
+              {/* Description - 2 lines max */}
+              <p className="hidden sm:block text-sm text-gray-600 line-clamp-2 mb-3">
                 {property.description}
               </p>
 
@@ -362,7 +444,7 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
         </div>
 
         {/* Right Section: Seller/Agent Info - Hidden on small mobile */}
-        <div className="hidden sm:block lg:w-56 xl:w-64 border-t lg:border-t-0 lg:border-l p-4 bg-gray-50/50">
+        <div className="hidden sm:block lg:w-48 xl:w-52 border-t lg:border-t-0 lg:border-l p-3 bg-gray-50/50">
           {property.agent ? (
             <div className="space-y-3">
               {/* Agency info */}
