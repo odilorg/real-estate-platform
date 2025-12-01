@@ -67,6 +67,17 @@
     "becomeAgent": "Agent bo'lish",
     "agentDashboard": "Agent paneli"
   },
+  "categoryNav": {
+    "sale": "Sotish",
+    "rent": "Ijara",
+    "apartments": "Kvartiralar",
+    "houses": "Uylar",
+    "newBuildings": "Yangi binolar",
+    "townhouses": "Taunxauslar",
+    "land": "Yer uchastkasi",
+    "rooms": "Xonalar",
+    "agents": "Agentlar"
+  },
   "home": {
     "hero": {
       "title": "Ideal ko'chmas mulkni toping",
@@ -905,11 +916,7 @@
     "tools": {
       "title": "Asboblar",
       "notes": "Eslatmalar",
-    "myNotes": "Mening eslatmalarim",
-    "noNotes": "Hali eslatmalar yo'q",
-    "noNotesDesc": "Sizni qiziqtirgan mulklarga eslatmalar qo'shing.",
-    "browseProperties": "Mulklarni ko'rish",
-    "savedSearches": "Saqlangan qidiruvlar",
+      "savedSearches": "Saqlangan qidiruvlar",
       "favorites": "Tanlanganlar",
       "comparison": "Mulklarni solishtirish"
     },
