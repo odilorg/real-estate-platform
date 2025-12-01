@@ -175,7 +175,8 @@
       "searchLocation": "Shahar, viloyat, manzil...",
       "region": "Viloyat",
       "district": "Tuman",
-      "metro": "Metro"
+      "metro": "Metro",
+      "resetFilters": "Filtrlarni tozalash"
     },
     "types": {
       "house": "Uy",

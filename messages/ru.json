@@ -175,7 +175,8 @@
       "searchLocation": "Город, регион, адрес...",
       "region": "Регион",
       "district": "Район",
-      "metro": "Метро"
+      "metro": "Метро",
+      "resetFilters": "Сбросить фильтры"
     },
     "types": {
       "house": "Дом",
