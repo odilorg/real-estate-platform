@@ -5,39 +5,6 @@ import { useUser } from '@clerk/nextjs'
 import { ShareProperty } from './ShareProperty'
 import { ScheduleViewing } from './ScheduleViewing'
 import { FavoriteButton } from './FavoriteButton'
-import { PropertyPDF } from '@/components/property/PropertyPDF'
-
-interface PropertyForPDF {
-  id: string
-  title: string
-  description: string
-  price: number
-  listingType: string
-  propertyType: string
-  address: string
-  city: string
-  state?: string | null
-  country: string
-  bedrooms?: number | null
-  bathrooms?: number | null
-  area?: number | null
-  livingArea?: number | null
-  kitchenArea?: number | null
-  rooms?: number | null
-  floor?: number | null
-  totalFloors?: number | null
-  yearBuilt?: number | null
-  parking?: number | null
-  balcony?: number | null
-  buildingType?: string | null
-  buildingClass?: string | null
-  renovation?: string | null
-  furnished?: string | null
-  nearestMetro?: string | null
-  metroDistance?: number | null
-  images: string[]
-  amenities?: string[]
-}
 
 interface PropertyPageActionsProps {
   propertyId: string
@@ -45,7 +12,6 @@ interface PropertyPageActionsProps {
   propertyPrice: number
   propertyCity: string
   ownerId: string
-  property?: PropertyForPDF
 }
 
 export function PropertyPageActions({
@@ -53,8 +19,6 @@ export function PropertyPageActions({
   propertyTitle,
   propertyPrice,
   propertyCity,
-  ownerId,
-  property,
 }: PropertyPageActionsProps) {
   const { isSignedIn } = useUser()
 
@@ -78,7 +42,6 @@ export function PropertyPageActions({
         propertyPrice={propertyPrice}
         propertyCity={propertyCity}
       />
-      {property && <PropertyPDF property={property} />}
     </div>
   )
 }

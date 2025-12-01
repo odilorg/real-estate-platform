@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { TrendingDown, TrendingUp, Minus, History, Loader2 } from 'lucide-react'
@@ -20,6 +20,8 @@ interface PriceHistoryProps {
 }
 
 export function PriceHistory({ propertyId, currentPrice }: PriceHistoryProps) {
+  const t = useTranslations('priceHistory')
+  const locale = useLocale()
   const [history, setHistory] = useState<PriceHistoryEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -42,7 +44,7 @@ export function PriceHistory({ propertyId, currentPrice }: PriceHistoryProps) {
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(locale === 'uz' ? 'uz-UZ' : 'ru-RU', {
       style: 'currency',
       currency: 'USD',
       maximumFractionDigits: 0,
@@ -50,7 +52,7 @@ export function PriceHistory({ propertyId, currentPrice }: PriceHistoryProps) {
   }
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
+    return new Date(dateStr).toLocaleDateString(locale === 'uz' ? 'uz-UZ' : 'ru-RU', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -72,7 +74,7 @@ export function PriceHistory({ propertyId, currentPrice }: PriceHistoryProps) {
 
   const getChangeBadge = (entry: PriceHistoryEntry, prevPrice?: number) => {
     if (!prevPrice || entry.changeType === 'INITIAL') {
-      return <Badge variant="outline">Initial</Badge>
+      return <Badge variant="outline">{t('initial')}</Badge>
     }
 
     const change = entry.price - prevPrice
@@ -91,7 +93,7 @@ export function PriceHistory({ propertyId, currentPrice }: PriceHistoryProps) {
         </Badge>
       )
     }
-    return <Badge variant="outline">No change</Badge>
+    return <Badge variant="outline">{t('noChange')}</Badge>
   }
 
   // Calculate total change from first to current price
@@ -120,20 +122,20 @@ export function PriceHistory({ propertyId, currentPrice }: PriceHistoryProps) {
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           <History className="h-5 w-5" />
-          Price History
+          {t('title')}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {history.length === 0 ? (
           <p className="text-sm text-gray-500 text-center py-4">
-            No price history available
+            {t('noHistory')}
           </p>
         ) : (
           <div className="space-y-4">
             {/* Summary */}
             {totalChange && history.length > 1 && (
               <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Since listing</p>
+                <p className="text-sm text-gray-600 mb-1">{t('sinceListing')}</p>
                 <div className="flex items-center gap-2">
                   {totalChange.change < 0 ? (
                     <TrendingDown className="h-5 w-5 text-green-600" />
@@ -167,9 +169,9 @@ export function PriceHistory({ propertyId, currentPrice }: PriceHistoryProps) {
                   <div className="flex-1 pb-3">
                     <div className="flex items-center justify-between">
                       <p className="font-semibold text-blue-600">{formatPrice(currentPrice)}</p>
-                      <Badge className="bg-blue-100 text-blue-800">Current</Badge>
+                      <Badge className="bg-blue-100 text-blue-800">{t('current')}</Badge>
                     </div>
-                    <p className="text-xs text-gray-500">Today</p>
+                    <p className="text-xs text-gray-500">{t('today')}</p>
                   </div>
                 </div>
 

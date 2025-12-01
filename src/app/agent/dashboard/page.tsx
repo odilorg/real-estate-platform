@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
+import { useTranslations } from 'next-intl'
 import { MainLayout } from '@/components/layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -87,6 +88,7 @@ interface AgentStats {
 export default function AgentDashboardPage() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
+  const t = useTranslations('agent.dashboard')
   const [data, setData] = useState<AgentStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -145,12 +147,12 @@ export default function AgentDashboardPage() {
           <Card className="max-w-md">
             <CardContent className="pt-6 text-center">
               <Building2 className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-              <h2 className="text-xl font-bold mb-2">Agent Access Required</h2>
+              <h2 className="text-xl font-bold mb-2">{t('errors.accessRequired')}</h2>
               <p className="text-gray-600 mb-4">
-                This dashboard is only available to approved agents.
+                {t('errors.accessRequiredDesc')}
               </p>
               <Link href="/become-agent">
-                <Button>Apply to Become an Agent</Button>
+                <Button>{t('errors.applyToBecome')}</Button>
               </Link>
             </CardContent>
           </Card>
@@ -163,7 +165,7 @@ export default function AgentDashboardPage() {
     return (
       <MainLayout>
         <div className="min-h-screen flex items-center justify-center">
-          <p className="text-gray-600">Failed to load dashboard</p>
+          <p className="text-gray-600">{t('errors.failedToLoad')}</p>
         </div>
       </MainLayout>
     )
@@ -209,8 +211,8 @@ export default function AgentDashboardPage() {
                   )}
                 </div>
                 <p className="text-blue-100">
-                  {agent.agency?.name || 'Independent Agent'}
-                  {agent.yearsExperience > 0 && ` • ${agent.yearsExperience} years experience`}
+                  {agent.agency?.name || t('independentAgent')}
+                  {agent.yearsExperience > 0 && ` • ${agent.yearsExperience} ${t('yearsExperience')}`}
                 </p>
                 <div className="flex items-center gap-4 mt-2">
                   <div className="flex items-center gap-1">
@@ -218,10 +220,10 @@ export default function AgentDashboardPage() {
                     <span className="font-medium">
                       {agent.rating > 0 ? agent.rating.toFixed(1) : 'N/A'}
                     </span>
-                    <span className="text-blue-200">({agent.reviewCount} reviews)</span>
+                    <span className="text-blue-200">({agent.reviewCount} {t('recentReviews.title').toLowerCase()})</span>
                   </div>
                   <div className="text-blue-200">
-                    {agent.totalDeals} deals closed
+                    {agent.totalDeals} {t('dealsClosed')}
                   </div>
                 </div>
               </div>
@@ -229,7 +231,7 @@ export default function AgentDashboardPage() {
               <Link href="/properties/new">
                 <Button className="bg-white text-blue-600 hover:bg-blue-50">
                   <PlusCircle className="h-4 w-4 mr-2" />
-                  Add Listing
+                  {t('addListing')}
                 </Button>
               </Link>
             </div>
@@ -247,7 +249,7 @@ export default function AgentDashboardPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.activeListings}</p>
-                    <p className="text-xs text-gray-500">Active Listings</p>
+                    <p className="text-xs text-gray-500">{t('stats.activeListings')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -261,7 +263,7 @@ export default function AgentDashboardPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.totalViews.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">Total Views</p>
+                    <p className="text-xs text-gray-500">{t('stats.totalViews')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -275,7 +277,7 @@ export default function AgentDashboardPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.totalFavorites}</p>
-                    <p className="text-xs text-gray-500">Favorites</p>
+                    <p className="text-xs text-gray-500">{t('stats.favorites')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -289,7 +291,7 @@ export default function AgentDashboardPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.pendingViewings}</p>
-                    <p className="text-xs text-gray-500">Pending Viewings</p>
+                    <p className="text-xs text-gray-500">{t('stats.pendingViewings')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -303,7 +305,7 @@ export default function AgentDashboardPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.unreadMessages}</p>
-                    <p className="text-xs text-gray-500">Unread Messages</p>
+                    <p className="text-xs text-gray-500">{t('stats.unreadMessages')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -317,7 +319,7 @@ export default function AgentDashboardPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.soldListings + stats.rentedListings}</p>
-                    <p className="text-xs text-gray-500">Closed Deals</p>
+                    <p className="text-xs text-gray-500">{t('stats.closedDeals')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -332,49 +334,49 @@ export default function AgentDashboardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
-                    Performance Overview
+                    {t('performance.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div>
                       <div className="flex justify-between mb-2">
-                        <span className="text-sm text-gray-600">Listings Status</span>
-                        <span className="text-sm font-medium">{stats.totalListings} total</span>
+                        <span className="text-sm text-gray-600">{t('performance.listingsStatus')}</span>
+                        <span className="text-sm font-medium">{stats.totalListings} {t('performance.total')}</span>
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-green-500" />
-                          <span className="text-sm flex-1">Active</span>
+                          <span className="text-sm flex-1">{t('performance.active')}</span>
                           <span className="text-sm font-medium">{stats.activeListings}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-blue-500" />
-                          <span className="text-sm flex-1">Sold</span>
+                          <span className="text-sm flex-1">{t('performance.sold')}</span>
                           <span className="text-sm font-medium">{stats.soldListings}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-purple-500" />
-                          <span className="text-sm flex-1">Rented</span>
+                          <span className="text-sm flex-1">{t('performance.rented')}</span>
                           <span className="text-sm font-medium">{stats.rentedListings}</span>
                         </div>
                       </div>
                     </div>
                     <div>
                       <div className="flex justify-between mb-2">
-                        <span className="text-sm text-gray-600">This Month</span>
+                        <span className="text-sm text-gray-600">{t('performance.thisMonth')}</span>
                       </div>
                       <div className="space-y-3">
                         <div>
                           <div className="flex justify-between text-sm mb-1">
-                            <span>New Listings</span>
+                            <span>{t('performance.newListings')}</span>
                             <span className="font-medium">{stats.newListingsThisMonth}</span>
                           </div>
                           <Progress value={Math.min(stats.newListingsThisMonth * 20, 100)} className="h-2" />
                         </div>
                         <div>
                           <div className="flex justify-between text-sm mb-1">
-                            <span>Viewings</span>
+                            <span>{t('performance.viewings')}</span>
                             <span className="font-medium">{stats.viewingsThisMonth}</span>
                           </div>
                           <Progress value={Math.min(stats.viewingsThisMonth * 10, 100)} className="h-2" />
@@ -390,11 +392,11 @@ export default function AgentDashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <Home className="h-5 w-5" />
-                    Recent Listings
+                    {t('recentListings.title')}
                   </CardTitle>
                   <Link href="/dashboard?tab=properties">
                     <Button variant="ghost" size="sm">
-                      View All <ArrowRight className="h-4 w-4 ml-1" />
+                      {t('recentListings.viewAll')} <ArrowRight className="h-4 w-4 ml-1" />
                     </Button>
                   </Link>
                 </CardHeader>
@@ -402,11 +404,11 @@ export default function AgentDashboardPage() {
                   {recentListings.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <Home className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                      <p>No listings yet</p>
+                      <p>{t('recentListings.noListings')}</p>
                       <Link href="/properties/new">
                         <Button className="mt-4" size="sm">
                           <PlusCircle className="h-4 w-4 mr-2" />
-                          Add Your First Listing
+                          {t('recentListings.addFirst')}
                         </Button>
                       </Link>
                     </div>
@@ -450,7 +452,7 @@ export default function AgentDashboardPage() {
                                   : 'bg-gray-100 text-gray-800'
                               }
                             >
-                              {listing.status}
+                              {listing.status === 'ACTIVE' ? t('status.active') : listing.status === 'SOLD' ? t('status.sold') : t('status.rented')}
                             </Badge>
                           </div>
                         </Link>
@@ -468,15 +470,15 @@ export default function AgentDashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <Calendar className="h-5 w-5" />
-                    Upcoming Viewings
+                    {t('upcomingViewings.title')}
                   </CardTitle>
                   <Link href="/dashboard?tab=viewings">
-                    <Button variant="ghost" size="sm">View All</Button>
+                    <Button variant="ghost" size="sm">{t('upcomingViewings.viewAll')}</Button>
                   </Link>
                 </CardHeader>
                 <CardContent>
                   {recentViewings.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-4">No viewings scheduled</p>
+                    <p className="text-sm text-gray-500 text-center py-4">{t('upcomingViewings.noViewings')}</p>
                   ) : (
                     <div className="space-y-3">
                       {recentViewings.map((viewing) => (
@@ -497,7 +499,7 @@ export default function AgentDashboardPage() {
                             <p className="text-xs text-gray-500">{viewing.time}</p>
                           </div>
                           <Badge variant="outline" className="text-xs">
-                            {viewing.status}
+                            {viewing.status === 'CONFIRMED' ? t('status.confirmed') : t('status.pending')}
                           </Badge>
                         </div>
                       ))}
@@ -511,12 +513,12 @@ export default function AgentDashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <Star className="h-5 w-5" />
-                    Recent Reviews
+                    {t('recentReviews.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {recentReviews.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-4">No reviews yet</p>
+                    <p className="text-sm text-gray-500 text-center py-4">{t('recentReviews.noReviews')}</p>
                   ) : (
                     <div className="space-y-4">
                       {recentReviews.map((review) => (
@@ -532,7 +534,7 @@ export default function AgentDashboardPage() {
                             ))}
                             {review.dealType && (
                               <Badge variant="outline" className="ml-2 text-xs">
-                                {review.dealType}
+                                {t(`dealTypes.${review.dealType.toLowerCase()}`)}
                               </Badge>
                             )}
                           </div>
@@ -552,19 +554,19 @@ export default function AgentDashboardPage() {
               {/* Quick Actions */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Quick Actions</CardTitle>
+                  <CardTitle className="text-base">{t('quickActions.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Link href="/properties/new" className="block">
                     <Button variant="outline" className="w-full justify-start">
                       <PlusCircle className="h-4 w-4 mr-2" />
-                      Add New Listing
+                      {t('quickActions.addNewListing')}
                     </Button>
                   </Link>
                   <Link href="/dashboard?tab=messages" className="block">
                     <Button variant="outline" className="w-full justify-start">
                       <MessageSquare className="h-4 w-4 mr-2" />
-                      View Messages
+                      {t('quickActions.viewMessages')}
                       {stats.unreadMessages > 0 && (
                         <Badge className="ml-auto">{stats.unreadMessages}</Badge>
                       )}
@@ -573,7 +575,7 @@ export default function AgentDashboardPage() {
                   <Link href="/dashboard?tab=viewings" className="block">
                     <Button variant="outline" className="w-full justify-start">
                       <Calendar className="h-4 w-4 mr-2" />
-                      Manage Viewings
+                      {t('quickActions.manageViewings')}
                       {stats.pendingViewings > 0 && (
                         <Badge variant="outline" className="ml-auto">{stats.pendingViewings}</Badge>
                       )}
@@ -582,7 +584,7 @@ export default function AgentDashboardPage() {
                   <Link href="/dashboard?tab=properties" className="block">
                     <Button variant="outline" className="w-full justify-start">
                       <Home className="h-4 w-4 mr-2" />
-                      Manage Listings
+                      {t('quickActions.manageListings')}
                     </Button>
                   </Link>
                 </CardContent>

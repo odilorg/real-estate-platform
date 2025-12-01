@@ -30,6 +30,18 @@ import {
   LABELS
 } from '@/lib/validations/property'
 import {
+  regions,
+  getCitiesByRegion,
+  getDistrictsByCity,
+  getMetrosByCity,
+  cityHasMetro,
+  getLocalizedName,
+  type Region,
+  type City,
+  type District,
+  type MetroStation,
+} from '@/lib/locations'
+import {
   ChevronLeft,
   ChevronRight,
   Check,
@@ -38,8 +50,10 @@ import {
   Ruler,
   Paintbrush,
   Camera,
-  FileText
+  FileText,
+  Train
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 
 const AMENITY_KEYS = [
   'PARKING',
@@ -65,6 +79,7 @@ const STEP_ICONS = [Home, MapPin, Ruler, Paintbrush, Camera, FileText]
 
 export default function CreatePropertyPage() {
   const router = useRouter()
+  const locale = useLocale()
   const t = useTranslations('properties.form')
   const tTypes = useTranslations('properties.types')
   const tListingTypes = useTranslations('properties.listingTypes')
@@ -75,6 +90,15 @@ export default function CreatePropertyPage() {
   const tCommon = useTranslations('common')
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Location select states
+  const [selectedRegion, setSelectedRegion] = useState<string>('')
+  const [selectedCityId, setSelectedCityId] = useState<string>('')
+  const [selectedDistrictId, setSelectedDistrictId] = useState<string>('')
+  const [availableCities, setAvailableCities] = useState<City[]>([])
+  const [availableDistricts, setAvailableDistricts] = useState<District[]>([])
+  const [availableMetros, setAvailableMetros] = useState<MetroStation[]>([])
+  const [showMetroField, setShowMetroField] = useState(false)
 
   // Translated step titles
   const STEPS = [
@@ -96,7 +120,7 @@ export default function CreatePropertyPage() {
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
     defaultValues: {
-      country: 'USA',
+      country: 'Узбекистан',
       amenities: [],
       images: [],
       hasGarbageChute: false,
@@ -104,6 +128,66 @@ export default function CreatePropertyPage() {
       hasGatedArea: false,
     },
   })
+
+  // Location change handlers
+  const handleRegionChange = (regionId: string) => {
+    setSelectedRegion(regionId)
+    setSelectedCityId('')
+    setSelectedDistrictId('')
+    setAvailableDistricts([])
+    setAvailableMetros([])
+    setShowMetroField(false)
+
+    const cities = getCitiesByRegion(regionId)
+    setAvailableCities(cities)
+
+    // Clear form values
+    setValue('city', '')
+    setValue('state', getLocalizedName(regions.find(r => r.id === regionId)!, locale))
+    setValue('district', '')
+    setValue('nearestMetro', '')
+  }
+
+  const handleCityChange = (cityId: string) => {
+    setSelectedCityId(cityId)
+    setSelectedDistrictId('')
+    setAvailableMetros([])
+
+    const districts = getDistrictsByCity(selectedRegion, cityId)
+    setAvailableDistricts(districts)
+
+    const city = availableCities.find(c => c.id === cityId)
+    if (city) {
+      setValue('city', getLocalizedName(city, locale))
+    }
+
+    const hasMetro = cityHasMetro(selectedRegion, cityId)
+    setShowMetroField(hasMetro)
+
+    if (hasMetro) {
+      const metros = getMetrosByCity(selectedRegion, cityId)
+      setAvailableMetros(metros)
+    }
+
+    setValue('district', '')
+    setValue('nearestMetro', '')
+  }
+
+  const handleDistrictChange = (districtId: string) => {
+    setSelectedDistrictId(districtId)
+
+    const district = availableDistricts.find(d => d.id === districtId)
+    if (district) {
+      setValue('district', getLocalizedName(district, locale))
+    }
+  }
+
+  const handleMetroChange = (metroId: string) => {
+    const metro = availableMetros.find(m => m.id === metroId)
+    if (metro) {
+      setValue('nearestMetro', getLocalizedName(metro, locale))
+    }
+  }
 
   const selectedAmenities = watch('amenities') || []
   const propertyType = watch('propertyType')
@@ -402,6 +486,78 @@ export default function CreatePropertyPage() {
                 {/* Step 2: Location */}
                 {currentStep === 2 && (
                   <>
+                    {/* Region & City Selection */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>{t('state')} *</Label>
+                        <Select
+                          value={selectedRegion}
+                          onValueChange={handleRegionChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={t('selectRegion')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {regions.map(region => (
+                              <SelectItem key={region.id} value={region.id}>
+                                {getLocalizedName(region, locale)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>{t('city')} *</Label>
+                        <Select
+                          value={selectedCityId}
+                          onValueChange={handleCityChange}
+                          disabled={!selectedRegion}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={selectedRegion ? t('selectCity') : t('selectRegionFirst')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableCities.map(city => (
+                              <SelectItem key={city.id} value={city.id}>
+                                {getLocalizedName(city, locale)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {errors.city && (
+                          <p className="text-sm text-red-600 mt-1">{errors.city.message}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* District Selection */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>{t('district')}</Label>
+                        <Select
+                          value={selectedDistrictId}
+                          onValueChange={handleDistrictChange}
+                          disabled={!selectedCityId || availableDistricts.length === 0}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={selectedCityId ? t('selectDistrict') : t('selectCityFirst')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableDistricts.map(district => (
+                              <SelectItem key={district.id} value={district.id}>
+                                {getLocalizedName(district, locale)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="zipCode">{t('zipCode')}</Label>
+                        <Input id="zipCode" {...register('zipCode')} placeholder="100000" />
+                      </div>
+                    </div>
+
+                    {/* Address */}
                     <div>
                       <Label htmlFor="address">{t('address')} *</Label>
                       <Input
@@ -414,53 +570,43 @@ export default function CreatePropertyPage() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="city">{t('city')} *</Label>
-                        <Input id="city" {...register('city')} />
-                        {errors.city && (
-                          <p className="text-sm text-red-600 mt-1">{errors.city.message}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="state">{t('state')}</Label>
-                        <Input id="state" {...register('state')} />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="zipCode">{t('zipCode')}</Label>
-                        <Input id="zipCode" {...register('zipCode')} />
-                      </div>
-                      <div>
-                        <Label htmlFor="district">{t('district')}</Label>
-                        <Input id="district" {...register('district')} />
-                      </div>
-                    </div>
-
-                    {/* Metro/Transit */}
-                    <div className="border rounded-lg p-4 bg-blue-50">
-                      <Label className="font-medium text-blue-900">{t('publicTransit')}</Label>
-                      <div className="grid grid-cols-2 gap-4 mt-3">
-                        <div>
-                          <Label htmlFor="nearestMetro">{t('nearestMetro')}</Label>
-                          <Input
-                            id="nearestMetro"
-                            {...register('nearestMetro')}
-                          />
+                    {/* Metro/Transit - Only show for cities with metro */}
+                    {showMetroField && (
+                      <div className="border rounded-lg p-4 bg-blue-50">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Train className="h-5 w-5 text-blue-600" />
+                          <Label className="font-medium text-blue-900">{t('publicTransit')}</Label>
                         </div>
-                        <div>
-                          <Label htmlFor="metroDistance">{t('metroDistance')}</Label>
-                          <Input
-                            id="metroDistance"
-                            type="number"
-                            {...register('metroDistance', { valueAsNumber: true })}
-                            placeholder="5"
-                          />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>{t('nearestMetro')}</Label>
+                            <Select
+                              onValueChange={handleMetroChange}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder={t('selectMetro')} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {availableMetros.map(metro => (
+                                  <SelectItem key={metro.id} value={metro.id}>
+                                    {getLocalizedName(metro, locale)}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label htmlFor="metroDistance">{t('metroDistance')}</Label>
+                            <Input
+                              id="metroDistance"
+                              type="number"
+                              {...register('metroDistance', { valueAsNumber: true })}
+                              placeholder="5"
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* GPS Coordinates */}
                     <div className="border rounded-lg p-4 bg-gray-50">

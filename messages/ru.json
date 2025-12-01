@@ -182,6 +182,8 @@
       "apartment": "Квартира",
       "condo": "Кондоминиум",
       "townhouse": "Таунхаус",
+      "villa": "Вилла",
+      "studio": "Студия",
       "land": "Земельный участок",
       "commercial": "Коммерческая"
     },
@@ -207,13 +209,37 @@
       "street": "Уличная парковка",
       "underground": "Подземная",
       "garage": "Гараж",
+      "covered": "Крытая",
+      "open": "Открытая",
       "multi_level": "Многоуровневая"
     },
     "metroDistances": {
       "walking5": "5 мин пешком",
       "walking10": "10 мин пешком",
       "walking15": "15 мин пешком",
-      "transport": "На транспорте"
+      "walking20": "20 мин пешком",
+      "walking30": "30 мин пешком",
+      "transport": "На транспорте",
+      "anyDistance": "Любое расстояние",
+      "within": "До"
+    },
+    "advancedFilters": {
+      "title": "Расширенные фильтры",
+      "active": "Активны",
+      "show": "Показать",
+      "hide": "Скрыть",
+      "applyFilters": "Применить фильтры",
+      "squareFootage": "Площадь",
+      "location": "Местоположение",
+      "searchRadius": "Радиус поиска",
+      "latitude": "Широта",
+      "longitude": "Долгота",
+      "radiusMiles": "Радиус (км)",
+      "radiusHelp": "Поиск объектов в указанном радиусе от координат",
+      "enterCity": "Введите город",
+      "enterRegion": "Введите регион",
+      "notFirstFloor": "Не первый этаж",
+      "upTo": "До"
     },
     "sort": {
       "title": "Сортировка",
@@ -242,7 +268,14 @@
       "share": "Поделиться",
       "report": "Пожаловаться",
       "similarProperties": "Похожие объекты",
+      "similarPropertiesIn": "Похожие объекты в {city}",
       "propertyDetails": "Характеристики объекта",
+      "propertyInformation": "Информация об объекте",
+      "propertyId": "ID объекта",
+      "status": "Статус",
+      "pricePerSqFt": "Цена/м²",
+      "posted": "Опубликовано",
+      "views": "Просмотры",
       "yearBuilt": "Год постройки",
       "parkingSpaces": "Парковочные места",
       "lotSize": "Размер участка",
@@ -253,13 +286,163 @@
       "floor": "Этаж",
       "totalFloors": "Всего этажей",
       "metroDistance": "До метро",
+      "walkToMetro": "Пешком до метро",
       "minutes": "мин",
+      "minWalk": "мин пешком",
       "postedBy": "Размещено",
       "contactSeller": "Связаться с продавцом",
       "sendMessage": "Отправить сообщение",
       "writeMessage": "Напишите сообщение...",
       "phone": "Телефон",
-      "email": "Эл. почта"
+      "email": "Эл. почта",
+      "breadcrumb": {
+        "home": "Главная",
+        "properties": "Недвижимость"
+      },
+      "badges": {
+        "forSale": "Продажа",
+        "forRent": "Аренда",
+        "verifiedListing": "Проверенный объект"
+      },
+      "stats": {
+        "rooms": "Комнат",
+        "sqft": "м²",
+        "living": "жилая",
+        "floor": "Этаж",
+        "built": "Построен",
+        "ceiling": "потолок",
+        "inquiries": "запросов",
+        "saved": "сохранено",
+        "popularListing": "Популярный объект"
+      },
+      "sections": {
+        "aboutApartment": "О квартире",
+        "aboutHouse": "О доме",
+        "aboutBuilding": "О доме",
+        "landDetails": "Информация об участке",
+        "utilitiesAccess": "Коммуникации и доступ",
+        "spaceDetails": "Информация о помещении",
+        "buildingInfo": "Информация о здании",
+        "amenitiesFeatures": "Удобства и особенности",
+        "neighborhoodHighlights": "Инфраструктура района"
+      },
+      "fields": {
+        "rooms": "Комнаты",
+        "bedrooms": "Спальни",
+        "bathrooms": "Санузлы",
+        "totalArea": "Общая площадь",
+        "livingArea": "Жилая площадь",
+        "kitchenArea": "Площадь кухни",
+        "ceilingHeight": "Высота потолков",
+        "balconies": "Балконы",
+        "furnished": "Мебель",
+        "buildingName": "Название дома",
+        "buildingType": "Тип дома",
+        "building": "Здание",
+        "elevators": "Лифты",
+        "passengerElevators": "Пассажирские лифты",
+        "parking": "Парковка",
+        "space": "место",
+        "spaces": "места",
+        "plotSize": "Размер участка",
+        "pricePerSqFt": "Цена за м²",
+        "district": "Район",
+        "metro": "Метро"
+      },
+      "utilities": {
+        "electricity": "Электричество",
+        "water": "Вода",
+        "gas": "Газ",
+        "roadAccess": "Подъездная дорога",
+        "contactAgentToConfirm": "Свяжитесь с агентом для подтверждения наличия коммуникаций"
+      },
+      "features": {
+        "title": "Особенности",
+        "garbageChute": "Мусоропровод",
+        "concierge": "Консьерж",
+        "gatedCommunity": "Закрытая территория"
+      },
+      "neighborhood": {
+        "title": "Инфраструктура района",
+        "loading": "Загрузка данных об инфраструктуре...",
+        "error": "Не удалось загрузить данные об инфраструктуре",
+        "noData": "Нет данных об окрестностях",
+        "showOnMap": "Показать на карте",
+        "showAll": "Показать все",
+        "walkScore": "Оценка пешей доступности",
+        "walkScoreLabels": {
+          "excellent": "Идеально для пешеходов",
+          "veryGood": "Очень удобно",
+          "good": "Удобно",
+          "carDependent": "Зависит от машины",
+          "carRequired": "Требуется машина"
+        },
+        "categories": {
+          "transport": "Транспорт",
+          "education": "Образование",
+          "healthcare": "Медицина",
+          "shopping": "Магазины",
+          "food": "Рестораны и кафе",
+          "leisure": "Отдых",
+          "finance": "Банки"
+        },
+        "subcategories": {
+          "metro": "Метро",
+          "train": "Ж/Д станция",
+          "bus": "Автобус",
+          "school": "Школа",
+          "kindergarten": "Детский сад",
+          "university": "Университет",
+          "college": "Колледж",
+          "hospital": "Больница",
+          "clinic": "Поликлиника",
+          "pharmacy": "Аптека",
+          "doctors": "Врачебный кабинет",
+          "dentist": "Стоматология",
+          "supermarket": "Супермаркет",
+          "mall": "ТЦ",
+          "convenience": "Магазин",
+          "market": "Рынок",
+          "restaurant": "Ресторан",
+          "cafe": "Кафе",
+          "fast_food": "Фастфуд",
+          "park": "Парк",
+          "playground": "Детская площадка",
+          "gym": "Фитнес",
+          "sports": "Спортзал",
+          "pool": "Бассейн",
+          "bank": "Банк",
+          "atm": "Банкомат"
+        },
+        "distance": {
+          "meters": "{distance} м",
+          "kilometers": "{distance} км",
+          "walkMinutes": "{minutes} мин пешком"
+        },
+        "summary": {
+          "nearestMetro": "Ближайшее метро",
+          "nearestSchool": "Ближайшая школа",
+          "nearestHospital": "Ближайшая больница",
+          "nearestSupermarket": "Ближайший супермаркет",
+          "nearestPark": "Ближайший парк",
+          "placesFound": "Найдено {count} объектов",
+          "goodTransport": "Хорошая транспортная доступность",
+          "schoolsNearby": "Школы рядом",
+          "healthcareNearby": "Медицина рядом",
+          "shoppingNearby": "Магазины рядом"
+        },
+        "schools": "Школы",
+        "nearby": "рядом",
+        "shopping": "Магазины",
+        "stores": "магазинов",
+        "healthcare": "Медицина",
+        "hospitals": "больницы",
+        "transport": "Транспорт",
+        "wellConnected": "Хорошее сообщение",
+        "areaDescription": "{district} — это благоустроенный район в {city} с развитой инфраструктурой."
+      },
+      "passenger": "пассажирских",
+      "cargo": "грузовых"
     },
     "form": {
       "createTitle": "Разместить объект",
@@ -320,6 +503,12 @@
       "garbageChute": "Мусоропровод",
       "concierge": "Консьерж",
       "gatedCommunity": "Закрытая территория",
+      "selectRegion": "Выберите область/регион",
+      "selectCity": "Выберите город",
+      "selectDistrict": "Выберите район",
+      "selectMetro": "Выберите станцию метро",
+      "selectRegionFirst": "Сначала выберите регион",
+      "selectCityFirst": "Сначала выберите город",
       "steps": {
         "basics": "Основное",
         "basicsDesc": "Основная информация об объекте",
@@ -516,7 +705,46 @@
     "privacy": "Политика конфиденциальности",
     "terms": "Условия использования",
     "copyright": "Все права защищены",
-    "description": "Найдите идеальную недвижимость с EstateHub"
+    "description": "Найдите недвижимость вашей мечты",
+    "properties": {
+      "title": "Недвижимость",
+      "forSale": "Продажа",
+      "forRent": "Аренда",
+      "listProperty": "Разместить объект",
+      "compare": "Сравнить объекты"
+    },
+    "browse": {
+      "title": "Поиск",
+      "areas": "Районы и регионы",
+      "findAgents": "Найти агентов",
+      "apartments": "Квартиры",
+      "houses": "Дома",
+      "commercial": "Коммерческая"
+    },
+    "forProfessionals": {
+      "title": "Для профессионалов",
+      "becomeAgent": "Стать агентом",
+      "agentDashboard": "Кабинет агента",
+      "agentDirectory": "Каталог агентов"
+    },
+    "tools": {
+      "title": "Инструменты",
+      "savedSearches": "Сохранённые поиски",
+      "favorites": "Избранное",
+      "comparison": "Сравнение объектов"
+    },
+    "company": {
+      "title": "Компания",
+      "aboutUs": "О нас",
+      "contact": "Контакты",
+      "helpCenter": "Центр помощи"
+    },
+    "legal": {
+      "title": "Правовая информация",
+      "privacyPolicy": "Политика конфиденциальности",
+      "termsOfService": "Условия использования",
+      "cookiePolicy": "Политика cookie"
+    }
   },
   "validation": {
     "required": "Это поле обязательно",
@@ -576,6 +804,15 @@
     "balcony": "Балкон",
     "furnished": "Меблировка"
   },
+  "priceHistory": {
+    "title": "История цены",
+    "noHistory": "История цены недоступна",
+    "sinceListing": "С момента публикации",
+    "current": "Текущая",
+    "today": "Сегодня",
+    "initial": "Начальная",
+    "noChange": "Без изменений"
+  },
   "agent": {
     "realEstateAgency": "Агентство недвижимости",
     "realtor": "Риелтор",
@@ -621,7 +858,70 @@
       "recentLeads": "Последние заявки",
       "performanceChart": "Эффективность",
       "thisMonth": "Этот месяц",
-      "lastMonth": "Прошлый месяц"
+      "lastMonth": "Прошлый месяц",
+      "addListing": "Добавить объект",
+      "independentAgent": "Независимый агент",
+      "yearsExperience": "лет опыта",
+      "dealsClosed": "сделок закрыто",
+      "stats": {
+        "activeListings": "Активных объектов",
+        "totalViews": "Всего просмотров",
+        "favorites": "В избранном",
+        "pendingViewings": "Ожидают просмотра",
+        "unreadMessages": "Непрочитанных",
+        "closedDeals": "Закрытых сделок"
+      },
+      "performance": {
+        "title": "Обзор эффективности",
+        "listingsStatus": "Статус объявлений",
+        "total": "всего",
+        "active": "Активные",
+        "sold": "Продано",
+        "rented": "Сдано",
+        "thisMonth": "Этот месяц",
+        "newListings": "Новых объявлений",
+        "viewings": "Просмотры"
+      },
+      "recentListings": {
+        "title": "Последние объявления",
+        "viewAll": "Смотреть все",
+        "noListings": "Объявлений пока нет",
+        "addFirst": "Добавить первое объявление"
+      },
+      "upcomingViewings": {
+        "title": "Предстоящие просмотры",
+        "viewAll": "Смотреть все",
+        "noViewings": "Просмотров не запланировано"
+      },
+      "recentReviews": {
+        "title": "Последние отзывы",
+        "noReviews": "Отзывов пока нет"
+      },
+      "quickActions": {
+        "title": "Быстрые действия",
+        "addNewListing": "Добавить объявление",
+        "viewMessages": "Посмотреть сообщения",
+        "manageViewings": "Управление просмотрами",
+        "manageListings": "Управление объявлениями"
+      },
+      "errors": {
+        "accessRequired": "Требуется доступ агента",
+        "accessRequiredDesc": "Эта панель доступна только для одобренных агентов.",
+        "applyToBecome": "Подать заявку на агента",
+        "failedToLoad": "Не удалось загрузить панель"
+      },
+      "status": {
+        "active": "Активный",
+        "sold": "Продан",
+        "rented": "Сдан",
+        "pending": "На рассмотрении",
+        "confirmed": "Подтверждён"
+      },
+      "dealTypes": {
+        "bought": "покупка",
+        "rented": "аренда",
+        "sold": "продажа"
+      }
     },
     "become": {
       "title": "Стать агентом",

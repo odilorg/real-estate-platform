@@ -999,3 +999,17 @@ export async function rejectReview(id: string) {
 export async function adminDeleteProperty(id: string) {
   return prisma.property.delete({ where: { id } })
 }
+
+// ============ Social Proof Operations ============
+
+export async function getPropertySocialProof(propertyId: string) {
+  const [conversationCount, favoriteCount] = await Promise.all([
+    prisma.conversation.count({ where: { propertyId } }),
+    prisma.favorite.count({ where: { propertyId } }),
+  ])
+
+  return {
+    inquiryCount: conversationCount,
+    favoriteCount,
+  }
+}

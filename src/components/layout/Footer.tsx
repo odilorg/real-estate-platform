@@ -1,7 +1,11 @@
+"use client"
+
 import Link from 'next/link'
-import { Home, MapPin, Users, UserCheck, Calculator, Search, Building2, FileText, HelpCircle, Mail } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { Home, MapPin, Users, UserCheck, Search, HelpCircle } from 'lucide-react'
 
 export function Footer() {
+  const t = useTranslations('footer')
   const currentYear = new Date().getFullYear()
 
   return (
@@ -10,14 +14,14 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
           {/* Properties */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Properties</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('properties.title')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/properties?type=sale"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  For Sale
+                  {t('properties.forSale')}
                 </Link>
               </li>
               <li>
@@ -25,7 +29,7 @@ export function Footer() {
                   href="/properties?type=rent"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  For Rent
+                  {t('properties.forRent')}
                 </Link>
               </li>
               <li>
@@ -33,7 +37,7 @@ export function Footer() {
                   href="/properties/new"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  List Property
+                  {t('properties.listProperty')}
                 </Link>
               </li>
               <li>
@@ -41,7 +45,7 @@ export function Footer() {
                   href="/compare"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Compare Properties
+                  {t('properties.compare')}
                 </Link>
               </li>
             </ul>
@@ -49,7 +53,7 @@ export function Footer() {
 
           {/* Browse */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Browse</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('browse.title')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -57,7 +61,7 @@ export function Footer() {
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1"
                 >
                   <MapPin className="h-3 w-3" />
-                  Areas & Districts
+                  {t('browse.areas')}
                 </Link>
               </li>
               <li>
@@ -66,7 +70,7 @@ export function Footer() {
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1"
                 >
                   <Users className="h-3 w-3" />
-                  Find Agents
+                  {t('browse.findAgents')}
                 </Link>
               </li>
               <li>
@@ -74,7 +78,7 @@ export function Footer() {
                   href="/properties?propertyType=APARTMENT"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Apartments
+                  {t('browse.apartments')}
                 </Link>
               </li>
               <li>
@@ -82,7 +86,7 @@ export function Footer() {
                   href="/properties?propertyType=HOUSE"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Houses
+                  {t('browse.houses')}
                 </Link>
               </li>
               <li>
@@ -90,7 +94,7 @@ export function Footer() {
                   href="/properties?propertyType=COMMERCIAL"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Commercial
+                  {t('browse.commercial')}
                 </Link>
               </li>
             </ul>
@@ -98,7 +102,7 @@ export function Footer() {
 
           {/* For Professionals */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">For Professionals</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('forProfessionals.title')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -106,7 +110,7 @@ export function Footer() {
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1"
                 >
                   <UserCheck className="h-3 w-3" />
-                  Become an Agent
+                  {t('forProfessionals.becomeAgent')}
                 </Link>
               </li>
               <li>
@@ -114,7 +118,7 @@ export function Footer() {
                   href="/agent/dashboard"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Agent Dashboard
+                  {t('forProfessionals.agentDashboard')}
                 </Link>
               </li>
               <li>
@@ -122,7 +126,7 @@ export function Footer() {
                   href="/agents"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Agent Directory
+                  {t('forProfessionals.agentDirectory')}
                 </Link>
               </li>
             </ul>
@@ -130,7 +134,7 @@ export function Footer() {
 
           {/* Tools */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Tools</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('tools.title')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -138,7 +142,7 @@ export function Footer() {
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1"
                 >
                   <Search className="h-3 w-3" />
-                  Saved Searches
+                  {t('tools.savedSearches')}
                 </Link>
               </li>
               <li>
@@ -146,7 +150,7 @@ export function Footer() {
                   href="/favorites"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Favorites
+                  {t('tools.favorites')}
                 </Link>
               </li>
               <li>
@@ -154,7 +158,7 @@ export function Footer() {
                   href="/compare"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Property Comparison
+                  {t('tools.comparison')}
                 </Link>
               </li>
             </ul>
@@ -162,14 +166,14 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Company</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('company.title')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/about"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  About Us
+                  {t('company.aboutUs')}
                 </Link>
               </li>
               <li>
@@ -177,7 +181,7 @@ export function Footer() {
                   href="/contact"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Contact
+                  {t('company.contact')}
                 </Link>
               </li>
               <li>
@@ -186,7 +190,7 @@ export function Footer() {
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1"
                 >
                   <HelpCircle className="h-3 w-3" />
-                  Help Center
+                  {t('company.helpCenter')}
                 </Link>
               </li>
             </ul>
@@ -194,14 +198,14 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('legal.title')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/privacy"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Privacy Policy
+                  {t('legal.privacyPolicy')}
                 </Link>
               </li>
               <li>
@@ -209,7 +213,7 @@ export function Footer() {
                   href="/terms"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Terms of Service
+                  {t('legal.termsOfService')}
                 </Link>
               </li>
               <li>
@@ -217,7 +221,7 @@ export function Footer() {
                   href="/cookies"
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  Cookie Policy
+                  {t('legal.cookiePolicy')}
                 </Link>
               </li>
             </ul>
@@ -236,13 +240,13 @@ export function Footer() {
                 </span>
               </Link>
               <p className="text-sm text-gray-500 hidden md:block">
-                Find your dream property
+                {t('description')}
               </p>
             </div>
 
             {/* Copyright */}
             <p className="text-sm text-gray-500">
-              © {currentYear} EstateHub. All rights reserved.
+              © {currentYear} EstateHub. {t('copyright')}
             </p>
           </div>
         </div>

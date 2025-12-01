@@ -182,6 +182,8 @@
       "apartment": "Kvartira",
       "condo": "Kondominium",
       "townhouse": "Taunxaus",
+      "villa": "Villa",
+      "studio": "Studiya",
       "land": "Yer uchastkasi",
       "commercial": "Tijorat binosi"
     },
@@ -207,13 +209,37 @@
       "street": "Ko'cha parkingsi",
       "underground": "Yer osti",
       "garage": "Garaj",
+      "covered": "Yopiq",
+      "open": "Ochiq",
       "multi_level": "Ko'p qavatli"
     },
     "metroDistances": {
       "walking5": "5 daq piyoda",
       "walking10": "10 daq piyoda",
       "walking15": "15 daq piyoda",
-      "transport": "Transport bilan"
+      "walking20": "20 daq piyoda",
+      "walking30": "30 daq piyoda",
+      "transport": "Transport bilan",
+      "anyDistance": "Har qanday masofa",
+      "within": "Ichida"
+    },
+    "advancedFilters": {
+      "title": "Kengaytirilgan filtrlar",
+      "active": "Faol",
+      "show": "Ko'rsatish",
+      "hide": "Yashirish",
+      "applyFilters": "Filtrlarni qo'llash",
+      "squareFootage": "Maydon",
+      "location": "Joylashuv",
+      "searchRadius": "Qidiruv radiusi",
+      "latitude": "Kenglik",
+      "longitude": "Uzunlik",
+      "radiusMiles": "Radius (km)",
+      "radiusHelp": "Koordinatalardan belgilangan radiusdagi mulklarni qidiring",
+      "enterCity": "Shaharni kiriting",
+      "enterRegion": "Viloyatni kiriting",
+      "notFirstFloor": "Birinchi qavat emas",
+      "upTo": "Gacha"
     },
     "sort": {
       "title": "Saralash",
@@ -242,7 +268,14 @@
       "share": "Ulashish",
       "report": "Shikoyat qilish",
       "similarProperties": "O'xshash mulklar",
+      "similarPropertiesIn": "{city} shahridagi o'xshash mulklar",
       "propertyDetails": "Mulk ma'lumotlari",
+      "propertyInformation": "Mulk haqida ma'lumot",
+      "propertyId": "Mulk ID",
+      "status": "Holat",
+      "pricePerSqFt": "Narx/m²",
+      "posted": "Joylashtirilgan",
+      "views": "Ko'rishlar",
       "yearBuilt": "Qurilgan yili",
       "parkingSpaces": "Avtoturargoh joylari",
       "lotSize": "Uchastka hajmi",
@@ -253,13 +286,163 @@
       "floor": "Qavat",
       "totalFloors": "Jami qavatlar",
       "metroDistance": "Metrogacha",
+      "walkToMetro": "Metrogacha piyoda",
       "minutes": "daq",
+      "minWalk": "daq piyoda",
       "postedBy": "Joylashtirilgan",
       "contactSeller": "Sotuvchi bilan bog'lanish",
       "sendMessage": "Xabar yuborish",
       "writeMessage": "Xabar yozing...",
       "phone": "Telefon",
-      "email": "Elektron pochta"
+      "email": "Elektron pochta",
+      "breadcrumb": {
+        "home": "Bosh sahifa",
+        "properties": "Mulklar"
+      },
+      "badges": {
+        "forSale": "Sotuvda",
+        "forRent": "Ijaraga",
+        "verifiedListing": "Tasdiqlangan mulk"
+      },
+      "stats": {
+        "rooms": "Xonalar",
+        "sqft": "m²",
+        "living": "yashash",
+        "floor": "Qavat",
+        "built": "Qurilgan",
+        "ceiling": "shift",
+        "inquiries": "so'rovlar",
+        "saved": "saqlangan",
+        "popularListing": "Mashhur e'lon"
+      },
+      "sections": {
+        "aboutApartment": "Kvartira haqida",
+        "aboutHouse": "Uy haqida",
+        "aboutBuilding": "Bino haqida",
+        "landDetails": "Yer uchastkasi haqida",
+        "utilitiesAccess": "Kommunikatsiyalar va kirish",
+        "spaceDetails": "Xona haqida ma'lumot",
+        "buildingInfo": "Bino ma'lumotlari",
+        "amenitiesFeatures": "Qulayliklar va xususiyatlar",
+        "neighborhoodHighlights": "Atrofdagi infratuzilma"
+      },
+      "fields": {
+        "rooms": "Xonalar",
+        "bedrooms": "Yotoqxonalar",
+        "bathrooms": "Hammomlar",
+        "totalArea": "Umumiy maydon",
+        "livingArea": "Yashash maydoni",
+        "kitchenArea": "Oshxona maydoni",
+        "ceilingHeight": "Shift balandligi",
+        "balconies": "Balkonlar",
+        "furnished": "Mebel",
+        "buildingName": "Bino nomi",
+        "buildingType": "Bino turi",
+        "building": "Bino",
+        "elevators": "Liftlar",
+        "passengerElevators": "Yo'lovchi liftlari",
+        "parking": "Avtoturargoh",
+        "space": "joy",
+        "spaces": "joy",
+        "plotSize": "Uchastka hajmi",
+        "pricePerSqFt": "Har m² uchun narx",
+        "district": "Tuman",
+        "metro": "Metro"
+      },
+      "utilities": {
+        "electricity": "Elektr",
+        "water": "Suv",
+        "gas": "Gaz",
+        "roadAccess": "Yo'l kirishi",
+        "contactAgentToConfirm": "Kommunikatsiyalar mavjudligini tasdiqlash uchun agent bilan bog'laning"
+      },
+      "features": {
+        "title": "Xususiyatlar",
+        "garbageChute": "Axlat quvuri",
+        "concierge": "Konsyerj",
+        "gatedCommunity": "Yopiq hudud"
+      },
+      "neighborhood": {
+        "title": "Hudud infratuzilmasi",
+        "loading": "Infratuzilma ma'lumotlari yuklanmoqda...",
+        "error": "Infratuzilma ma'lumotlarini yuklab bo'lmadi",
+        "noData": "Atrofdagi joylar haqida ma'lumot yo'q",
+        "showOnMap": "Xaritada ko'rsatish",
+        "showAll": "Hammasini ko'rsatish",
+        "walkScore": "Piyoda qulaylik bahosi",
+        "walkScoreLabels": {
+          "excellent": "Piyodalar uchun ideal",
+          "veryGood": "Juda qulay",
+          "good": "Qulay",
+          "carDependent": "Mashinaga bog'liq",
+          "carRequired": "Mashina kerak"
+        },
+        "categories": {
+          "transport": "Transport",
+          "education": "Ta'lim",
+          "healthcare": "Tibbiyot",
+          "shopping": "Do'konlar",
+          "food": "Restoranlar va kafelar",
+          "leisure": "Dam olish",
+          "finance": "Banklar"
+        },
+        "subcategories": {
+          "metro": "Metro",
+          "train": "Temir yo'l bekati",
+          "bus": "Avtobus",
+          "school": "Maktab",
+          "kindergarten": "Bog'cha",
+          "university": "Universitet",
+          "college": "Kollej",
+          "hospital": "Kasalxona",
+          "clinic": "Poliklinika",
+          "pharmacy": "Dorixona",
+          "doctors": "Shifokor",
+          "dentist": "Stomatolog",
+          "supermarket": "Supermarket",
+          "mall": "Savdo markazi",
+          "convenience": "Do'kon",
+          "market": "Bozor",
+          "restaurant": "Restoran",
+          "cafe": "Kafe",
+          "fast_food": "Fastfud",
+          "park": "Park",
+          "playground": "Bolalar maydoni",
+          "gym": "Fitnes",
+          "sports": "Sport zali",
+          "pool": "Basseyn",
+          "bank": "Bank",
+          "atm": "Bankomat"
+        },
+        "distance": {
+          "meters": "{distance} m",
+          "kilometers": "{distance} km",
+          "walkMinutes": "{minutes} daq piyoda"
+        },
+        "summary": {
+          "nearestMetro": "Eng yaqin metro",
+          "nearestSchool": "Eng yaqin maktab",
+          "nearestHospital": "Eng yaqin kasalxona",
+          "nearestSupermarket": "Eng yaqin supermarket",
+          "nearestPark": "Eng yaqin park",
+          "placesFound": "{count} ta joy topildi",
+          "goodTransport": "Yaxshi transport aloqasi",
+          "schoolsNearby": "Maktablar yaqinda",
+          "healthcareNearby": "Tibbiyot yaqinda",
+          "shoppingNearby": "Do'konlar yaqinda"
+        },
+        "schools": "Maktablar",
+        "nearby": "yaqinda",
+        "shopping": "Do'konlar",
+        "stores": "do'kon",
+        "healthcare": "Sog'liqni saqlash",
+        "hospitals": "kasalxona",
+        "transport": "Transport",
+        "wellConnected": "Yaxshi aloqador",
+        "areaDescription": "{district} — {city} shahridagi rivojlangan infratuzilmaga ega hudud."
+      },
+      "passenger": "yo'lovchi",
+      "cargo": "yuk"
     },
     "form": {
       "createTitle": "Yangi e'lon joylashtirish",
@@ -320,6 +503,12 @@
       "garbageChute": "Axlat quvuri",
       "concierge": "Konsyerj",
       "gatedCommunity": "Yopiq hudud",
+      "selectRegion": "Viloyat/hududni tanlang",
+      "selectCity": "Shaharni tanlang",
+      "selectDistrict": "Tumanni tanlang",
+      "selectMetro": "Metro bekatini tanlang",
+      "selectRegionFirst": "Avval viloyatni tanlang",
+      "selectCityFirst": "Avval shaharni tanlang",
       "steps": {
         "basics": "Asosiy",
         "basicsDesc": "Asosiy mulk ma'lumotlari",
@@ -516,7 +705,46 @@
     "privacy": "Maxfiylik siyosati",
     "terms": "Foydalanish shartlari",
     "copyright": "Barcha huquqlar himoyalangan",
-    "description": "EstateHub bilan ideal mulkingizni toping"
+    "description": "Orzuingizdagi mulkni toping",
+    "properties": {
+      "title": "Mulklar",
+      "forSale": "Sotuvda",
+      "forRent": "Ijaraga",
+      "listProperty": "Mulk joylashtirish",
+      "compare": "Mulklarni solishtirish"
+    },
+    "browse": {
+      "title": "Ko'rish",
+      "areas": "Hududlar va tumanlar",
+      "findAgents": "Agent topish",
+      "apartments": "Kvartiralar",
+      "houses": "Uylar",
+      "commercial": "Tijorat"
+    },
+    "forProfessionals": {
+      "title": "Professionallar uchun",
+      "becomeAgent": "Agent bo'lish",
+      "agentDashboard": "Agent paneli",
+      "agentDirectory": "Agentlar katalogi"
+    },
+    "tools": {
+      "title": "Asboblar",
+      "savedSearches": "Saqlangan qidiruvlar",
+      "favorites": "Tanlanganlar",
+      "comparison": "Mulklarni solishtirish"
+    },
+    "company": {
+      "title": "Kompaniya",
+      "aboutUs": "Biz haqimizda",
+      "contact": "Bog'lanish",
+      "helpCenter": "Yordam markazi"
+    },
+    "legal": {
+      "title": "Huquqiy ma'lumot",
+      "privacyPolicy": "Maxfiylik siyosati",
+      "termsOfService": "Foydalanish shartlari",
+      "cookiePolicy": "Cookie siyosati"
+    }
   },
   "validation": {
     "required": "Bu maydon to'ldirilishi shart",
@@ -576,6 +804,15 @@
     "balcony": "Balkon",
     "furnished": "Mebel"
   },
+  "priceHistory": {
+    "title": "Narx tarixi",
+    "noHistory": "Narx tarixi mavjud emas",
+    "sinceListing": "E'lon berilgandan beri",
+    "current": "Joriy",
+    "today": "Bugun",
+    "initial": "Boshlang'ich",
+    "noChange": "O'zgarishsiz"
+  },
   "agent": {
     "realEstateAgency": "Ko'chmas mulk agentligi",
     "realtor": "Rieltor",
@@ -621,7 +858,70 @@
       "recentLeads": "So'nggi so'rovlar",
       "performanceChart": "Samaradorlik",
       "thisMonth": "Bu oy",
-      "lastMonth": "O'tgan oy"
+      "lastMonth": "O'tgan oy",
+      "addListing": "E'lon qo'shish",
+      "independentAgent": "Mustaqil agent",
+      "yearsExperience": "yillik tajriba",
+      "dealsClosed": "bitim yopildi",
+      "stats": {
+        "activeListings": "Faol e'lonlar",
+        "totalViews": "Jami ko'rishlar",
+        "favorites": "Tanlanganlar",
+        "pendingViewings": "Kutilayotgan ko'rishlar",
+        "unreadMessages": "O'qilmagan xabarlar",
+        "closedDeals": "Yopilgan bitimlar"
+      },
+      "performance": {
+        "title": "Samaradorlik ko'rinishi",
+        "listingsStatus": "E'lonlar holati",
+        "total": "jami",
+        "active": "Faol",
+        "sold": "Sotilgan",
+        "rented": "Ijaraga berilgan",
+        "thisMonth": "Bu oy",
+        "newListings": "Yangi e'lonlar",
+        "viewings": "Ko'rishlar"
+      },
+      "recentListings": {
+        "title": "So'nggi e'lonlar",
+        "viewAll": "Hammasini ko'rish",
+        "noListings": "E'lonlar hali yo'q",
+        "addFirst": "Birinchi e'lonni qo'shish"
+      },
+      "upcomingViewings": {
+        "title": "Kelgusi ko'rishlar",
+        "viewAll": "Hammasini ko'rish",
+        "noViewings": "Ko'rishlar rejalashtirilmagan"
+      },
+      "recentReviews": {
+        "title": "So'nggi sharhlar",
+        "noReviews": "Sharhlar hali yo'q"
+      },
+      "quickActions": {
+        "title": "Tezkor harakatlar",
+        "addNewListing": "Yangi e'lon qo'shish",
+        "viewMessages": "Xabarlarni ko'rish",
+        "manageViewings": "Ko'rishlarni boshqarish",
+        "manageListings": "E'lonlarni boshqarish"
+      },
+      "errors": {
+        "accessRequired": "Agent kirishi talab qilinadi",
+        "accessRequiredDesc": "Bu panel faqat tasdiqlangan agentlar uchun mavjud.",
+        "applyToBecome": "Agent bo'lish uchun ariza",
+        "failedToLoad": "Panelni yuklab bo'lmadi"
+      },
+      "status": {
+        "active": "Faol",
+        "sold": "Sotilgan",
+        "rented": "Ijarada",
+        "pending": "Kutilmoqda",
+        "confirmed": "Tasdiqlangan"
+      },
+      "dealTypes": {
+        "bought": "sotib olindi",
+        "rented": "ijaraga olindi",
+        "sold": "sotildi"
+      }
     },
     "become": {
       "title": "Agent bo'lish",

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -13,7 +14,15 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { SlidersHorizontal, X } from 'lucide-react'
+import { SlidersHorizontal, X, MapPin } from 'lucide-react'
+import {
+  regions,
+  getCitiesByRegion,
+  getDistrictsByCity,
+  getLocalizedName,
+  type City,
+  type District,
+} from '@/lib/locations'
 
 export interface AdvancedFilterValues {
   propertyTypes: string[]
@@ -29,6 +38,7 @@ export interface AdvancedFilterValues {
   amenities: string[]
   city?: string
   state?: string
+  district?: string
   latitude?: number
   longitude?: number
   radius?: number // in miles
@@ -55,67 +65,13 @@ interface AdvancedFiltersProps {
   onReset: () => void
 }
 
-const PROPERTY_TYPES = [
-  { value: 'APARTMENT', label: 'Apartment' },
-  { value: 'HOUSE', label: 'House' },
-  { value: 'CONDO', label: 'Condo' },
-  { value: 'TOWNHOUSE', label: 'Townhouse' },
-  { value: 'VILLA', label: 'Villa' },
-  { value: 'STUDIO', label: 'Studio' },
-  { value: 'COMMERCIAL', label: 'Commercial' },
-  { value: 'LAND', label: 'Land' },
-]
-
-const LISTING_TYPES = [
-  { value: 'SALE', label: 'For Sale' },
-  { value: 'RENT', label: 'For Rent' },
-]
-
-const AMENITIES = [
-  { value: 'PARKING', label: 'Parking' },
-  { value: 'GARAGE', label: 'Garage' },
-  { value: 'GARDEN', label: 'Garden' },
-  { value: 'POOL', label: 'Pool' },
-  { value: 'GYM', label: 'Gym' },
-  { value: 'ELEVATOR', label: 'Elevator' },
-  { value: 'SECURITY', label: 'Security' },
-  { value: 'AIR_CONDITIONING', label: 'Air Conditioning' },
-  { value: 'HEATING', label: 'Heating' },
-  { value: 'BALCONY', label: 'Balcony' },
-  { value: 'FIREPLACE', label: 'Fireplace' },
-  { value: 'PET_FRIENDLY', label: 'Pet Friendly' },
-]
-
-const BUILDING_CLASSES = [
-  { value: 'ECONOMY', label: 'Economy' },
-  { value: 'COMFORT', label: 'Comfort' },
-  { value: 'BUSINESS', label: 'Business' },
-  { value: 'ELITE', label: 'Elite/Premium' },
-]
-
-const RENOVATION_TYPES = [
-  { value: 'NONE', label: 'No Renovation' },
-  { value: 'COSMETIC', label: 'Cosmetic' },
-  { value: 'EURO', label: 'Euro-style' },
-  { value: 'DESIGNER', label: 'Designer' },
-  { value: 'NEEDS_RENOVATION', label: 'Needs Renovation' },
-]
-
-const PARKING_TYPES = [
-  { value: 'STREET', label: 'Street Parking' },
-  { value: 'GARAGE', label: 'Garage' },
-  { value: 'UNDERGROUND', label: 'Underground' },
-  { value: 'COVERED', label: 'Covered' },
-  { value: 'OPEN', label: 'Open Lot' },
-]
-
-const METRO_DISTANCES = [
-  { value: 5, label: '5 min walk' },
-  { value: 10, label: '10 min walk' },
-  { value: 15, label: '15 min walk' },
-  { value: 20, label: '20 min walk' },
-  { value: 30, label: '30 min walk' },
-]
+const PROPERTY_TYPE_KEYS = ['APARTMENT', 'HOUSE', 'CONDO', 'TOWNHOUSE', 'VILLA', 'STUDIO', 'COMMERCIAL', 'LAND'] as const
+const LISTING_TYPE_KEYS = ['SALE', 'RENT'] as const
+const AMENITY_KEYS = ['PARKING', 'GARAGE', 'GARDEN', 'POOL', 'GYM', 'ELEVATOR', 'SECURITY', 'AIR_CONDITIONING', 'HEATING', 'BALCONY', 'FIREPLACE', 'PET_FRIENDLY'] as const
+const BUILDING_CLASS_KEYS = ['ECONOMY', 'COMFORT', 'BUSINESS', 'ELITE'] as const
+const RENOVATION_TYPE_KEYS = ['NONE', 'COSMETIC', 'EURO', 'DESIGNER', 'NEEDS_RENOVATION'] as const
+const PARKING_TYPE_KEYS = ['STREET', 'GARAGE', 'UNDERGROUND', 'COVERED', 'OPEN'] as const
+const METRO_DISTANCE_VALUES = [5, 10, 15, 20, 30] as const
 
 export function AdvancedFilters({
   values,
@@ -124,6 +80,69 @@ export function AdvancedFilters({
   onReset,
 }: AdvancedFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const locale = useLocale()
+  const t = useTranslations('properties')
+  const tCommon = useTranslations('common')
+  const tAmenities = useTranslations('amenities')
+
+  // Location select states
+  const [selectedRegionId, setSelectedRegionId] = useState<string>('')
+  const [selectedCityId, setSelectedCityId] = useState<string>('')
+  const [selectedDistrictId, setSelectedDistrictId] = useState<string>('')
+  const [availableCities, setAvailableCities] = useState<City[]>([])
+  const [availableDistricts, setAvailableDistricts] = useState<District[]>([])
+
+  // Location change handlers
+  const handleRegionChange = (regionId: string) => {
+    setSelectedRegionId(regionId)
+    setSelectedCityId('')
+    setSelectedDistrictId('')
+    setAvailableDistricts([])
+
+    const cities = getCitiesByRegion(regionId)
+    setAvailableCities(cities)
+
+    const region = regions.find(r => r.id === regionId)
+    if (region) {
+      updateValue('state', getLocalizedName(region, locale))
+    }
+    updateValue('city', undefined)
+    updateValue('district', undefined)
+  }
+
+  const handleCityChange = (cityId: string) => {
+    setSelectedCityId(cityId)
+    setSelectedDistrictId('')
+
+    const districts = getDistrictsByCity(selectedRegionId, cityId)
+    setAvailableDistricts(districts)
+
+    const city = availableCities.find(c => c.id === cityId)
+    if (city) {
+      updateValue('city', getLocalizedName(city, locale))
+    }
+    updateValue('district', undefined)
+  }
+
+  const handleDistrictChange = (districtId: string) => {
+    setSelectedDistrictId(districtId)
+
+    const district = availableDistricts.find(d => d.id === districtId)
+    if (district) {
+      updateValue('district', getLocalizedName(district, locale))
+    }
+  }
+
+  const handleClearLocation = () => {
+    setSelectedRegionId('')
+    setSelectedCityId('')
+    setSelectedDistrictId('')
+    setAvailableCities([])
+    setAvailableDistricts([])
+    updateValue('state', undefined)
+    updateValue('city', undefined)
+    updateValue('district', undefined)
+  }
 
   const updateValue = (key: keyof AdvancedFilterValues, value: any) => {
     onChange({ ...values, [key]: value })
@@ -164,7 +183,8 @@ export function AdvancedFilters({
       values.hasConcierge !== undefined ||
       values.hasGatedArea !== undefined ||
       values.city ||
-      values.state
+      values.state ||
+      values.district
     )
   }
 
@@ -174,10 +194,10 @@ export function AdvancedFilters({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <SlidersHorizontal className="h-5 w-5" />
-            Advanced Filters
+            {t('advancedFilters.title')}
             {hasActiveFilters() && (
               <span className="text-sm font-normal text-blue-600">
-                (Active)
+                ({t('advancedFilters.active')})
               </span>
             )}
           </CardTitle>
@@ -186,7 +206,7 @@ export function AdvancedFilters({
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            {isExpanded ? 'Hide' : 'Show'}
+            {isExpanded ? t('advancedFilters.hide') : t('advancedFilters.show')}
           </Button>
         </div>
       </CardHeader>
@@ -195,20 +215,20 @@ export function AdvancedFilters({
         <CardContent className="space-y-6">
           {/* Property Type */}
           <div>
-            <Label className="text-base mb-3 block">Property Type</Label>
+            <Label className="text-base mb-3 block">{t('filters.propertyType')}</Label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {PROPERTY_TYPES.map((type) => (
-                <div key={type.value} className="flex items-center space-x-2">
+              {PROPERTY_TYPE_KEYS.map((typeKey) => (
+                <div key={typeKey} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`prop-${type.value}`}
-                    checked={values.propertyTypes.includes(type.value)}
-                    onCheckedChange={() => toggleArrayValue('propertyTypes', type.value)}
+                    id={`prop-${typeKey}`}
+                    checked={values.propertyTypes.includes(typeKey)}
+                    onCheckedChange={() => toggleArrayValue('propertyTypes', typeKey)}
                   />
                   <label
-                    htmlFor={`prop-${type.value}`}
+                    htmlFor={`prop-${typeKey}`}
                     className="text-sm cursor-pointer"
                   >
-                    {type.label}
+                    {t(`types.${typeKey.toLowerCase()}`)}
                   </label>
                 </div>
               ))}
@@ -217,20 +237,20 @@ export function AdvancedFilters({
 
           {/* Listing Type */}
           <div>
-            <Label className="text-base mb-3 block">Listing Type</Label>
+            <Label className="text-base mb-3 block">{t('filters.listingType')}</Label>
             <div className="flex gap-4">
-              {LISTING_TYPES.map((type) => (
-                <div key={type.value} className="flex items-center space-x-2">
+              {LISTING_TYPE_KEYS.map((typeKey) => (
+                <div key={typeKey} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`list-${type.value}`}
-                    checked={values.listingTypes.includes(type.value)}
-                    onCheckedChange={() => toggleArrayValue('listingTypes', type.value)}
+                    id={`list-${typeKey}`}
+                    checked={values.listingTypes.includes(typeKey)}
+                    onCheckedChange={() => toggleArrayValue('listingTypes', typeKey)}
                   />
                   <label
-                    htmlFor={`list-${type.value}`}
+                    htmlFor={`list-${typeKey}`}
                     className="text-sm cursor-pointer"
                   >
-                    {type.label}
+                    {t(`listingTypes.${typeKey.toLowerCase()}`)}
                   </label>
                 </div>
               ))}
@@ -239,11 +259,11 @@ export function AdvancedFilters({
 
           {/* Price Range */}
           <div>
-            <Label className="text-base mb-3 block">Price Range</Label>
+            <Label className="text-base mb-3 block">{t('filters.priceRange')}</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="minPrice" className="text-xs text-gray-600">
-                  Min Price
+                  {t('filters.minPrice')}
                 </Label>
                 <Input
                   id="minPrice"
@@ -257,12 +277,12 @@ export function AdvancedFilters({
               </div>
               <div>
                 <Label htmlFor="maxPrice" className="text-xs text-gray-600">
-                  Max Price
+                  {t('filters.maxPrice')}
                 </Label>
                 <Input
                   id="maxPrice"
                   type="number"
-                  placeholder="Any"
+                  placeholder={tCommon('any')}
                   value={values.maxPrice || ''}
                   onChange={(e) =>
                     updateValue('maxPrice', e.target.value ? Number(e.target.value) : undefined)
@@ -274,21 +294,21 @@ export function AdvancedFilters({
 
           {/* Bedrooms */}
           <div>
-            <Label className="text-base mb-3 block">Bedrooms</Label>
+            <Label className="text-base mb-3 block">{t('filters.bedrooms')}</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="minBedrooms" className="text-xs text-gray-600">
-                  Min Bedrooms
+                  {t('filters.minBeds')}
                 </Label>
                 <Select
                   value={values.minBedrooms?.toString()}
                   onValueChange={(val) => updateValue('minBedrooms', val ? Number(val) : undefined)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Any" />
+                    <SelectValue placeholder={tCommon('any')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Any</SelectItem>
+                    <SelectItem value="0">{tCommon('any')}</SelectItem>
                     {[1, 2, 3, 4, 5].map((num) => (
                       <SelectItem key={num} value={num.toString()}>
                         {num}+
@@ -299,17 +319,17 @@ export function AdvancedFilters({
               </div>
               <div>
                 <Label htmlFor="maxBedrooms" className="text-xs text-gray-600">
-                  Max Bedrooms
+                  {t('filters.maxBeds')}
                 </Label>
                 <Select
                   value={values.maxBedrooms?.toString()}
                   onValueChange={(val) => updateValue('maxBedrooms', val ? Number(val) : undefined)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Any" />
+                    <SelectValue placeholder={tCommon('any')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Any</SelectItem>
+                    <SelectItem value="0">{tCommon('any')}</SelectItem>
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
                       <SelectItem key={num} value={num.toString()}>
                         {num}
@@ -323,11 +343,11 @@ export function AdvancedFilters({
 
           {/* Bathrooms */}
           <div>
-            <Label className="text-base mb-3 block">Bathrooms</Label>
+            <Label className="text-base mb-3 block">{t('filters.bathrooms')}</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="minBathrooms" className="text-xs text-gray-600">
-                  Min Bathrooms
+                  {t('filters.minBaths')}
                 </Label>
                 <Select
                   value={values.minBathrooms?.toString()}
@@ -336,10 +356,10 @@ export function AdvancedFilters({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Any" />
+                    <SelectValue placeholder={tCommon('any')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Any</SelectItem>
+                    <SelectItem value="0">{tCommon('any')}</SelectItem>
                     {[1, 2, 3, 4, 5].map((num) => (
                       <SelectItem key={num} value={num.toString()}>
                         {num}+
@@ -350,7 +370,7 @@ export function AdvancedFilters({
               </div>
               <div>
                 <Label htmlFor="maxBathrooms" className="text-xs text-gray-600">
-                  Max Bathrooms
+                  {t('filters.maxBaths')}
                 </Label>
                 <Select
                   value={values.maxBathrooms?.toString()}
@@ -359,10 +379,10 @@ export function AdvancedFilters({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Any" />
+                    <SelectValue placeholder={tCommon('any')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Any</SelectItem>
+                    <SelectItem value="0">{tCommon('any')}</SelectItem>
                     {[1, 2, 3, 4, 5, 6].map((num) => (
                       <SelectItem key={num} value={num.toString()}>
                         {num}
@@ -376,11 +396,11 @@ export function AdvancedFilters({
 
           {/* Square Footage */}
           <div>
-            <Label className="text-base mb-3 block">Square Footage</Label>
+            <Label className="text-base mb-3 block">{t('advancedFilters.squareFootage')}</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="minArea" className="text-xs text-gray-600">
-                  Min Sq Ft
+                  {t('filters.minArea')}
                 </Label>
                 <Input
                   id="minArea"
@@ -394,12 +414,12 @@ export function AdvancedFilters({
               </div>
               <div>
                 <Label htmlFor="maxArea" className="text-xs text-gray-600">
-                  Max Sq Ft
+                  {t('filters.maxArea')}
                 </Label>
                 <Input
                   id="maxArea"
                   type="number"
-                  placeholder="Any"
+                  placeholder={tCommon('any')}
                   value={values.maxArea || ''}
                   onChange={(e) =>
                     updateValue('maxArea', e.target.value ? Number(e.target.value) : undefined)
@@ -411,11 +431,11 @@ export function AdvancedFilters({
 
           {/* Price per Sq Ft */}
           <div>
-            <Label className="text-base mb-3 block">Price per Sq Ft</Label>
+            <Label className="text-base mb-3 block">{t('filters.pricePerSqFt')}</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="minPricePerSqFt" className="text-xs text-gray-600">
-                  Min $/sq ft
+                  {tCommon('min')} $/м²
                 </Label>
                 <Input
                   id="minPricePerSqFt"
@@ -429,12 +449,12 @@ export function AdvancedFilters({
               </div>
               <div>
                 <Label htmlFor="maxPricePerSqFt" className="text-xs text-gray-600">
-                  Max $/sq ft
+                  {tCommon('max')} $/м²
                 </Label>
                 <Input
                   id="maxPricePerSqFt"
                   type="number"
-                  placeholder="Any"
+                  placeholder={tCommon('any')}
                   value={values.maxPricePerSqFt || ''}
                   onChange={(e) =>
                     updateValue('maxPricePerSqFt', e.target.value ? Number(e.target.value) : undefined)
@@ -446,20 +466,20 @@ export function AdvancedFilters({
 
           {/* Building Class */}
           <div>
-            <Label className="text-base mb-3 block">Building Class</Label>
+            <Label className="text-base mb-3 block">{t('filters.buildingClass')}</Label>
             <div className="flex flex-wrap gap-2">
-              {BUILDING_CLASSES.map((cls) => (
-                <div key={cls.value} className="flex items-center space-x-2">
+              {BUILDING_CLASS_KEYS.map((classKey) => (
+                <div key={classKey} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`class-${cls.value}`}
-                    checked={(values.buildingClasses || []).includes(cls.value)}
-                    onCheckedChange={() => toggleArrayValue('buildingClasses', cls.value)}
+                    id={`class-${classKey}`}
+                    checked={(values.buildingClasses || []).includes(classKey)}
+                    onCheckedChange={() => toggleArrayValue('buildingClasses', classKey)}
                   />
                   <label
-                    htmlFor={`class-${cls.value}`}
+                    htmlFor={`class-${classKey}`}
                     className="text-sm cursor-pointer"
                   >
-                    {cls.label}
+                    {t(`buildingClasses.${classKey.toLowerCase()}`)}
                   </label>
                 </div>
               ))}
@@ -468,20 +488,20 @@ export function AdvancedFilters({
 
           {/* Renovation Type */}
           <div>
-            <Label className="text-base mb-3 block">Renovation</Label>
+            <Label className="text-base mb-3 block">{t('filters.renovation')}</Label>
             <div className="flex flex-wrap gap-2">
-              {RENOVATION_TYPES.map((type) => (
-                <div key={type.value} className="flex items-center space-x-2">
+              {RENOVATION_TYPE_KEYS.map((typeKey) => (
+                <div key={typeKey} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`reno-${type.value}`}
-                    checked={(values.renovationTypes || []).includes(type.value)}
-                    onCheckedChange={() => toggleArrayValue('renovationTypes', type.value)}
+                    id={`reno-${typeKey}`}
+                    checked={(values.renovationTypes || []).includes(typeKey)}
+                    onCheckedChange={() => toggleArrayValue('renovationTypes', typeKey)}
                   />
                   <label
-                    htmlFor={`reno-${type.value}`}
+                    htmlFor={`reno-${typeKey}`}
                     className="text-sm cursor-pointer"
                   >
-                    {type.label}
+                    {t(`renovationTypes.${typeKey.toLowerCase()}`)}
                   </label>
                 </div>
               ))}
@@ -490,19 +510,19 @@ export function AdvancedFilters({
 
           {/* Metro Distance */}
           <div>
-            <Label className="text-base mb-3 block">Metro Distance</Label>
+            <Label className="text-base mb-3 block">{t('filters.metroDistance')}</Label>
             <Select
               value={values.maxMetroDistance?.toString()}
               onValueChange={(val) => updateValue('maxMetroDistance', val && val !== '0' ? Number(val) : undefined)}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Any distance" />
+                <SelectValue placeholder={t('metroDistances.anyDistance')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="0">Any distance</SelectItem>
-                {METRO_DISTANCES.map((dist) => (
-                  <SelectItem key={dist.value} value={dist.value.toString()}>
-                    Within {dist.label}
+                <SelectItem value="0">{t('metroDistances.anyDistance')}</SelectItem>
+                {METRO_DISTANCE_VALUES.map((dist) => (
+                  <SelectItem key={dist} value={dist.toString()}>
+                    {t('metroDistances.within')} {t(`metroDistances.walking${dist}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -511,11 +531,11 @@ export function AdvancedFilters({
 
           {/* Year Built */}
           <div>
-            <Label className="text-base mb-3 block">Year Built</Label>
+            <Label className="text-base mb-3 block">{t('filters.yearBuilt')}</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="minYearBuilt" className="text-xs text-gray-600">
-                  From
+                  {tCommon('from')}
                 </Label>
                 <Input
                   id="minYearBuilt"
@@ -529,7 +549,7 @@ export function AdvancedFilters({
               </div>
               <div>
                 <Label htmlFor="maxYearBuilt" className="text-xs text-gray-600">
-                  To
+                  {tCommon('to')}
                 </Label>
                 <Input
                   id="maxYearBuilt"
@@ -546,22 +566,22 @@ export function AdvancedFilters({
 
           {/* Floor Range */}
           <div>
-            <Label className="text-base mb-3 block">Floor</Label>
+            <Label className="text-base mb-3 block">{t('filters.floor')}</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="minFloor" className="text-xs text-gray-600">
-                  Min Floor
+                  {t('filters.minFloor')}
                 </Label>
                 <Select
                   value={values.minFloor?.toString()}
                   onValueChange={(val) => updateValue('minFloor', val && val !== '0' ? Number(val) : undefined)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Any" />
+                    <SelectValue placeholder={tCommon('any')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Any</SelectItem>
-                    <SelectItem value="2">Not first floor</SelectItem>
+                    <SelectItem value="0">{tCommon('any')}</SelectItem>
+                    <SelectItem value="2">{t('advancedFilters.notFirstFloor')}</SelectItem>
                     {[1, 2, 3, 5, 10, 15, 20].map((num) => (
                       <SelectItem key={num} value={num.toString()}>
                         {num}+
@@ -572,20 +592,20 @@ export function AdvancedFilters({
               </div>
               <div>
                 <Label htmlFor="maxFloor" className="text-xs text-gray-600">
-                  Max Floor
+                  {t('filters.maxFloor')}
                 </Label>
                 <Select
                   value={values.maxFloor?.toString()}
                   onValueChange={(val) => updateValue('maxFloor', val && val !== '0' ? Number(val) : undefined)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Any" />
+                    <SelectValue placeholder={tCommon('any')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Any</SelectItem>
+                    <SelectItem value="0">{tCommon('any')}</SelectItem>
                     {[3, 5, 10, 15, 20, 30, 50].map((num) => (
                       <SelectItem key={num} value={num.toString()}>
-                        Up to {num}
+                        {t('advancedFilters.upTo')} {num}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -596,20 +616,20 @@ export function AdvancedFilters({
 
           {/* Parking Type */}
           <div>
-            <Label className="text-base mb-3 block">Parking</Label>
+            <Label className="text-base mb-3 block">{t('filters.parking')}</Label>
             <div className="flex flex-wrap gap-2">
-              {PARKING_TYPES.map((type) => (
-                <div key={type.value} className="flex items-center space-x-2">
+              {PARKING_TYPE_KEYS.map((typeKey) => (
+                <div key={typeKey} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`parking-${type.value}`}
-                    checked={(values.parkingTypes || []).includes(type.value)}
-                    onCheckedChange={() => toggleArrayValue('parkingTypes', type.value)}
+                    id={`parking-${typeKey}`}
+                    checked={(values.parkingTypes || []).includes(typeKey)}
+                    onCheckedChange={() => toggleArrayValue('parkingTypes', typeKey)}
                   />
                   <label
-                    htmlFor={`parking-${type.value}`}
+                    htmlFor={`parking-${typeKey}`}
                     className="text-sm cursor-pointer"
                   >
-                    {type.label}
+                    {t(`parkingTypes.${typeKey.toLowerCase()}`)}
                   </label>
                 </div>
               ))}
@@ -618,7 +638,7 @@ export function AdvancedFilters({
 
           {/* Building Features */}
           <div>
-            <Label className="text-base mb-3 block">Building Features</Label>
+            <Label className="text-base mb-3 block">{t('filters.features')}</Label>
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -627,7 +647,7 @@ export function AdvancedFilters({
                   onCheckedChange={(checked) => updateValue('hasBalcony', checked ? true : undefined)}
                 />
                 <label htmlFor="hasBalcony" className="text-sm cursor-pointer">
-                  Has Balcony
+                  {t('filters.balcony')}
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -637,7 +657,7 @@ export function AdvancedFilters({
                   onCheckedChange={(checked) => updateValue('hasConcierge', checked ? true : undefined)}
                 />
                 <label htmlFor="hasConcierge" className="text-sm cursor-pointer">
-                  Concierge Service
+                  {t('filters.concierge')}
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -647,7 +667,7 @@ export function AdvancedFilters({
                   onCheckedChange={(checked) => updateValue('hasGatedArea', checked ? true : undefined)}
                 />
                 <label htmlFor="hasGatedArea" className="text-sm cursor-pointer">
-                  Gated Community
+                  {t('filters.gatedArea')}
                 </label>
               </div>
             </div>
@@ -655,20 +675,20 @@ export function AdvancedFilters({
 
           {/* Amenities */}
           <div>
-            <Label className="text-base mb-3 block">Amenities</Label>
+            <Label className="text-base mb-3 block">{t('filters.amenities')}</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {AMENITIES.map((amenity) => (
-                <div key={amenity.value} className="flex items-center space-x-2">
+              {AMENITY_KEYS.map((amenityKey) => (
+                <div key={amenityKey} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`amenity-${amenity.value}`}
-                    checked={values.amenities.includes(amenity.value)}
-                    onCheckedChange={() => toggleArrayValue('amenities', amenity.value)}
+                    id={`amenity-${amenityKey}`}
+                    checked={values.amenities.includes(amenityKey)}
+                    onCheckedChange={() => toggleArrayValue('amenities', amenityKey)}
                   />
                   <label
-                    htmlFor={`amenity-${amenity.value}`}
+                    htmlFor={`amenity-${amenityKey}`}
                     className="text-sm cursor-pointer"
                   >
-                    {amenity.label}
+                    {tAmenities(amenityKey.toLowerCase().replace('_', ''))}
                   </label>
                 </div>
               ))}
@@ -677,46 +697,101 @@ export function AdvancedFilters({
 
           {/* Location */}
           <div>
-            <Label className="text-base mb-3 block">Location</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="city" className="text-xs text-gray-600">
-                  City
-                </Label>
-                <Input
-                  id="city"
-                  placeholder="Enter city"
-                  value={values.city || ''}
-                  onChange={(e) => updateValue('city', e.target.value || undefined)}
-                />
-              </div>
+            <div className="flex items-center justify-between mb-3">
+              <Label className="text-base flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                {t('advancedFilters.location')}
+              </Label>
+              {(selectedRegionId || values.state || values.city || values.district) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearLocation}
+                  className="text-xs text-gray-500 hover:text-gray-700"
+                >
+                  {tCommon('clear')}
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="state" className="text-xs text-gray-600">
-                  State
+                  {t('form.state')}
                 </Label>
-                <Input
-                  id="state"
-                  placeholder="Enter state"
-                  value={values.state || ''}
-                  onChange={(e) => updateValue('state', e.target.value || undefined)}
-                />
+                <Select
+                  value={selectedRegionId}
+                  onValueChange={handleRegionChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('form.selectRegion')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {regions.map(region => (
+                      <SelectItem key={region.id} value={region.id}>
+                        {getLocalizedName(region, locale)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="city" className="text-xs text-gray-600">
+                  {t('form.city')}
+                </Label>
+                <Select
+                  value={selectedCityId}
+                  onValueChange={handleCityChange}
+                  disabled={!selectedRegionId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={selectedRegionId ? t('form.selectCity') : t('form.selectRegionFirst')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableCities.map(city => (
+                      <SelectItem key={city.id} value={city.id}>
+                        {getLocalizedName(city, locale)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="district" className="text-xs text-gray-600">
+                  {t('form.district')}
+                </Label>
+                <Select
+                  value={selectedDistrictId}
+                  onValueChange={handleDistrictChange}
+                  disabled={!selectedCityId || availableDistricts.length === 0}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={selectedCityId ? t('form.selectDistrict') : t('form.selectCityFirst')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableDistricts.map(district => (
+                      <SelectItem key={district.id} value={district.id}>
+                        {getLocalizedName(district, locale)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
 
           {/* Radius Search */}
           <div>
-            <Label className="text-base mb-3 block">Search Radius</Label>
+            <Label className="text-base mb-3 block">{t('advancedFilters.searchRadius')}</Label>
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="latitude" className="text-xs text-gray-600">
-                  Latitude
+                  {t('advancedFilters.latitude')}
                 </Label>
                 <Input
                   id="latitude"
                   type="number"
                   step="0.0001"
-                  placeholder="40.7128"
+                  placeholder="41.2995"
                   value={values.latitude || ''}
                   onChange={(e) =>
                     updateValue('latitude', e.target.value ? Number(e.target.value) : undefined)
@@ -725,13 +800,13 @@ export function AdvancedFilters({
               </div>
               <div>
                 <Label htmlFor="longitude" className="text-xs text-gray-600">
-                  Longitude
+                  {t('advancedFilters.longitude')}
                 </Label>
                 <Input
                   id="longitude"
                   type="number"
                   step="0.0001"
-                  placeholder="-74.0060"
+                  placeholder="69.2401"
                   value={values.longitude || ''}
                   onChange={(e) =>
                     updateValue('longitude', e.target.value ? Number(e.target.value) : undefined)
@@ -740,7 +815,7 @@ export function AdvancedFilters({
               </div>
               <div>
                 <Label htmlFor="radius" className="text-xs text-gray-600">
-                  Radius (miles)
+                  {t('advancedFilters.radiusMiles')}
                 </Label>
                 <Input
                   id="radius"
@@ -754,18 +829,18 @@ export function AdvancedFilters({
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              Find properties within a specific radius of coordinates
+              {t('advancedFilters.radiusHelp')}
             </p>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4 border-t">
             <Button onClick={onApply} className="flex-1">
-              Apply Filters
+              {t('advancedFilters.applyFilters')}
             </Button>
             <Button variant="outline" onClick={onReset}>
               <X className="h-4 w-4 mr-2" />
-              Reset
+              {tCommon('reset')}
             </Button>
           </div>
         </CardContent>

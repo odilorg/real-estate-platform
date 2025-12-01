@@ -1,16 +1,14 @@
-export const locales = ['en', 'ru', 'uz'] as const
+export const locales = ['ru', 'uz'] as const
 export type Locale = (typeof locales)[number]
 
-export const defaultLocale: Locale = 'en'
+export const defaultLocale: Locale = 'ru'
 
 export const localeNames: Record<Locale, string> = {
-  en: 'English',
   ru: 'Русский',
-  uz: "O'zbek"
+  uz: "O'zbekcha"
 }
 
 export const localeFlags: Record<Locale, string> = {
-  en: '🇺🇸',
   ru: '🇷🇺',
   uz: '🇺🇿'
 }

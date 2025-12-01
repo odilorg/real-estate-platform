@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Real Estate Platform - Find Your Dream Property",
-  description: "Discover and list properties for sale or rent. Browse apartments, houses, and commercial spaces.",
+  title: "EstateHub - Найдите недвижимость вашей мечты",
+  description: "Покупка, продажа и аренда недвижимости в Узбекистане. Квартиры, дома, земельные участки и коммерческая недвижимость.",
 };
 
 export default async function RootLayout({
