@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { ChevronDown, Home, Building2, Building, TreePine, DoorOpen } from 'lucide-react'
@@ -28,9 +28,25 @@ const rentCategories: CategoryItem[] = [
 export function CategoryNav() {
   const t = useTranslations('categoryNav')
   const [openMenu, setOpenMenu] = useState<'sale' | 'rent' | null>(null)
+  const navRef = useRef<HTMLDivElement>(null)
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setOpenMenu(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const toggleMenu = (menu: 'sale' | 'rent') => {
+    setOpenMenu(openMenu === menu ? null : menu)
+  }
 
   return (
-    <nav className="bg-white border-b hidden md:block">
+    <nav ref={navRef} className="bg-white border-b hidden md:block">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center space-x-8 h-12">
           {/* Sale Dropdown */}
@@ -39,7 +55,10 @@ export function CategoryNav() {
             onMouseEnter={() => setOpenMenu('sale')}
             onMouseLeave={() => setOpenMenu(null)}
           >
-            <button className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors py-3">
+            <button
+              onClick={() => toggleMenu('sale')}
+              className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors py-3"
+            >
               <span>{t('sale')}</span>
               <ChevronDown className={`h-4 w-4 transition-transform ${openMenu === 'sale' ? 'rotate-180' : ''}`} />
             </button>
@@ -67,7 +86,10 @@ export function CategoryNav() {
             onMouseEnter={() => setOpenMenu('rent')}
             onMouseLeave={() => setOpenMenu(null)}
           >
-            <button className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors py-3">
+            <button
+              onClick={() => toggleMenu('rent')}
+              className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors py-3"
+            >
               <span>{t('rent')}</span>
               <ChevronDown className={`h-4 w-4 transition-transform ${openMenu === 'rent' ? 'rotate-180' : ''}`} />
             </button>

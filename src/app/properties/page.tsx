@@ -9,6 +9,8 @@ import { MapView } from '@/components/map/MapView'
 import { AdvancedFilters, AdvancedFilterValues } from '@/components/search/AdvancedFilters'
 import { SaveSearchDialog } from '@/components/search/SaveSearchDialog'
 import { LocationSearch } from '@/components/search/LocationSearch'
+import { QuickFilters, QuickFilterValues } from '@/components/search/QuickFilters'
+import { MoreFiltersModal, MoreFiltersValues, defaultMoreFiltersValues } from '@/components/search/MoreFiltersModal'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -96,6 +98,18 @@ function PropertiesContent() {
     parkingTypes: [],
   })
 
+  // Quick filters state - for UI-driven filter changes
+  const [quickFilters, setQuickFilters] = useState<QuickFilterValues>({
+    listingType: null,
+    propertyTypes: [],
+    rooms: [],
+    minPrice: undefined,
+    maxPrice: undefined,
+  })
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+  const [showMoreFiltersModal, setShowMoreFiltersModal] = useState(false)
+  const [moreFilters, setMoreFilters] = useState<MoreFiltersValues>(defaultMoreFiltersValues)
+
   // Data states
   const [properties, setProperties] = useState<Property[]>([])
   const [pagination, setPagination] = useState({
@@ -130,8 +144,47 @@ function PropertiesContent() {
         // Build query params
         const params = new URLSearchParams()
         if (debouncedQuery) params.append('query', debouncedQuery)
-        if (propertyType !== 'all') params.append('propertyType', propertyType)
-        if (listingType !== 'all') params.append('listingType', listingType)
+
+        // Determine listingType: UI filters > URL param > state
+        const urlListingType = searchParams.get('listingType')
+        if (quickFilters.listingType) {
+          params.append('listingType', quickFilters.listingType)
+        } else if (urlListingType) {
+          params.append('listingType', urlListingType)
+        } else if (listingType !== 'all') {
+          params.append('listingType', listingType)
+        }
+
+        // Determine propertyType: UI filters > URL param > state
+        const urlPropertyType = searchParams.get('propertyType')
+        if (quickFilters.propertyTypes.length > 0) {
+          params.append('propertyType', quickFilters.propertyTypes.join(','))
+        } else if (urlPropertyType) {
+          params.append('propertyType', urlPropertyType)
+        } else if (propertyType !== 'all') {
+          params.append('propertyType', propertyType)
+        }
+
+        // Quick filter price
+        if (quickFilters.minPrice) params.append('minPrice', quickFilters.minPrice.toString())
+        if (quickFilters.maxPrice) params.append('maxPrice', quickFilters.maxPrice.toString())
+
+        // Quick filter area
+        if (quickFilters.minArea) params.append('minArea', quickFilters.minArea.toString())
+        if (quickFilters.maxArea) params.append('maxArea', quickFilters.maxArea.toString())
+
+        // Quick filter rooms (bedrooms)
+        if (quickFilters.rooms.length > 0) {
+          const minRooms = Math.min(...quickFilters.rooms)
+          const maxRooms = Math.max(...quickFilters.rooms)
+          if (quickFilters.rooms.includes(5)) {
+            params.append('minBedrooms', minRooms.toString())
+          } else {
+            params.append('minBedrooms', minRooms.toString())
+            params.append('maxBedrooms', maxRooms.toString())
+          }
+        }
+
         params.append('sort', sortBy)
         params.append('order', sortBy === 'createdAt' ? 'desc' : 'asc')
         params.append('page', page.toString())
@@ -227,10 +280,6 @@ function PropertiesContent() {
           params.append('hasGatedArea', advancedFilters.hasGatedArea.toString())
         }
 
-        // Update URL
-        const newUrl = `/properties?${params.toString()}`
-        router.push(newUrl, { scroll: false })
-
         // Fetch data
         const response = await fetch(`/api/properties/search?${params.toString()}`)
         if (!response.ok) throw new Error('Failed to fetch properties')
@@ -247,7 +296,7 @@ function PropertiesContent() {
     }
 
     fetchProperties()
-  }, [debouncedQuery, propertyType, listingType, sortBy, page, router, advancedFilters])
+  }, [debouncedQuery, propertyType, listingType, sortBy, page, advancedFilters, quickFilters, searchParams])
 
   // Handle filter changes
   const handleQueryChange = (value: string) => {
@@ -294,69 +343,43 @@ function PropertiesContent() {
     setSelectedPropertyId(propertyId)
   }
 
-  const hasActiveFilters = query || propertyType !== 'all' || listingType !== 'all' || selectedLocations.length > 0
+  const handleQuickFiltersChange = (newFilters: QuickFilterValues) => {
+    setQuickFilters(newFilters)
+    setPage(1)
+  }
+
+  const hasActiveFilters = query || propertyType !== 'all' || listingType !== 'all' || selectedLocations.length > 0 ||
+    quickFilters.listingType || quickFilters.propertyTypes.length > 0 || quickFilters.rooms.length > 0 ||
+    quickFilters.minPrice || quickFilters.maxPrice || quickFilters.minArea || quickFilters.maxArea
 
   return (
     <MainLayout>
       <div className="bg-gray-50 min-h-screen">
-        {/* Header */}
+        {/* Quick Filters Bar */}
+        <QuickFilters
+          values={quickFilters}
+          onChange={handleQuickFiltersChange}
+          onSaveSearch={() => {
+            // Trigger save search dialog
+            const dialog = document.querySelector('[data-save-search-trigger]') as HTMLButtonElement
+            dialog?.click()
+          }}
+          onMoreFilters={() => setShowMoreFiltersModal(true)}
+          showMoreFilters={true}
+        />
+
+        {/* Location Search Bar */}
         <div className="bg-white border-b">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-              <h1 className="text-xl sm:text-2xl font-bold">{t('title')}</h1>
-              <div className="flex gap-2 items-center">
-                <SaveSearchDialog
-                  filters={{ query, propertyType, listingType, sortBy }}
-                  advancedFilters={advancedFilters}
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <LocationSearch
+                  onLocationSelect={handleLocationSelect}
+                  selectedLocations={selectedLocations}
+                  onRemoveLocation={handleRemoveLocation}
                 />
-                {hasActiveFilters && (
-                  <Button variant="outline" size="sm" onClick={handleClearFilters}>
-                    {t('filters.resetFilters') || 'Clear Filters'}
-                  </Button>
-                )}
               </div>
-            </div>
-
-            {/* Location Search */}
-            <div className="mb-4">
-              <LocationSearch
-                onLocationSelect={handleLocationSelect}
-                selectedLocations={selectedLocations}
-                onRemoveLocation={handleRemoveLocation}
-              />
-            </div>
-
-            {/* Filters Row - Mobile Stacked, Desktop Inline */}
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 items-center">
-              <Select value={listingType} onValueChange={handleListingTypeChange}>
-                <SelectTrigger className="w-full sm:w-32">
-                  <SelectValue placeholder={t('filters.listingType')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('listingTypes.sale')} & {t('listingTypes.rent')}</SelectItem>
-                  <SelectItem value="SALE">{t('listingTypes.sale')}</SelectItem>
-                  <SelectItem value="RENT">{t('listingTypes.rent')}</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={propertyType} onValueChange={handlePropertyTypeChange}>
-                <SelectTrigger className="w-full sm:w-40">
-                  <SelectValue placeholder={t('filters.propertyType')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="APARTMENT">{t('types.apartment')}</SelectItem>
-                  <SelectItem value="HOUSE">{t('types.house')}</SelectItem>
-                  <SelectItem value="CONDO">{t('types.condo')}</SelectItem>
-                  <SelectItem value="TOWNHOUSE">{t('types.townhouse')}</SelectItem>
-                  <SelectItem value="VILLA">Villa</SelectItem>
-                  <SelectItem value="STUDIO">Studio</SelectItem>
-                  <SelectItem value="LAND">{t('types.land')}</SelectItem>
-                  <SelectItem value="COMMERCIAL">{t('types.commercial')}</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <div className="col-span-2 sm:col-span-1 sm:flex-1 relative sm:max-w-xs">
+              <div className="relative max-w-xs hidden sm:block">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder={t('searchPlaceholder')}
@@ -365,31 +388,35 @@ function PropertiesContent() {
                   onChange={(e) => handleQueryChange(e.target.value)}
                 />
               </div>
+              {/* Hidden save search trigger */}
+              <div className="hidden">
+                <SaveSearchDialog
+                  filters={{ query, propertyType, listingType, sortBy }}
+                  advancedFilters={advancedFilters}
+                />
+              </div>
             </div>
           </div>
         </div>
 
+        {/* More Filters Modal */}
+        <MoreFiltersModal
+          isOpen={showMoreFiltersModal}
+          onClose={() => setShowMoreFiltersModal(false)}
+          values={moreFilters}
+          onChange={setMoreFilters}
+          onApply={() => {
+            setShowMoreFiltersModal(false)
+            setPage(1)
+          }}
+          onReset={() => {
+            setMoreFilters(defaultMoreFiltersValues)
+          }}
+          resultsCount={pagination.total}
+        />
+
         {/* Results */}
         <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
-          {/* Advanced Filters */}
-          <div className="mb-6">
-            <AdvancedFilters
-              values={advancedFilters}
-              onChange={setAdvancedFilters}
-              onApply={() => setPage(1)}
-              onReset={() => {
-                setAdvancedFilters({
-                  propertyTypes: [],
-                  listingTypes: [],
-                  amenities: [],
-                  buildingClasses: [],
-                  renovationTypes: [],
-                  parkingTypes: [],
-                })
-                setPage(1)
-              }}
-            />
-          </div>
 
           {/* Results Count, View Toggle and Sort */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
