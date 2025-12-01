@@ -33,11 +33,17 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
   const favorite = isFavorite(property.id)
   const inComparison = isInComparison(property.id)
 
-  // Handle print
+  // Handle print - open property page and trigger print
   const handlePrint = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    window.open(`/properties/${property.id}?print=true`, '_blank')
+    // Open property in new tab and print after load
+    const printWindow = window.open(`/properties/${property.id}`, '_blank')
+    if (printWindow) {
+      printWindow.onload = () => {
+        setTimeout(() => printWindow.print(), 500)
+      }
+    }
   }
 
   // Handle report

@@ -121,3 +121,79 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Print styles */
+@media print {
+  /* Hide non-essential elements */
+  header,
+  footer,
+  nav,
+  .no-print,
+  [data-sonner-toaster],
+  button:not(.print-show),
+  .comparison-bar,
+  .inquiry-form,
+  .mortgage-calculator,
+  .schedule-viewing,
+  .share-buttons,
+  .favorite-button,
+  .similar-properties {
+    display: none !important;
+  }
+
+  /* Reset background colors for printing */
+  body,
+  .bg-gray-50,
+  .bg-white {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Make content full width */
+  .lg\:col-span-2 {
+    grid-column: span 3 !important;
+  }
+
+  /* Hide sidebar on print */
+  .lg\:grid-cols-3 > div:last-child:not(.lg\:col-span-2) {
+    display: none !important;
+  }
+
+  /* Ensure images print */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Prevent page breaks inside cards */
+  .card,
+  [class*="Card"] {
+    page-break-inside: avoid;
+  }
+
+  /* Show full content */
+  .line-clamp-1,
+  .line-clamp-2,
+  .line-clamp-3 {
+    -webkit-line-clamp: unset !important;
+    overflow: visible !important;
+  }
+
+  /* Adjust page margins */
+  @page {
+    margin: 1cm;
+  }
+
+  /* Print-friendly text */
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+
+  /* Show URL after links for reference */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+}

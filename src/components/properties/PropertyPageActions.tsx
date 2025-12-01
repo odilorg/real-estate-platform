@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { ShareProperty } from './ShareProperty'
 import { ScheduleViewing } from './ScheduleViewing'
 import { FavoriteButton } from './FavoriteButton'
+import { PropertyNotes } from './PropertyNotes'
 import { Button } from '@/components/ui/button'
 import { useComparison } from '@/contexts/ComparisonContext'
 import { Map, Printer, Flag, GitCompare, Check, Share2, Download, Edit3 } from 'lucide-react'
@@ -101,9 +102,9 @@ export function PropertyPageActions({
     }
   }
 
-  // Handle print
+  // Handle print - trigger browser print dialog directly
   const handlePrint = () => {
-    window.open(`/properties/${propertyId}?print=true`, '_blank')
+    window.print()
   }
 
   // Handle report
@@ -180,25 +181,12 @@ export function PropertyPageActions({
           {inComparison ? <Check className="h-4 w-4 mr-1.5" /> : <GitCompare className="h-4 w-4 mr-1.5" />}
           {t('compare')}
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => {
-            if (navigator.share) {
-              navigator.share({
-                title: propertyTitle,
-                url: window.location.href,
-              })
-            } else {
-              navigator.clipboard.writeText(window.location.href)
-              toast.success(t('linkCopied') || 'Link copied to clipboard')
-            }
-          }}
-          className="h-9 w-9 text-gray-500 hover:text-gray-700"
-          title={t('share') || 'Share'}
-        >
-          <Share2 className="h-4 w-4" />
-        </Button>
+        <ShareProperty
+          propertyId={propertyId}
+          propertyTitle={propertyTitle}
+          propertyPrice={propertyPrice}
+          propertyCity={propertyCity}
+        />
         <Button
           variant="ghost"
           size="icon"
@@ -217,14 +205,11 @@ export function PropertyPageActions({
         >
           <Printer className="h-4 w-4" />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 text-gray-500 hover:text-gray-700"
-          title={t('notes') || 'Notes'}
-        >
-          <Edit3 className="h-4 w-4" />
-        </Button>
+        <PropertyNotes
+          propertyId={propertyId}
+          propertyTitle={propertyTitle}
+          variant="icon"
+        />
         <Button
           variant="ghost"
           size="sm"

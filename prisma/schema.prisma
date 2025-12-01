@@ -43,6 +43,7 @@ model User {
   adminLogs     AdminLog[]
   inquiriesSent PropertyInquiry[] @relation("InquirySender")
   inquiriesReceived PropertyInquiry[] @relation("InquiryOwner")
+  propertyNotes PropertyNote[]
 
   @@index([email])
   @@index([role])
@@ -506,4 +507,20 @@ model PropertyInquiry {
   @@index([senderId])
   @@index([status])
   @@index([createdAt])
+}
+
+// Property Notes - personal notes users can add to properties
+model PropertyNote {
+  id          String    @id @default(cuid())
+  userId      String
+  propertyId  String
+  content     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+  @@index([propertyId])
 }
