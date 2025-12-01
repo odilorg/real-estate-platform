@@ -290,6 +290,7 @@
       "contactAgent": "Связаться с агентом",
       "schedule": "Записаться на просмотр",
       "share": "Поделиться",
+      "perMonth": "мес",
       "report": "Пожаловаться",
       "similarProperties": "Похожие объекты",
       "similarPropertiesIn": "Похожие объекты в {city}",
@@ -330,7 +331,9 @@
       },
       "stats": {
         "rooms": "Комнат",
+        "room": "комн.",
         "sqft": "м²",
+        "sqm": "м²",
         "living": "жилая",
         "floor": "Этаж",
         "built": "Построен",
@@ -339,10 +342,21 @@
         "saved": "сохранено",
         "popularListing": "Популярный объект"
       },
+      "propertyTypes": {
+        "apartment": "квартира",
+        "house": "дом",
+        "condo": "кондоминиум",
+        "townhouse": "таунхаус",
+        "villa": "вилла",
+        "studio": "студия",
+        "land": "земельный участок",
+        "commercial": "коммерческое помещение"
+      },
       "sections": {
         "aboutApartment": "О квартире",
         "aboutHouse": "О доме",
         "aboutBuilding": "О доме",
+        "inBuilding": "в ЖК",
         "landDetails": "Информация об участке",
         "utilitiesAccess": "Коммуникации и доступ",
         "spaceDetails": "Информация о помещении",
@@ -746,6 +760,25 @@
       "inquiryArchived": "Запрос перемещён в архив",
       "archiveFailed": "Не удалось архивировать запрос"
     }
+  },
+  "property": {
+    "forSale": "Продаётся",
+    "forRent": "Сдаётся",
+    "room": "комн.",
+    "sqm": "м²",
+    "floor": "эт.",
+    "onMap": "На карте",
+    "compare": "Сравнить",
+    "print": "Печать",
+    "report": "Пожаловаться",
+    "signInToReport": "Войдите, чтобы пожаловаться",
+    "signIn": "Войти",
+    "reportReceived": "Спасибо за сообщение. Мы рассмотрим его в ближайшее время.",
+    "share": "Поделиться",
+    "notes": "Заметки",
+    "linkCopied": "Ссылка скопирована",
+    "perMonth": "мес",
+    "pricePerSqm": "Цена за м²"
   },
   "favorites": {
     "title": "Избранное",

@@ -1,5 +1,21 @@
 // Shared type definitions for the real estate platform
 
+// Agent/Seller info for property cards
+export interface PropertyAgent {
+  id: string
+  firstName: string
+  lastName: string
+  photo?: string | null
+  phone?: string | null
+  verified: boolean
+  showPhone: boolean
+  agency?: {
+    id: string
+    name: string
+    logo?: string | null
+  } | null
+}
+
 export interface Property {
   id: string
   userId: string
@@ -29,6 +45,7 @@ export interface Property {
   updatedAt: Date
   images: string[]
   amenities: string[]
+  agent?: PropertyAgent | null
 }
 
 export interface Review {

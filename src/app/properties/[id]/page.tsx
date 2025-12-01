@@ -6,6 +6,7 @@ import { MainLayout } from '@/components/layout'
 import { ImageGallery } from '@/components/properties/ImageGallery'
 import { PropertyCard } from '@/components/properties/PropertyCard'
 import { ContactOwnerButton } from '@/components/properties/ContactOwnerButton'
+import { FavoriteButton } from '@/components/properties/FavoriteButton'
 import { PropertyPageActions, PropertySidebarActions } from '@/components/properties/PropertyPageActions'
 import { PropertyMapSection } from '@/components/properties/PropertyMap'
 import { MortgageCalculator } from '@/components/properties/MortgageCalculator'
@@ -130,100 +131,121 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Title and Actions */}
+              {/* Title Section - Cian Style */}
               <div className="bg-white rounded-lg p-6">
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
-                  <div>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      <Badge variant="secondary">
-                        {property.listingType === 'SALE' ? t('badges.forSale') : t('badges.forRent')}
-                      </Badge>
-                      <Badge variant="outline">{getLabel('propertyType', property.propertyType)}</Badge>
-                      {property.buildingClass && (
-                        <Badge className="bg-purple-100 text-purple-800">
-                          {getLabel('buildingClass', property.buildingClass)}
-                        </Badge>
-                      )}
-                      {property.verified && (
-                        <Badge className="bg-green-500 text-white font-semibold px-3 py-1">
-                          <CheckCircle2 className="h-4 w-4 mr-1" />
-                          {t('badges.verifiedListing')}
-                        </Badge>
-                      )}
-                    </div>
-                    <h1 className="text-2xl md:text-3xl font-bold mb-2">{property.title}</h1>
-                    {property.buildingName && (
-                      <p className="text-lg text-blue-600 font-medium mb-2">{property.buildingName}</p>
-                    )}
-                    <div className="flex items-center text-gray-600">
-                      <MapPin className="h-5 w-5 mr-1" />
-                      <span>
-                        {property.address}, {property.city}
-                        {property.district && `, ${property.district}`}
-                        {property.state && `, ${property.state}`}
-                        {property.zipCode && ` ${property.zipCode}`}
-                      </span>
-                    </div>
-                    {property.nearestMetro && (
-                      <div className="flex items-center text-gray-600 mt-1">
-                        <Train className="h-4 w-4 mr-1" />
-                        <span>
-                          {property.nearestMetro}
-                          {property.metroDistance && ` (${property.metroDistance} ${t('minWalk')})`}
-                        </span>
-                      </div>
-                    )}
+                {/* Badges Row */}
+                {property.verified && (
+                  <div className="mb-3">
+                    <Badge className="bg-green-500 text-white font-semibold px-3 py-1">
+                      <CheckCircle2 className="h-4 w-4 mr-1" />
+                      {t('badges.verifiedListing')}
+                    </Badge>
                   </div>
+                )}
+
+                {/* Title */}
+                <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                  {property.listingType === 'SALE' ? t('badges.forSale') : t('badges.forRent')}{' '}
+                  {property.rooms ? `${property.rooms}-${t('stats.room')} ` : ''}
+                  {t(`propertyTypes.${property.propertyType.toLowerCase()}`)}
+                  {property.area ? `, ${property.area} ${t('stats.sqm')}` : ''}
+                </h1>
+
+                {/* Building Name */}
+                {property.buildingName && (
+                  <p className="text-lg text-blue-600 font-medium mb-3">
+                    {t('sections.inBuilding')} «{property.buildingName}»
+                  </p>
+                )}
+
+                {/* Location Row */}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-gray-600 text-sm mb-3">
+                  <span>
+                    {property.city}
+                    {property.district && `, ${property.district}`}
+                    {property.state && `, ${property.state}`}
+                  </span>
                   <PropertyPageActions
                     propertyId={property.id}
                     propertyTitle={property.title}
                     propertyPrice={property.price}
                     propertyCity={property.city}
                     ownerId={property.userId}
+                    latitude={property.latitude}
+                    longitude={property.longitude}
+                    propertyType={property.propertyType}
+                    listingType={property.listingType}
+                    address={property.address}
+                    state={property.state}
+                    bedrooms={property.bedrooms}
+                    bathrooms={property.bathrooms}
+                    area={property.area}
+                    livingArea={property.livingArea}
+                    kitchenArea={property.kitchenArea}
+                    rooms={property.rooms}
+                    floor={property.floor}
+                    totalFloors={property.totalFloors}
+                    yearBuilt={property.yearBuilt}
+                    parking={property.parking}
+                    balcony={property.balcony}
+                    buildingType={property.buildingType}
+                    buildingClass={property.buildingClass}
+                    renovation={property.renovation}
+                    furnished={property.furnished}
+                    images={property.images}
+                    amenities={property.amenities}
+                    variant="inline"
                   />
                 </div>
 
-                <div className="flex flex-wrap items-baseline gap-2 md:gap-4">
-                  <div className="text-2xl md:text-4xl font-bold text-blue-600">
-                    {formatPrice(property.price)}
-                    {property.listingType === 'RENT' && (
-                      <span className="text-sm md:text-lg text-gray-600 font-normal">/мес</span>
-                    )}
-                  </div>
-                  {pricePerSqFt && (
-                    <div className="text-sm md:text-base text-gray-600">
-                      ${pricePerSqFt.toLocaleString()}/{t('stats.sqft')}
+                {/* Metro Info */}
+                {property.nearestMetro && (
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center">
+                      <Train className="h-4 w-4 mr-1 text-red-500" />
+                      <span>{property.nearestMetro}</span>
+                      {property.metroDistance && (
+                        <span className="ml-1 text-gray-500">
+                          {property.metroDistance} {t('minWalk')}
+                        </span>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
-                {/* Social Proof Bar */}
-                <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center text-gray-600">
-                    <Eye className="h-4 w-4 mr-1.5 text-blue-500" />
-                    <span className="font-medium">{property.views}</span>
-                    <span className="ml-1 text-sm">{t('views')}</span>
-                  </div>
-                  {socialProof.inquiryCount > 0 && (
-                    <div className="flex items-center text-gray-600">
-                      <MessageCircle className="h-4 w-4 mr-1.5 text-green-500" />
-                      <span className="font-medium">{socialProof.inquiryCount}</span>
-                      <span className="ml-1 text-sm">{t('stats.inquiries')}</span>
-                    </div>
-                  )}
-                  {socialProof.favoriteCount > 0 && (
-                    <div className="flex items-center text-gray-600">
-                      <Heart className="h-4 w-4 mr-1.5 text-red-500" />
-                      <span className="font-medium">{socialProof.favoriteCount}</span>
-                      <span className="ml-1 text-sm">{t('stats.saved')}</span>
-                    </div>
-                  )}
-                  {(property.views > 10 || socialProof.inquiryCount > 3) && (
-                    <div className="flex items-center text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
-                      <TrendingUp className="h-4 w-4 mr-1" />
-                      <span className="text-sm font-medium">{t('stats.popularListing')}</span>
-                    </div>
-                  )}
+                {/* Action Buttons Row - Cian Style */}
+                <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-100">
+                  <PropertyPageActions
+                    propertyId={property.id}
+                    propertyTitle={property.title}
+                    propertyPrice={property.price}
+                    propertyCity={property.city}
+                    ownerId={property.userId}
+                    latitude={property.latitude}
+                    longitude={property.longitude}
+                    propertyType={property.propertyType}
+                    listingType={property.listingType}
+                    address={property.address}
+                    state={property.state}
+                    bedrooms={property.bedrooms}
+                    bathrooms={property.bathrooms}
+                    area={property.area}
+                    livingArea={property.livingArea}
+                    kitchenArea={property.kitchenArea}
+                    rooms={property.rooms}
+                    floor={property.floor}
+                    totalFloors={property.totalFloors}
+                    yearBuilt={property.yearBuilt}
+                    parking={property.parking}
+                    balcony={property.balcony}
+                    buildingType={property.buildingType}
+                    buildingClass={property.buildingClass}
+                    renovation={property.renovation}
+                    furnished={property.furnished}
+                    images={property.images}
+                    amenities={property.amenities}
+                    variant="buttons"
+                  />
                 </div>
               </div>
 
@@ -619,7 +641,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               </Card>
 
               {/* Map */}
-              <Card>
+              <Card id="property-map">
                 <CardContent className="pt-6">
                   <PropertyMapSection
                     latitude={property.latitude}
@@ -675,6 +697,47 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
             {/* Sidebar */}
             <div className="space-y-6">
+              {/* Price Card - Cian Style */}
+              <Card className="overflow-hidden">
+                <CardContent className="p-6">
+                  {/* Price */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <div className="text-3xl font-bold text-gray-900">
+                        {formatPrice(property.price)}
+                        {property.listingType === 'RENT' && (
+                          <span className="text-lg text-gray-500 font-normal"> /{t('perMonth')}</span>
+                        )}
+                      </div>
+                      {pricePerSqFt && (
+                        <div className="text-sm text-gray-500 mt-1">
+                          {t('pricePerSqFt')}: ${pricePerSqFt.toLocaleString()}/{t('stats.sqm')}
+                        </div>
+                      )}
+                    </div>
+                    <FavoriteButton propertyId={property.id} />
+                  </div>
+
+                  {/* Quick Info */}
+                  <div className="space-y-2 py-4 border-t border-gray-100">
+                    {property.propertyType && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">{t('propertyType')}</span>
+                        <span className="font-medium">{getLabel('propertyType', property.propertyType)}</span>
+                      </div>
+                    )}
+                    {property.listingType && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">{t('listingType')}</span>
+                        <span className="font-medium">
+                          {property.listingType === 'SALE' ? t('badges.forSale') : t('badges.forRent')}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Agent/Owner Contact - CIAN style */}
               <AgentSidebar
                 ownerId={property.userId}

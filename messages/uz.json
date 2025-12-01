@@ -290,6 +290,7 @@
       "contactAgent": "Agent bilan bog'lanish",
       "schedule": "Ko'rishga yozilish",
       "share": "Ulashish",
+      "perMonth": "oy",
       "report": "Shikoyat qilish",
       "similarProperties": "O'xshash mulklar",
       "similarPropertiesIn": "{city} shahridagi o'xshash mulklar",
@@ -330,7 +331,9 @@
       },
       "stats": {
         "rooms": "Xonalar",
+        "room": "xonali",
         "sqft": "m²",
+        "sqm": "m²",
         "living": "yashash",
         "floor": "Qavat",
         "built": "Qurilgan",
@@ -339,10 +342,21 @@
         "saved": "saqlangan",
         "popularListing": "Mashhur e'lon"
       },
+      "propertyTypes": {
+        "apartment": "kvartira",
+        "house": "uy",
+        "condo": "kondominium",
+        "townhouse": "taunxaus",
+        "villa": "villa",
+        "studio": "studiya",
+        "land": "yer uchastkasi",
+        "commercial": "tijorat binosi"
+      },
       "sections": {
         "aboutApartment": "Kvartira haqida",
         "aboutHouse": "Uy haqida",
         "aboutBuilding": "Bino haqida",
+        "inBuilding": "TKda",
         "landDetails": "Yer uchastkasi haqida",
         "utilitiesAccess": "Kommunikatsiyalar va kirish",
         "spaceDetails": "Xona haqida ma'lumot",
@@ -746,6 +760,25 @@
       "inquiryArchived": "So'rov arxivlandi",
       "archiveFailed": "Arxivlashda xatolik"
     }
+  },
+  "property": {
+    "forSale": "Sotiladi",
+    "forRent": "Ijaraga",
+    "room": "xonali",
+    "sqm": "m²",
+    "floor": "qavat",
+    "onMap": "Xaritada",
+    "compare": "Solishtirish",
+    "print": "Chop etish",
+    "report": "Shikoyat",
+    "signInToReport": "Shikoyat qilish uchun tizimga kiring",
+    "signIn": "Kirish",
+    "reportReceived": "Xabaringiz uchun rahmat. Tez orada ko'rib chiqamiz.",
+    "share": "Ulashish",
+    "notes": "Eslatmalar",
+    "linkCopied": "Havola nusxalandi",
+    "perMonth": "oy",
+    "pricePerSqm": "Narx m² uchun"
   },
   "favorites": {
     "title": "Sevimlilar",

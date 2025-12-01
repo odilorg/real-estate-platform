@@ -7,6 +7,22 @@ type ListingType = string
 
 // ============ Property Operations ============
 
+// Agent/Seller info for property cards
+interface PropertyAgent {
+  id: string
+  firstName: string
+  lastName: string
+  photo?: string | null
+  phone?: string | null
+  verified: boolean
+  showPhone: boolean
+  agency?: {
+    id: string
+    name: string
+    logo?: string | null
+  } | null
+}
+
 export interface PropertyWithRelations {
   id: string
   userId: string
@@ -36,6 +52,7 @@ export interface PropertyWithRelations {
   updatedAt: Date
   images: string[]
   amenities: string[]
+  agent?: PropertyAgent | null
 }
 
 // Transform Prisma property to our expected format
@@ -44,6 +61,20 @@ function transformProperty(property: any): PropertyWithRelations {
     ...property,
     images: property.images?.map((img: any) => img.url) || [],
     amenities: property.amenities?.map((a: any) => a.amenity) || [],
+    agent: property.agent ? {
+      id: property.agent.id,
+      firstName: property.agent.firstName,
+      lastName: property.agent.lastName,
+      photo: property.agent.photo,
+      phone: property.agent.phone,
+      verified: property.agent.verified,
+      showPhone: property.agent.showPhone,
+      agency: property.agent.agency ? {
+        id: property.agent.agency.id,
+        name: property.agent.agency.name,
+        logo: property.agent.agency.logo,
+      } : null,
+    } : null,
   }
 }
 
@@ -115,6 +146,34 @@ export interface SearchFilters {
   hasBalcony?: boolean
   hasConcierge?: boolean
   hasGatedArea?: boolean
+}
+
+// Helper to fetch agents for properties by their userIds
+async function fetchAgentsForProperties(properties: any[]): Promise<Map<string, PropertyAgent>> {
+  const userIds = [...new Set(properties.map(p => p.userId))]
+  const agents = await prisma.agent.findMany({
+    where: { userId: { in: userIds } },
+    include: { agency: true },
+  })
+
+  const agentMap = new Map<string, PropertyAgent>()
+  for (const agent of agents) {
+    agentMap.set(agent.userId, {
+      id: agent.id,
+      firstName: agent.firstName,
+      lastName: agent.lastName,
+      photo: agent.photo,
+      phone: agent.phone,
+      verified: agent.verified,
+      showPhone: agent.showPhone,
+      agency: agent.agency ? {
+        id: agent.agency.id,
+        name: agent.agency.name,
+        logo: agent.agency.logo,
+      } : null,
+    })
+  }
+  return agentMap
 }
 
 export async function searchProperties(filters: SearchFilters): Promise<PropertyWithRelations[]> {
@@ -286,7 +345,14 @@ export async function searchProperties(filters: SearchFilters): Promise<Property
     })
   }
 
-  return results
+  // Fetch agent data for all properties
+  const agentMap = await fetchAgentsForProperties(properties)
+
+  // Attach agent data to results
+  return results.map(property => ({
+    ...property,
+    agent: agentMap.get(property.userId) || null,
+  }))
 }
 
 export interface CreatePropertyData {
