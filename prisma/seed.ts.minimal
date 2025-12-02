@@ -1,0 +1,60 @@
+import { PrismaClient } from '@prisma/client'
+import * as bcrypt from 'bcrypt'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  console.log('Starting database seed...')
+  
+  // Clear all existing data first (respecting foreign key order)
+  console.log('Clearing existing data...')
+  await prisma.message.deleteMany()
+  await prisma.conversation.deleteMany()
+  await prisma.review.deleteMany()
+  await prisma.favorite.deleteMany()
+  await prisma.savedSearch.deleteMany()
+  await prisma.recentlyViewed.deleteMany()
+  await prisma.viewing.deleteMany()
+  await prisma.propertyInquiry.deleteMany()
+  await prisma.propertyNote.deleteMany()
+  await prisma.propertyAmenity.deleteMany()
+  await prisma.propertyImage.deleteMany()
+  await prisma.priceHistory.deleteMany()
+  await prisma.property.deleteMany()
+  await prisma.agentReview.deleteMany()
+  await prisma.agentApplication.deleteMany()
+  await prisma.agent.deleteMany()
+  await prisma.agency.deleteMany()
+  await prisma.adminLog.deleteMany()
+  await prisma.session.deleteMany()
+  await prisma.account.deleteMany()
+  await prisma.user.deleteMany()
+  
+  console.log('Cleared existing data successfully')
+  
+  // Hash password for all users
+  const hashedPassword = await bcrypt.hash('password123', 10)
+  
+  console.log('Creating users...')
+  const users = await Promise.all([
+    prisma.user.create({ data: { name: 'Aziz Rahimov', email: 'aziz.rahimov@example.com', password: hashedPassword, role: 'AGENT' } }),
+    prisma.user.create({ data: { name: 'Dilorom Karimova', email: 'dilorom.karimova@example.com', password: hashedPassword, role: 'AGENT' } }),
+    prisma.user.create({ data: { name: 'Javohir Tursunov', email: 'javohir.tursunov@example.com', password: hashedPassword, role: 'AGENT' } }),
+    prisma.user.create({ data: { name: 'Malika Yusupova', email: 'malika.yusupova@example.com', password: hashedPassword, role: 'AGENT' } }),
+    prisma.user.create({ data: { name: 'Rustam Sharipov', email: 'rustam.sharipov@example.com', password: hashedPassword, role: 'AGENT' } }),
+    prisma.user.create({ data: { name: 'Oybek Abdullayev', email: 'oybek.abdullayev@example.com', password: hashedPassword, role: 'USER' } }),
+    prisma.user.create({ data: { name: 'Nilufar Nazarova', email: 'nilufar.nazarova@example.com', password: hashedPassword, role: 'USER' } }),
+    prisma.user.create({ data: { name: 'Bobur Mahmudov', email: 'bobur.mahmudov@example.com', password: hashedPassword, role: 'USER' } }),
+    prisma.user.create({ data: { name: 'Sardor Alimov', email: 'sardor.alimov@example.com', password: hashedPassword, role: 'ADMIN' } }),
+  ])
+  console.log('Created', users.length, 'users')
+}
+
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })

@@ -1,253 +1,103 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client"
+import * as bcrypt from "bcrypt"
 
 const prisma = new PrismaClient()
 
-const mockProperties = [
-  {
-    userId: "demo_user_1",
-    title: "Modern 2-Bedroom Apartment in Downtown",
-    description: "Beautiful apartment with stunning city views. Recently renovated with modern amenities. Close to public transportation and shopping centers.",
-    price: 2500,
-    propertyType: "APARTMENT",
-    listingType: "RENT",
-    address: "123 Main Street, Apt 5B",
-    city: "New York",
-    state: "NY",
-    zipCode: "10001",
-    bedrooms: 2,
-    bathrooms: 2,
-    area: 1200,
-    yearBuilt: 2018,
-    floor: 5,
-    totalFloors: 10,
-    images: [
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800",
-    ],
-    amenities: ["PARKING", "ELEVATOR", "GYM", "AIR_CONDITIONING"],
-    latitude: 40.7505,
-    longitude: -73.9934,
-  },
-  {
-    userId: "demo_user_2",
-    title: "Spacious Family House with Garden",
-    description: "Charming 4-bedroom house perfect for families. Large backyard, modern kitchen, and attached garage.",
-    price: 650000,
-    propertyType: "HOUSE",
-    listingType: "SALE",
-    address: "456 Oak Avenue",
-    city: "Austin",
-    state: "TX",
-    zipCode: "78701",
-    bedrooms: 4,
-    bathrooms: 3,
-    area: 2800,
-    yearBuilt: 2015,
-    parking: 2,
-    images: [
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800",
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-    ],
-    amenities: ["GARAGE", "GARDEN", "HEATING", "DISHWASHER"],
-    latitude: 30.2672,
-    longitude: -97.7431,
-  },
-  {
-    userId: "demo_user_1",
-    title: "Luxury Studio in Heart of City",
-    description: "High-end studio apartment with floor-to-ceiling windows. Perfect for young professionals. All utilities included.",
-    price: 1800,
-    propertyType: "STUDIO",
-    listingType: "RENT",
-    address: "789 Park Lane, Unit 12A",
-    city: "San Francisco",
-    state: "CA",
-    zipCode: "94102",
-    bedrooms: 1,
-    bathrooms: 1,
-    area: 650,
-    yearBuilt: 2020,
-    floor: 12,
-    totalFloors: 20,
-    images: [
-      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800",
-      "https://images.unsplash.com/photo-1502672023488-70e25813eb80?w=800",
-    ],
-    amenities: ["ELEVATOR", "SECURITY", "GYM", "POOL"],
-    latitude: 37.7749,
-    longitude: -122.4194,
-  },
-  {
-    userId: "demo_user_3",
-    title: "Commercial Office Space Downtown",
-    description: "Prime commercial space ideal for startups or small businesses. High-speed internet, conference rooms included.",
-    price: 3500,
-    propertyType: "COMMERCIAL",
-    listingType: "RENT",
-    address: "321 Business Blvd, Suite 200",
-    city: "Chicago",
-    state: "IL",
-    zipCode: "60601",
-    area: 1500,
-    yearBuilt: 2019,
-    floor: 2,
-    totalFloors: 15,
-    parking: 5,
-    images: [
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800",
-      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800",
-    ],
-    amenities: ["PARKING", "ELEVATOR", "SECURITY", "INTERNET"],
-    latitude: 41.8781,
-    longitude: -87.6298,
-  },
-  {
-    userId: "demo_user_2",
-    title: "Cozy 3-Bedroom Condo with Balcony",
-    description: "Well-maintained condo in quiet neighborhood. Large balcony with mountain views. Pet-friendly building.",
-    price: 2200,
-    propertyType: "CONDO",
-    listingType: "RENT",
-    address: "555 Maple Drive, #304",
-    city: "Denver",
-    state: "CO",
-    zipCode: "80202",
-    bedrooms: 3,
-    bathrooms: 2,
-    area: 1400,
-    yearBuilt: 2016,
-    floor: 3,
-    totalFloors: 6,
-    images: [
-      "https://images.unsplash.com/photo-1515263487990-61b07816b324?w=800",
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800",
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800",
-    ],
-    amenities: ["BALCONY", "PARKING", "PET_FRIENDLY", "WASHING_MACHINE"],
-    latitude: 39.7392,
-    longitude: -104.9903,
-  },
-  {
-    userId: "demo_user_1",
-    title: "Beautiful Villa with Pool",
-    description: "Stunning Mediterranean-style villa with private pool and landscaped gardens. Perfect for luxury living.",
-    price: 1250000,
-    propertyType: "VILLA",
-    listingType: "SALE",
-    address: "888 Sunset Boulevard",
-    city: "Los Angeles",
-    state: "CA",
-    zipCode: "90028",
-    bedrooms: 5,
-    bathrooms: 4,
-    area: 4200,
-    yearBuilt: 2017,
-    parking: 3,
-    images: [
-      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800",
-      "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800",
-      "https://images.unsplash.com/photo-1613977257592-4871e5fcd7c4?w=800",
-    ],
-    amenities: ["POOL", "GARDEN", "GARAGE", "FIREPLACE", "SECURITY"],
-    latitude: 34.0522,
-    longitude: -118.2437,
-  },
-  {
-    userId: "demo_user_3",
-    title: "Development Land - 2 Acres",
-    description: "Prime development opportunity. Zoned for residential construction. All utilities available at property line.",
-    price: 180000,
-    propertyType: "LAND",
-    listingType: "SALE",
-    address: "County Road 45",
-    city: "Boulder",
-    state: "CO",
-    zipCode: "80301",
-    area: 87120,
-    images: [
-      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800",
-      "https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800",
-    ],
-    amenities: [],
-    latitude: 40.0150,
-    longitude: -105.2705,
-  },
-  {
-    userId: "demo_user_2",
-    title: "Charming Townhouse in Suburbs",
-    description: "Move-in ready townhouse with updated kitchen and bathrooms. Close to schools and parks. Great community.",
-    price: 425000,
-    propertyType: "TOWNHOUSE",
-    listingType: "SALE",
-    address: "234 Elm Street",
-    city: "Seattle",
-    state: "WA",
-    zipCode: "98101",
-    bedrooms: 3,
-    bathrooms: 2.5,
-    area: 1850,
-    yearBuilt: 2010,
-    parking: 2,
-    images: [
-      "https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=800",
-      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800",
-    ],
-    amenities: ["PARKING", "GARDEN", "STORAGE", "DISHWASHER"],
-    latitude: 47.6062,
-    longitude: -122.3321,
-  },
-]
-
 async function main() {
-  console.log('Seeding database...')
-
-  // Clear existing data
+  console.log("Starting database seed...")
+  console.log("Clearing existing data...")
   await prisma.message.deleteMany()
   await prisma.conversation.deleteMany()
   await prisma.review.deleteMany()
   await prisma.favorite.deleteMany()
   await prisma.savedSearch.deleteMany()
+  await prisma.recentlyViewed.deleteMany()
+  await prisma.viewing.deleteMany()
+  await prisma.propertyInquiry.deleteMany()
+  await prisma.propertyNote.deleteMany()
   await prisma.propertyAmenity.deleteMany()
   await prisma.propertyImage.deleteMany()
+  await prisma.priceHistory.deleteMany()
   await prisma.property.deleteMany()
+  await prisma.agentReview.deleteMany()
+  await prisma.agentApplication.deleteMany()
+  await prisma.agent.deleteMany()
+  await prisma.agency.deleteMany()
+  await prisma.adminLog.deleteMany()
+  await prisma.session.deleteMany()
+  await prisma.account.deleteMany()
+  await prisma.user.deleteMany()
+  console.log("Cleared existing data successfully")
 
-  console.log('Cleared existing data')
+  const hashedPassword = await bcrypt.hash("password123", 10)
 
-  // Create properties with images and amenities
-  for (const prop of mockProperties) {
-    const { images, amenities, ...propertyData } = prop
+  console.log("Creating users...")
+  const users = await Promise.all([
+    prisma.user.create({ data: { name: "Aziz Rahimov", email: "aziz@example.com", password: hashedPassword, role: "AGENT" } }),
+    prisma.user.create({ data: { name: "Dilorom Karimova", email: "dilorom@example.com", password: hashedPassword, role: "AGENT" } }),
+    prisma.user.create({ data: { name: "Javohir Tursunov", email: "javohir@example.com", password: hashedPassword, role: "AGENT" } }),
+    prisma.user.create({ data: { name: "Malika Yusupova", email: "malika@example.com", password: hashedPassword, role: "AGENT" } }),
+    prisma.user.create({ data: { name: "Rustam Sharipov", email: "rustam@example.com", password: hashedPassword, role: "AGENT" } }),
+    prisma.user.create({ data: { name: "Oybek Abdullayev", email: "oybek@example.com", password: hashedPassword, role: "USER" } }),
+    prisma.user.create({ data: { name: "Nilufar Nazarova", email: "nilufar@example.com", password: hashedPassword, role: "USER" } }),
+    prisma.user.create({ data: { name: "Bobur Mahmudov", email: "bobur@example.com", password: hashedPassword, role: "USER" } }),
+    prisma.user.create({ data: { name: "Sardor Alimov", email: "admin@example.com", password: hashedPassword, role: "ADMIN" } }),
+  ])
+  console.log("Created users: " + users.length)
 
-    const property = await prisma.property.create({
-      data: {
-        ...propertyData,
-        images: {
-          create: images.map((url, index) => ({
-            url,
-            order: index,
-            isPrimary: index === 0,
-          })),
-        },
-        amenities: {
-          create: amenities.map(amenity => ({
-            amenity,
-          })),
-        },
-      },
+  console.log("Creating agencies...")
+  const agencies = await Promise.all([
+    prisma.agency.create({ data: { name: "Tashkent Realty", slug: "tashkent-realty", description: "Leading agency", email: "info@tr.uz", phone: "+998711234567", city: "Tashkent", yearsOnPlatform: 3, verified: true } }),
+    prisma.agency.create({ data: { name: "Silk Road Properties", slug: "silk-road-properties", description: "Premium real estate", email: "contact@srp.uz", phone: "+998719876543", city: "Tashkent", yearsOnPlatform: 2, verified: true } }),
+  ])
+  console.log("Created agencies: " + agencies.length)
+
+  console.log("Creating agents...")
+  const agents = await Promise.all([
+    prisma.agent.create({ data: { userId: users[0].id, agencyId: agencies[0].id, firstName: "Aziz", lastName: "Rahimov", phone: "+998901234567", email: "aziz@example.com", licenseNumber: "UZ001", verified: true, superAgent: true, responseTime: "fast", rating: 4.8, reviewCount: 56 } }),
+    prisma.agent.create({ data: { userId: users[1].id, agencyId: agencies[0].id, firstName: "Dilorom", lastName: "Karimova", phone: "+998902345678", email: "dilorom@example.com", licenseNumber: "UZ002", verified: true, responseTime: "fast", rating: 4.7, reviewCount: 42 } }),
+    prisma.agent.create({ data: { userId: users[2].id, agencyId: agencies[1].id, firstName: "Javohir", lastName: "Tursunov", phone: "+998903456789", email: "javohir@example.com", licenseNumber: "UZ003", verified: true, superAgent: true, responseTime: "medium", rating: 4.6, reviewCount: 38 } }),
+    prisma.agent.create({ data: { userId: users[3].id, agencyId: agencies[1].id, firstName: "Malika", lastName: "Yusupova", phone: "+998904567890", email: "malika@example.com", licenseNumber: "UZ004", verified: true, responseTime: "fast", rating: 4.9, reviewCount: 31 } }),
+    prisma.agent.create({ data: { userId: users[4].id, agencyId: null, firstName: "Rustam", lastName: "Sharipov", phone: "+998905678901", email: "rustam@example.com", licenseNumber: "UZ005", verified: true, responseTime: "medium", rating: 4.5, reviewCount: 22 } }),
+  ])
+  console.log("Created agents: " + agents.length)
+
+  console.log("Creating properties...")
+  const props = [
+    { title: "Modern apt Tashkent", description: "Spacious 3-room", price: 185000, propertyType: "APARTMENT", listingType: "SALE", address: "Navoi 15", city: "Tashkent", district: "Mirzo-Ulugbek", bedrooms: 3, bathrooms: 2, area: 120, rooms: 4, yearBuilt: 2021, floor: 8, totalFloors: 16, buildingType: "MONOLITHIC", buildingClass: "BUSINESS", renovation: "EURO", userId: users[0].id, featured: true, verified: true },
+    { title: "Cozy studio", description: "Compact studio", price: 350, propertyType: "STUDIO", listingType: "RENT", address: "Mukimi 48", city: "Tashkent", district: "Yakkasaray", bedrooms: 0, bathrooms: 1, area: 38, rooms: 1, yearBuilt: 2019, floor: 3, totalFloors: 9, buildingType: "PANEL", buildingClass: "COMFORT", renovation: "COSMETIC", userId: users[1].id, verified: true },
+    { title: "Elite apt Infinity", description: "Luxury 4-room", price: 450000, propertyType: "APARTMENT", listingType: "SALE", address: "Rustaveli 1", city: "Tashkent", district: "Mirabad", bedrooms: 4, bathrooms: 3, area: 210, rooms: 5, yearBuilt: 2023, floor: 15, totalFloors: 25, buildingType: "MONOLITHIC", buildingClass: "ELITE", renovation: "DESIGNER", userId: users[0].id, featured: true, verified: true },
+    { title: "Apt Samarkand", description: "2-room apt", price: 68000, propertyType: "APARTMENT", listingType: "SALE", address: "Registan 25", city: "Samarkand", district: "Central", bedrooms: 2, bathrooms: 1, area: 72, rooms: 3, yearBuilt: 2024, floor: 5, totalFloors: 12, buildingType: "BRICK", buildingClass: "COMFORT", renovation: "NONE", userId: users[3].id, verified: true },
+    { title: "Budget apt Fergana", description: "Good 2-room", price: 28000, propertyType: "APARTMENT", listingType: "SALE", address: "Navoi 112", city: "Fergana", district: "Fergana", bedrooms: 2, bathrooms: 1, area: 54, rooms: 2, yearBuilt: 1985, floor: 2, totalFloors: 5, buildingType: "PANEL", buildingClass: "ECONOMY", renovation: "NEEDS_REPAIR", userId: users[2].id },
+    { title: "House with pool", description: "Two-story house", price: 520000, propertyType: "HOUSE", listingType: "SALE", address: "Yunusabad 15", city: "Tashkent", district: "Yunusabad", bedrooms: 5, bathrooms: 4, area: 380, rooms: 8, yearBuilt: 2020, totalFloors: 2, buildingType: "BRICK", buildingClass: "ELITE", renovation: "DESIGNER", userId: users[1].id, featured: true, verified: true },
+    { title: "House Samarkand", description: "Traditional house", price: 95000, propertyType: "HOUSE", listingType: "SALE", address: "Temur 89", city: "Samarkand", district: "Central", bedrooms: 4, bathrooms: 2, area: 180, rooms: 6, yearBuilt: 2005, totalFloors: 1, buildingType: "BRICK", buildingClass: "COMFORT", renovation: "COSMETIC", userId: users[3].id, verified: true },
+    { title: "House rent Bukhara", description: "Family house", price: 800, propertyType: "HOUSE", listingType: "RENT", address: "Nakshbandi 45", city: "Bukhara", district: "Bukhara", bedrooms: 3, bathrooms: 2, area: 140, rooms: 5, yearBuilt: 2010, totalFloors: 1, buildingType: "BRICK", buildingClass: "COMFORT", renovation: "EURO", userId: users[3].id },
+    { title: "Villa Golf City", description: "Exclusive villa", price: 850000, propertyType: "VILLA", listingType: "SALE", address: "Golf City 7", city: "Tashkent", district: "Sergeli", bedrooms: 6, bathrooms: 5, area: 520, rooms: 10, yearBuilt: 2022, totalFloors: 3, buildingType: "MONOLITHIC", buildingClass: "ELITE", renovation: "DESIGNER", userId: users[0].id, featured: true, verified: true },
+    { title: "Villa Charvak", description: "Country villa", price: 380000, propertyType: "VILLA", listingType: "SALE", address: "Charvak", city: "Tashkent", district: "Bostanlyk", bedrooms: 4, bathrooms: 3, area: 280, rooms: 7, yearBuilt: 2018, totalFloors: 2, buildingType: "BRICK", buildingClass: "BUSINESS", renovation: "EURO", userId: users[1].id, verified: true },
+    { title: "Townhouse gated", description: "3-level townhouse", price: 245000, propertyType: "TOWNHOUSE", listingType: "SALE", address: "Green Village", city: "Tashkent", district: "Chilanzar", bedrooms: 4, bathrooms: 3, area: 195, rooms: 6, yearBuilt: 2021, totalFloors: 3, buildingType: "BRICK", buildingClass: "BUSINESS", renovation: "EURO", userId: users[2].id, verified: true },
+    { title: "Townhouse rent", description: "Modern townhouse", price: 2500, propertyType: "TOWNHOUSE", listingType: "RENT", address: "Premium Res", city: "Tashkent", district: "Mirzo-Ulugbek", bedrooms: 3, bathrooms: 2, area: 160, rooms: 5, yearBuilt: 2020, totalFloors: 2, buildingType: "BRICK", buildingClass: "BUSINESS", renovation: "EURO", userId: users[0].id, verified: true },
+    { title: "Office Infinity", description: "Class A office", price: 320000, propertyType: "COMMERCIAL", listingType: "SALE", address: "BC Infinity", city: "Tashkent", district: "Mirabad", area: 250, rooms: 4, yearBuilt: 2023, floor: 10, totalFloors: 25, buildingType: "MONOLITHIC", buildingClass: "ELITE", renovation: "EURO", userId: users[2].id, verified: true },
+    { title: "Retail Chorsu", description: "Great location", price: 4500, propertyType: "COMMERCIAL", listingType: "RENT", address: "Beruni 3", city: "Tashkent", district: "Shaykhantaur", area: 120, rooms: 2, yearBuilt: 2000, floor: 1, totalFloors: 3, buildingType: "BRICK", renovation: "COSMETIC", userId: users[2].id },
+    { title: "Warehouse", description: "Warehouse 500sqm", price: 180000, propertyType: "COMMERCIAL", listingType: "SALE", address: "Sergeli Zone", city: "Tashkent", district: "Sergeli", area: 550, rooms: 3, yearBuilt: 2015, totalFloors: 1, buildingType: "BLOCK", renovation: "NONE", userId: users[2].id },
+    { title: "Restaurant Bukhara", description: "Operating restaurant", price: 2800, propertyType: "COMMERCIAL", listingType: "RENT", address: "Nakshbandi 12", city: "Bukhara", district: "Old Town", area: 280, rooms: 5, yearBuilt: 1990, floor: 1, totalFloors: 2, buildingType: "BRICK", renovation: "EURO", userId: users[3].id },
+    { title: "Plot Yangiyul", description: "10 sotka plot", price: 45000, propertyType: "LAND", listingType: "SALE", address: "Yangiyul", city: "Tashkent", district: "Yangiyul", area: 1000, userId: users[4].id, verified: true },
+    { title: "Farmland Fergana", description: "5 hectares", price: 120000, propertyType: "LAND", listingType: "SALE", address: "Fergana", city: "Fergana", district: "Fergana", area: 50000, userId: users[2].id },
+    { title: "Plot Namangan", description: "6 sotka plot", price: 18000, propertyType: "LAND", listingType: "SALE", address: "Navoi", city: "Namangan", district: "Namangan", area: 600, userId: users[4].id },
+    { title: "Daily rental", description: "Stylish apt", price: 75, propertyType: "APARTMENT", listingType: "RENT", address: "Babur 22", city: "Tashkent", district: "Mirabad", bedrooms: 2, bathrooms: 1, area: 65, rooms: 3, yearBuilt: 2018, floor: 6, totalFloors: 12, buildingType: "MONOLITHIC", buildingClass: "BUSINESS", renovation: "EURO", userId: users[1].id, verified: true },
+    { title: "Penthouse panoramic", description: "Unique penthouse", price: 650000, propertyType: "APARTMENT", listingType: "SALE", address: "Sky Tower", city: "Tashkent", district: "Yunusabad", bedrooms: 5, bathrooms: 4, area: 320, rooms: 7, yearBuilt: 2022, floor: 30, totalFloors: 30, buildingType: "MONOLITHIC", buildingClass: "ELITE", renovation: "DESIGNER", userId: users[0].id, featured: true, verified: true },
+    { title: "Mini-office", description: "Ready workspace", price: 800, propertyType: "COMMERCIAL", listingType: "RENT", address: "IT Park", city: "Tashkent", district: "Mirzo-Ulugbek", area: 30, rooms: 1, yearBuilt: 2021, floor: 3, totalFloors: 5, buildingType: "MONOLITHIC", buildingClass: "BUSINESS", renovation: "EURO", userId: users[2].id, verified: true },
+  ]
+
+  for (const p of props) {
+    const prop = await prisma.property.create({
+      data: { ...p, images: { create: [{ url: "https://picsum.photos/seed/" + p.title.substring(0,6) + "/800/600", order: 0, isPrimary: true }] }, amenities: { create: p.propertyType === "LAND" ? [] : [{ amenity: "internet" }] } }
     })
-
-    console.log(`Created property: ${property.title}`)
+    await prisma.priceHistory.create({ data: { propertyId: prop.id, price: p.price, changeType: "INITIAL" } })
   }
+  console.log("Created properties: " + props.length)
 
-  console.log('Seeding completed!')
+  console.log("=== Seeding completed! ===")
+  console.log("Default password: password123")
 }
 
-main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
+main().catch(e => { console.error(e); process.exit(1) }).finally(async () => await prisma.$disconnect())

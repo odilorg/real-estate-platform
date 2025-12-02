@@ -1,47 +1,40 @@
-import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export default withAuth(
-  function middleware(req) {
-    return NextResponse.next()
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const pathname = req.nextUrl.pathname
+export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
 
-        // Protected routes that require authentication
-        const protectedRoutes = [
-          '/dashboard',
-          '/properties/new',
-          '/properties/edit',
-          '/messages',
-          '/favorites',
-          '/profile',
-          '/agent/dashboard',
-          '/admin',
-          '/become-agent',
-        ]
+  // Check for session token cookie (next-auth stores session here)
+  const sessionToken = request.cookies.get('next-auth.session-token') || 
+                       request.cookies.get('__Secure-next-auth.session-token')
 
-        // Check if the current path starts with any protected route
-        const isProtectedRoute = protectedRoutes.some(route =>
-          pathname.startsWith(route)
-        )
+  // Protected routes that require authentication
+  const protectedRoutes = [
+    '/dashboard',
+    '/properties/new',
+    '/properties/edit',
+    '/messages',
+    '/favorites',
+    '/profile',
+    '/agent/dashboard',
+    '/admin',
+    '/become-agent',
+  ]
 
-        // If it's a protected route, require authentication
-        if (isProtectedRoute) {
-          return !!token
-        }
+  // Check if the current path starts with any protected route
+  const isProtectedRoute = protectedRoutes.some(route =>
+    pathname.startsWith(route)
+  )
 
-        // Allow access to non-protected routes
-        return true
-      },
-    },
-    pages: {
-      signIn: '/sign-in',
-    },
+  // If it's a protected route and no session token, redirect to sign-in
+  if (isProtectedRoute && !sessionToken) {
+    const signInUrl = new URL('/sign-in', request.url)
+    signInUrl.searchParams.set('callbackUrl', pathname)
+    return NextResponse.redirect(signInUrl)
   }
-)
+
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: [

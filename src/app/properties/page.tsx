@@ -459,15 +459,6 @@ function PropertiesContent() {
                   onRemoveLocation={handleRemoveLocation}
                 />
               </div>
-              <div className="relative max-w-xs hidden sm:block">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder={t('searchPlaceholder')}
-                  className="pl-9 h-9 w-full"
-                  value={query}
-                  onChange={(e) => handleQueryChange(e.target.value)}
-                />
-              </div>
               {/* Hidden save search trigger */}
               <div className="hidden">
                 <SaveSearchDialog

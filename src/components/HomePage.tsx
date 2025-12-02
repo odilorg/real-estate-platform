@@ -118,11 +118,11 @@ export function HomePage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    const type = listingType === 'buy' ? 'sale' : 'rent'
+    const type = listingType === 'buy' ? 'SALE' : 'RENT'
     const params = new URLSearchParams()
-    params.set('type', type)
+    params.set('listingType', type)
     if (searchQuery) {
-      params.set('q', searchQuery)
+      params.set('query', searchQuery)
     }
     router.push(`/properties?${params.toString()}`)
   }
@@ -193,19 +193,19 @@ export function HomePage() {
 
               {/* Quick Links */}
               <div className="flex flex-wrap justify-center gap-2 mt-4">
-                <Link href={`/properties?type=${listingType === 'buy' ? 'sale' : 'rent'}&propertyType=APARTMENT`}>
+                <Link href={`/properties?type=${listingType === 'buy' ? 'SALE' : 'RENT'}&propertyType=APARTMENT`}>
                   <Badge variant="secondary" className="cursor-pointer hover:bg-gray-200 transition-colors">
                     <Building2 className="h-3 w-3 mr-1" />
                     {tCommon('apartments')}
                   </Badge>
                 </Link>
-                <Link href={`/properties?type=${listingType === 'buy' ? 'sale' : 'rent'}&propertyType=HOUSE`}>
+                <Link href={`/properties?type=${listingType === 'buy' ? 'SALE' : 'RENT'}&propertyType=HOUSE`}>
                   <Badge variant="secondary" className="cursor-pointer hover:bg-gray-200 transition-colors">
                     <Home className="h-3 w-3 mr-1" />
                     {tCommon('houses')}
                   </Badge>
                 </Link>
-                <Link href={`/properties?type=${listingType === 'buy' ? 'sale' : 'rent'}&propertyType=COMMERCIAL`}>
+                <Link href={`/properties?type=${listingType === 'buy' ? 'SALE' : 'RENT'}&propertyType=COMMERCIAL`}>
                   <Badge variant="secondary" className="cursor-pointer hover:bg-gray-200 transition-colors">
                     <Warehouse className="h-3 w-3 mr-1" />
                     {tCommon('commercial')}

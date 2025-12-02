@@ -211,14 +211,8 @@ export async function searchProperties(filters: SearchFilters): Promise<Property
     status: 'ACTIVE',
   }
 
-  if (filters.query) {
-    where.OR = [
-      { title: { contains: filters.query } },
-      { description: { contains: filters.query } },
-      { address: { contains: filters.query } },
-      { city: { contains: filters.query } },
-    ]
-  }
+  // Store search query for case-insensitive filtering later (SQLite doesn't support mode: insensitive)
+  const searchQuery = filters.query?.toLowerCase()
 
   // Single property type filter
   if (filters.propertyType) {
@@ -338,6 +332,16 @@ export async function searchProperties(filters: SearchFilters): Promise<Property
   })
 
   let results = properties.map(transformProperty)
+
+  // Case-insensitive text search filter for SQLite
+  if (searchQuery) {
+    results = results.filter(p =>
+      p.title.toLowerCase().includes(searchQuery) ||
+      p.description.toLowerCase().includes(searchQuery) ||
+      p.address.toLowerCase().includes(searchQuery) ||
+      p.city.toLowerCase().includes(searchQuery)
+    )
+  }
 
   // Filter by amenities (must have all requested)
   if (filters.amenities && filters.amenities.length > 0) {
