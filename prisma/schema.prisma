@@ -17,7 +17,7 @@ model User {
   name          String?
   email         String    @unique
   emailVerified DateTime?
-  password      String?   // For credentials auth
+  password      String? // For credentials auth
   image         String?
   role          String    @default("USER") // USER, AGENT, ADMIN
   banned        Boolean   @default(false)
@@ -26,24 +26,24 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   // Relations
-  accounts      Account[]
-  sessions      Session[]
-  agent         Agent?
-  properties    Property[]
-  favorites     Favorite[]
-  reviews       Review[]
-  messages      Message[]
-  conversations1 Conversation[] @relation("Participant1")
-  conversations2 Conversation[] @relation("Participant2")
-  viewings      Viewing[]   @relation("Requester")
-  ownedViewings Viewing[]   @relation("Owner")
-  savedSearches SavedSearch[]
-  recentlyViewed RecentlyViewed[]
-  agentReviews  AgentReview[]
-  adminLogs     AdminLog[]
-  inquiriesSent PropertyInquiry[] @relation("InquirySender")
+  accounts          Account[]
+  sessions          Session[]
+  agent             Agent?
+  properties        Property[]
+  favorites         Favorite[]
+  reviews           Review[]
+  messages          Message[]
+  conversations1    Conversation[]    @relation("Participant1")
+  conversations2    Conversation[]    @relation("Participant2")
+  viewings          Viewing[]         @relation("Requester")
+  ownedViewings     Viewing[]         @relation("Owner")
+  savedSearches     SavedSearch[]
+  recentlyViewed    RecentlyViewed[]
+  agentReviews      AgentReview[]
+  adminLogs         AdminLog[]
+  inquiriesSent     PropertyInquiry[] @relation("InquirySender")
   inquiriesReceived PropertyInquiry[] @relation("InquiryOwner")
-  propertyNotes PropertyNote[]
+  propertyNotes     PropertyNote[]
 
   @@index([email])
   @@index([role])
@@ -92,79 +92,81 @@ model VerificationToken {
 
 // Property model - main listing entity
 model Property {
-  id          String        @id @default(cuid())
-  userId      String        // User ID of owner
-  title       String
-  description String
-  price       Float
+  id           String @id @default(cuid())
+  userId       String // User ID of owner
+  title        String
+  description  String
+  price        Float
   propertyType String
-  listingType String
-  status      String        @default("ACTIVE")
+  listingType  String
+  status       String @default("ACTIVE")
 
   // Location details
-  address     String
-  city        String
-  state       String?
-  country     String        @default("USA")
-  zipCode     String?
-  latitude    Float?
-  longitude   Float?
-  district    String?       // Neighborhood/District name
-  nearestMetro String?      // Nearest metro/transit station
-  metroDistance Int?        // Walking minutes to metro
+  address       String
+  cityId        String? // Reference to City table
+  districtId    String? // Reference to District table
+  state         String?
+  country       String  @default("USA")
+  zipCode       String?
+  latitude      Float?
+  nearestMetro  String? // Nearest metro/transit station
+  metroDistance Int? // Walking minutes to metro
 
   // Property details - Areas
   bedrooms    Int?
   bathrooms   Float?
-  area        Float?        // Total area in sq ft/m²
-  livingArea  Float?        // Living area (excluding kitchen, bathroom)
-  kitchenArea Float?        // Kitchen area
-  rooms       Int?          // Total number of rooms
+  area        Float? // Total area in sq ft/m²
+  livingArea  Float? // Living area (excluding kitchen, bathroom)
+  kitchenArea Float? // Kitchen area
+  rooms       Int? // Total number of rooms
 
   // Property details - Building info
-  yearBuilt   Int?
-  floor       Int?
-  totalFloors Int?
-  ceilingHeight Float?      // Ceiling height in meters/feet
+  yearBuilt     Int?
+  floor         Int?
+  totalFloors   Int?
+  ceilingHeight Float? // Ceiling height in meters/feet
 
   // Property details - Features
-  parking     Int?          // Number of parking spaces
-  parkingType String?       // STREET, UNDERGROUND, GARAGE, MULTI_LEVEL
-  balcony     Int?          // Number of balconies
-  loggia      Int?          // Number of loggias
+  parking     Int? // Number of parking spaces
+  parkingType String? // STREET, UNDERGROUND, GARAGE, MULTI_LEVEL
+  balcony     Int? // Number of balconies
+  loggia      Int? // Number of loggias
 
   // Building characteristics
-  buildingType  String?     // BRICK, PANEL, MONOLITHIC, WOOD, BLOCK
-  buildingClass String?     // ECONOMY, COMFORT, BUSINESS, ELITE
-  buildingName  String?     // Name of residential complex
-  elevatorPassenger Int?    // Number of passenger elevators
-  elevatorCargo     Int?    // Number of cargo elevators
+  buildingType      String? // BRICK, PANEL, MONOLITHIC, WOOD, BLOCK
+  buildingClass     String? // ECONOMY, COMFORT, BUSINESS, ELITE
+  buildingName      String? // Name of residential complex
+  elevatorPassenger Int? // Number of passenger elevators
+  elevatorCargo     Int? // Number of cargo elevators
   hasGarbageChute   Boolean @default(false)
   hasConcierge      Boolean @default(false)
   hasGatedArea      Boolean @default(false)
 
   // Apartment condition
-  renovation    String?     // NONE, COSMETIC, EURO, DESIGNER, NEEDS_REPAIR
-  windowView    String?     // COURTYARD, STREET, PARK, WATER, PANORAMIC
-  bathroomType  String?     // COMBINED, SEPARATE, MULTIPLE
-  furnished     String?     // NONE, PARTIAL, FULL
+  renovation   String? // NONE, COSMETIC, EURO, DESIGNER, NEEDS_REPAIR
+  windowView   String? // COURTYARD, STREET, PARK, WATER, PANORAMIC
+  bathroomType String? // COMBINED, SEPARATE, MULTIPLE
+  furnished    String? // NONE, PARTIAL, FULL
 
   // Metadata
-  views       Int           @default(0)
-  featured    Boolean       @default(false)
-  verified    Boolean       @default(false)  // Verified listing badge
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  views     Int      @default(0)
+  featured  Boolean  @default(false)
+  verified  Boolean  @default(false) // Verified listing badge
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  user        User          @relation(fields: [userId], references: [id])
+  user        User              @relation(fields: [userId], references: [id])
+  cityRef     City?             @relation(fields: [cityId], references: [id])
+  districtRef District?         @relation(fields: [districtId], references: [id])
   images      PropertyImage[]
   amenities   PropertyAmenity[]
   favorites   Favorite[]
   reviews     Review[]
 
   @@index([userId])
-  @@index([city])
+  @@index([cityId])
+  @@index([districtId])
   @@index([propertyType])
   @@index([listingType])
   @@index([price])
@@ -173,25 +175,25 @@ model Property {
 
 // Property images
 model PropertyImage {
-  id          String    @id @default(cuid())
-  propertyId  String
-  url         String
-  order       Int       @default(0)
-  isPrimary   Boolean   @default(false)
-  createdAt   DateTime  @default(now())
+  id         String   @id @default(cuid())
+  propertyId String
+  url        String
+  order      Int      @default(0)
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
-  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
 }
 
 // Amenities/Features
 model PropertyAmenity {
-  id          String    @id @default(cuid())
-  propertyId  String
-  amenity     String
+  id         String @id @default(cuid())
+  propertyId String
+  amenity    String
 
-  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@unique([propertyId, amenity])
   @@index([propertyId])
@@ -199,13 +201,13 @@ model PropertyAmenity {
 
 // Favorites/Wishlist
 model Favorite {
-  id          String    @id @default(cuid())
-  userId      String
-  propertyId  String
-  createdAt   DateTime  @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  propertyId String
+  createdAt  DateTime @default(now())
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@unique([userId, propertyId])
   @@index([userId])
@@ -213,16 +215,16 @@ model Favorite {
 
 // Conversation model for messaging
 model Conversation {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   propertyId    String
   participant1  String
   participant2  String
-  lastMessageAt DateTime  @default(now())
-  createdAt     DateTime  @default(now())
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
 
-  user1         User      @relation("Participant1", fields: [participant1], references: [id])
-  user2         User      @relation("Participant2", fields: [participant2], references: [id])
-  messages      Message[]
+  user1    User      @relation("Participant1", fields: [participant1], references: [id])
+  user2    User      @relation("Participant2", fields: [participant2], references: [id])
+  messages Message[]
 
   @@unique([propertyId, participant1, participant2])
   @@index([participant1])
@@ -231,15 +233,15 @@ model Conversation {
 
 // Messaging system
 model Message {
-  id             String       @id @default(cuid())
+  id             String   @id @default(cuid())
   conversationId String
   senderId       String
   content        String
-  read           Boolean      @default(false)
-  createdAt      DateTime     @default(now())
+  read           Boolean  @default(false)
+  createdAt      DateTime @default(now())
 
-  sender         User         @relation(fields: [senderId], references: [id])
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId])
   @@index([senderId])
@@ -248,17 +250,17 @@ model Message {
 
 // Reviews and ratings
 model Review {
-  id          String    @id @default(cuid())
-  propertyId  String
-  userId      String
-  rating      Int       // 1-5
-  comment     String
-  approved    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String   @id @default(cuid())
+  propertyId String
+  userId     String
+  rating     Int // 1-5
+  comment    String
+  approved   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  user        User      @relation(fields: [userId], references: [id])
-  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@unique([propertyId, userId])
   @@index([propertyId])
@@ -267,35 +269,35 @@ model Review {
 
 // Saved searches
 model SavedSearch {
-  id                   String    @id @default(cuid())
+  id                   String   @id @default(cuid())
   userId               String
   name                 String
-  filters              String    // JSON string for SQLite compatibility
-  notificationsEnabled Boolean   @default(false)
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  filters              String // JSON string for SQLite compatibility
+  notificationsEnabled Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
-  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 // Viewing appointments/scheduling
 model Viewing {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   propertyId  String
   requesterId String
   ownerId     String
   date        DateTime
-  time        String    // Time slot like "10:00 AM"
-  status      String    @default("PENDING") // PENDING, CONFIRMED, CANCELLED, COMPLETED
-  message     String?   // Optional message from requester
-  notes       String?   // Notes from owner
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  time        String // Time slot like "10:00 AM"
+  status      String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED, COMPLETED
+  message     String? // Optional message from requester
+  notes       String? // Notes from owner
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  requester   User      @relation("Requester", fields: [requesterId], references: [id])
-  owner       User      @relation("Owner", fields: [ownerId], references: [id])
+  requester User @relation("Requester", fields: [requesterId], references: [id])
+  owner     User @relation("Owner", fields: [ownerId], references: [id])
 
   @@index([propertyId])
   @@index([requesterId])
@@ -305,12 +307,12 @@ model Viewing {
 
 // Recently viewed properties
 model RecentlyViewed {
-  id          String    @id @default(cuid())
-  userId      String
-  propertyId  String
-  viewedAt    DateTime  @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  propertyId String
+  viewedAt   DateTime @default(now())
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, propertyId])
   @@index([userId])
@@ -319,26 +321,26 @@ model RecentlyViewed {
 
 // Real Estate Agency
 model Agency {
-  id              String    @id @default(cuid())
-  name            String
-  slug            String    @unique
-  logo            String?   // Logo URL
-  description     String?
-  website         String?
-  email           String?
-  phone           String?
-  address         String?
-  city            String?
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  logo        String? // Logo URL
+  description String?
+  website     String?
+  email       String?
+  phone       String?
+  address     String?
+  city        String?
 
   // Stats
-  yearsOnPlatform Int       @default(0)
-  verified        Boolean   @default(false)
+  yearsOnPlatform Int     @default(0)
+  verified        Boolean @default(false)
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  agents          Agent[]
+  agents Agent[]
 
   @@index([slug])
   @@index([city])
@@ -346,46 +348,46 @@ model Agency {
 
 // Real Estate Agent
 model Agent {
-  id              String    @id @default(cuid())
-  userId          String    @unique
-  agencyId        String?   // Optional - can be independent agent
+  id       String  @id @default(cuid())
+  userId   String  @unique
+  agencyId String? // Optional - can be independent agent
 
   // Profile info
-  firstName       String
-  lastName        String
-  photo           String?   // Profile photo URL
-  bio             String?
-  phone           String?
-  email           String?
-  whatsapp        String?
-  telegram        String?
+  firstName String
+  lastName  String
+  photo     String? // Profile photo URL
+  bio       String?
+  phone     String?
+  email     String?
+  whatsapp  String?
+  telegram  String?
 
   // Professional info
   licenseNumber   String?
-  specializations String?   // JSON array: ["residential", "commercial", "luxury"]
-  languages       String?   // JSON array: ["en", "ru", "uz"]
-  areasServed     String?   // JSON array of cities/districts
+  specializations String? // JSON array: ["residential", "commercial", "luxury"]
+  languages       String? // JSON array: ["en", "ru", "uz"]
+  areasServed     String? // JSON array of cities/districts
 
   // Stats & badges
-  yearsExperience Int       @default(0)
-  totalDeals      Int       @default(0)
-  verified        Boolean   @default(false)
-  superAgent      Boolean   @default(false)  // Top performer badge
-  responseTime    String?   // "fast", "medium", "slow"
-  rating          Float     @default(0)
-  reviewCount     Int       @default(0)
+  yearsExperience Int     @default(0)
+  totalDeals      Int     @default(0)
+  verified        Boolean @default(false)
+  superAgent      Boolean @default(false) // Top performer badge
+  responseTime    String? // "fast", "medium", "slow"
+  rating          Float   @default(0)
+  reviewCount     Int     @default(0)
 
   // Settings
-  showPhone       Boolean   @default(true)
-  showEmail       Boolean   @default(true)
+  showPhone Boolean @default(true)
+  showEmail Boolean @default(true)
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  user            User        @relation(fields: [userId], references: [id])
-  agency          Agency?     @relation(fields: [agencyId], references: [id])
-  reviews         AgentReview[]
+  user    User          @relation(fields: [userId], references: [id])
+  agency  Agency?       @relation(fields: [agencyId], references: [id])
+  reviews AgentReview[]
 
   @@index([userId])
   @@index([agencyId])
@@ -395,17 +397,17 @@ model Agent {
 
 // Agent Reviews
 model AgentReview {
-  id          String    @id @default(cuid())
-  agentId     String
-  userId      String
-  rating      Int       // 1-5
-  comment     String?
-  dealType    String?   // "bought", "sold", "rented"
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  agentId   String
+  userId    String
+  rating    Int // 1-5
+  comment   String?
+  dealType  String? // "bought", "sold", "rented"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user        User      @relation(fields: [userId], references: [id])
-  agent       Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id])
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@unique([agentId, userId])
   @@index([agentId])
@@ -414,31 +416,31 @@ model AgentReview {
 
 // Agent Application - for users wanting to become agents
 model AgentApplication {
-  id              String    @id @default(cuid())
-  userId          String    @unique  // Clerk user ID
+  id     String @id @default(cuid())
+  userId String @unique // Clerk user ID
 
   // Application info
-  firstName       String
-  lastName        String
-  email           String
-  phone           String
+  firstName String
+  lastName  String
+  email     String
+  phone     String
 
   // Professional info
-  companyName     String?   // Agency name if they have one
+  companyName     String? // Agency name if they have one
   licenseNumber   String?
-  yearsExperience Int       @default(0)
+  yearsExperience Int     @default(0)
   bio             String?
-  specializations String?   // JSON array
-  areasServed     String?   // JSON array
+  specializations String? // JSON array
+  areasServed     String? // JSON array
 
   // Status
   status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
   rejectionReason String?
-  reviewedBy      String?   // Admin who reviewed
+  reviewedBy      String? // Admin who reviewed
   reviewedAt      DateTime?
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
@@ -447,15 +449,15 @@ model AgentApplication {
 
 // Admin action log for audit trail
 model AdminLog {
-  id          String    @id @default(cuid())
-  adminId     String
-  action      String    // Action type (BAN_USER, DELETE_PROPERTY, etc.)
-  targetType  String    // Type of target (USER, PROPERTY, REVIEW)
-  targetId    String    // ID of target
-  details     String?   // JSON details
-  createdAt   DateTime  @default(now())
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String // Action type (BAN_USER, DELETE_PROPERTY, etc.)
+  targetType String // Type of target (USER, PROPERTY, REVIEW)
+  targetId   String // ID of target
+  details    String? // JSON details
+  createdAt  DateTime @default(now())
 
-  admin       User      @relation(fields: [adminId], references: [id])
+  admin User @relation(fields: [adminId], references: [id])
 
   @@index([adminId])
   @@index([action])
@@ -464,11 +466,11 @@ model AdminLog {
 
 // Price History - track price changes for properties
 model PriceHistory {
-  id          String    @id @default(cuid())
-  propertyId  String
-  price       Float
-  changeType  String    @default("UPDATE") // INITIAL, UPDATE, REDUCTION, INCREASE
-  changedAt   DateTime  @default(now())
+  id         String   @id @default(cuid())
+  propertyId String
+  price      Float
+  changeType String   @default("UPDATE") // INITIAL, UPDATE, REDUCTION, INCREASE
+  changedAt  DateTime @default(now())
 
   @@index([propertyId])
   @@index([changedAt])
@@ -476,9 +478,9 @@ model PriceHistory {
 
 // Property Inquiry - for users to contact owners/agents about properties
 model PropertyInquiry {
-  id          String    @id @default(cuid())
-  propertyId  String
-  ownerId     String
+  id         String @id @default(cuid())
+  propertyId String
+  ownerId    String
 
   // Inquiry sender info (can be logged in or guest)
   senderId    String?
@@ -488,19 +490,19 @@ model PropertyInquiry {
 
   // Inquiry details
   message     String
-  inquiryType String    @default("GENERAL") // GENERAL, VIEWING, PRICE, DETAILS
+  inquiryType String @default("GENERAL") // GENERAL, VIEWING, PRICE, DETAILS
 
   // Status
   status      String    @default("NEW") // NEW, READ, RESPONDED, ARCHIVED
-  response    String?   // Owner's response
+  response    String? // Owner's response
   respondedAt DateTime?
 
   // Metadata
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  owner       User      @relation("InquiryOwner", fields: [ownerId], references: [id])
-  sender      User?     @relation("InquirySender", fields: [senderId], references: [id])
+  owner  User  @relation("InquiryOwner", fields: [ownerId], references: [id])
+  sender User? @relation("InquirySender", fields: [senderId], references: [id])
 
   @@index([propertyId])
   @@index([ownerId])
@@ -511,16 +513,82 @@ model PropertyInquiry {
 
 // Property Notes - personal notes users can add to properties
 model PropertyNote {
-  id          String    @id @default(cuid())
-  userId      String
-  propertyId  String
-  content     String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String   @id @default(cuid())
+  userId     String
+  propertyId String
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, propertyId])
   @@index([userId])
   @@index([propertyId])
+}
+
+// ============ Location Models ============
+
+// Region/Oblast (e.g., Tashkent Region, Samarkand Region)
+model Region {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  nameEn    String
+  nameRu    String
+  nameUz    String
+  code      String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cities City[]
+
+  @@index([slug])
+  @@index([sortOrder])
+}
+
+// City (e.g., Tashkent, Samarkand, Bukhara)
+model City {
+  id         String   @id @default(cuid())
+  regionId   String
+  slug       String   @unique
+  nameEn     String
+  nameRu     String
+  nameUz     String
+  isCapital  Boolean  @default(false)
+  population Int?
+  sortOrder  Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  region     Region     @relation(fields: [regionId], references: [id])
+  districts  District[]
+  properties Property[]
+
+  @@index([regionId])
+  @@index([slug])
+  @@index([sortOrder])
+}
+
+// District/Neighborhood (e.g., Yunusabad, Mirzo-Ulugbek)
+model District {
+  id        String   @id @default(cuid())
+  cityId    String
+  slug      String
+  nameEn    String
+  nameRu    String
+  nameUz    String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  city       City       @relation(fields: [cityId], references: [id])
+  properties Property[]
+
+  @@unique([cityId, slug])
+  @@index([cityId])
+  @@index([slug])
 }
