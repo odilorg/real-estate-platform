@@ -26,12 +26,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const areaText = property.area ? `, ${property.area} m²` : ''
   const floorText = property.floor && property.totalFloors ? `, floor ${property.floor}/${property.totalFloors}` : ''
 
-  const title = `${listingAction} ${roomsText}${propertyTypeText}${areaText}${floorText} in ${property.city} - $${property.price.toLocaleString()}`
+  const title = `${listingAction} ${roomsText}${propertyTypeText}${areaText}${floorText} in ${property.city?.nameEn || ''} - $${property.price.toLocaleString()}`
 
   // Build description (max 160 chars for SEO)
   const description = property.description
     ? property.description.substring(0, 155) + (property.description.length > 155 ? '...' : '')
-    : `${listingAction} this ${roomsText}${propertyTypeText.toLowerCase()} in ${property.city}, ${property.district || property.state || ''}. ${property.area ? `Area: ${property.area} m².` : ''} Price: $${property.price.toLocaleString()}${property.listingType === 'RENT' ? '/month' : ''}.`
+    : `${listingAction} this ${roomsText}${propertyTypeText.toLowerCase()} in ${property.city?.nameEn || ''}, ${property.district?.nameEn || property.state || ''}. ${property.area ? `Area: ${property.area} m².` : ''} Price: $${property.price.toLocaleString()}${property.listingType === 'RENT' ? '/month' : ''}.`
 
   // Get primary image
   const primaryImage = property.images?.[0] || null
@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       'product:price:amount': property.price.toString(),
       'product:price:currency': 'USD',
       // Location meta
-      'geo.placename': property.city,
+      'geo.placename': property.city?.nameEn || '',
       'geo.region': property.state || '',
     },
   }
@@ -179,7 +179,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
   // Get similar properties (same city, different id)
   const allProperties = await getAllProperties()
   const similarProperties = allProperties
-    .filter((p) => p.city === property.city && p.id !== property.id)
+    .filter((p) => p.city?.nameEn === property.city?.nameEn && p.id !== property.id)
     .slice(0, 3)
 
   // Helper to get label for enum values
@@ -243,15 +243,15 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 {/* Location Row */}
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-gray-600 text-sm mb-3">
                   <span>
-                    {property.city}
-                    {property.district && `, ${property.district}`}
+                    {property.city?.nameEn || ''}
+                    {property.district?.nameEn && `, ${property.district?.nameEn || ''}`}
                     {property.state && `, ${property.state}`}
                   </span>
                   <PropertyPageActions
                     propertyId={property.id}
                     propertyTitle={property.title}
                     propertyPrice={property.price}
-                    propertyCity={property.city}
+                    propertyCity={property.city?.nameEn || ''}
                     ownerId={property.userId}
                     latitude={property.latitude}
                     longitude={property.longitude}
@@ -301,7 +301,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     propertyId={property.id}
                     propertyTitle={property.title}
                     propertyPrice={property.price}
-                    propertyCity={property.city}
+                    propertyCity={property.city?.nameEn || ''}
                     ownerId={property.userId}
                     latitude={property.latitude}
                     longitude={property.longitude}
@@ -426,10 +426,10 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                           <span className="text-gray-600">{t('listingType')}</span>
                           <span className="font-medium">{property.listingType === 'SALE' ? t('badges.forSale') : t('badges.forRent')}</span>
                         </div>
-                        {property.district && (
+                        {property.district?.nameEn && (
                           <div className="flex justify-between py-2 border-b border-gray-100">
                             <span className="text-gray-600">{t('fields.district')}</span>
-                            <span className="font-medium">{property.district}</span>
+                            <span className="font-medium">{property.district?.nameEn || ''}</span>
                           </div>
                         )}
                       </div>
@@ -729,7 +729,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     latitude={property.latitude}
                     longitude={property.longitude}
                     title={property.title}
-                    address={`${property.address}, ${property.city}, ${property.state} ${property.zipCode}`}
+                    address={`${property.address}, ${property.city?.nameEn || ''}, ${property.state} ${property.zipCode}`}
                   />
                 </CardContent>
               </Card>
@@ -757,15 +757,15 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               <NeighborhoodSection
                 latitude={property.latitude}
                 longitude={property.longitude}
-                district={property.district}
-                city={property.city}
+                district={property.district?.nameEn || ''}
+                city={property.city?.nameEn || ''}
               />
 
               {/* Similar Properties - Inside Main Content */}
               {similarProperties.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>{t('similarPropertiesIn', { city: property.city })}</CardTitle>
+                    <CardTitle>{t('similarPropertiesIn', { city: property.city?.nameEn || '' })}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {similarProperties.map((prop) => (
@@ -883,7 +883,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               </Card>
 
               {/* Location Info */}
-              {(property.nearestMetro || property.district) && (
+              {(property.nearestMetro || property.district?.nameEn) && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -892,10 +892,10 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
-                    {property.district && (
+                    {property.district?.nameEn && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">{t('fields.district')}:</span>
-                        <span className="font-semibold">{property.district}</span>
+                        <span className="font-semibold">{property.district?.nameEn || ''}</span>
                       </div>
                     )}
                     {property.nearestMetro && (

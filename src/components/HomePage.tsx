@@ -565,7 +565,7 @@ function PropertyCard({
           </h3>
           <p className="text-sm text-gray-500 flex items-center gap-1 mb-3">
             <MapPin className="h-3 w-3 flex-shrink-0" />
-            <span className="truncate">{property.address}, {property.city}</span>
+            <span className="truncate">{property.address}, {property.city?.nameEn || ''}</span>
           </p>
 
           {/* Property Details */}

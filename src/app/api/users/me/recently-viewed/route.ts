@@ -31,6 +31,18 @@ export async function GET() {
           orderBy: { order: 'asc' },
           take: 1,
         },
+        cityRef: true,
+        },
+        cityRef: true,
+      },
+    })
+
+    // dummy placeholder
+          orderBy: { order: 'asc' },
+          take: 1,
+        },
+        cityRef: true,
+        },
       },
     })
 
@@ -46,7 +58,7 @@ export async function GET() {
         listingType: property.listingType,
         propertyType: property.propertyType,
         address: property.address,
-        city: property.city,
+        city: property.cityRef?.nameEn || "",
         bedrooms: property.bedrooms,
         bathrooms: property.bathrooms,
         area: property.area,

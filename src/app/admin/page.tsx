@@ -154,7 +154,7 @@ export default async function AdminDashboardPage() {
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900">{property.title}</h4>
                     <p className="text-sm text-gray-600">
-                      {property.city}, {property.state} - {property.propertyType}
+                      {property.city?.nameEn || ''}, {property.state} - {property.propertyType}
                     </p>
                   </div>
                   <div className="text-right">

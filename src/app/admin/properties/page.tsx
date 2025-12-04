@@ -92,7 +92,7 @@ export default async function AdminPropertiesPage() {
                         <h3 className="font-semibold text-lg">{property.title}</h3>
                         <div className="flex items-center text-sm text-gray-600 mt-1">
                           <MapPin className="h-3 w-3 mr-1" />
-                          {property.city}, {property.state}
+                          {property.city?.nameEn || ''}, {property.state}
                           <span className="mx-2">|</span>
                           <Building className="h-3 w-3 mr-1" />
                           {property.propertyType}

@@ -174,7 +174,7 @@ export function PropertiesTab() {
                 </h3>
                 <div className="flex items-center text-sm text-gray-600">
                   <MapPin className="h-3 w-3 mr-1" />
-                  <span className="line-clamp-1">{property.city}, {property.state}</span>
+                  <span className="line-clamp-1">{property.city?.nameEn || ''}, {property.state}</span>
                 </div>
               </div>
 

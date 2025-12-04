@@ -104,7 +104,7 @@ export function RecentlyViewed() {
                   </h4>
                   <p className="text-xs text-gray-500 flex items-center mt-1">
                     <MapPin className="h-3 w-3 mr-1" />
-                    {property.city}{property.state ? `, ${property.state}` : ''}
+                    {property.city?.nameEn || ''}{property.state ? `, ${property.state}` : ''}
                   </p>
                   <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
                     {property.bedrooms && (

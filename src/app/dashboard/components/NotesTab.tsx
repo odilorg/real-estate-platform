@@ -177,7 +177,7 @@ export function NotesTab() {
                       </Link>
                       <p className="text-sm text-gray-500 flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
-                        {note.property.city}
+                        {note.property.city?.nameEn || ''}
                       </p>
                       <p className="text-lg font-bold text-blue-600">
                         {formatPrice(note.property.price)}

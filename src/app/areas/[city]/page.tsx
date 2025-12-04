@@ -304,7 +304,7 @@ export default function CityAreaPage({ params }: { params: Promise<{ city: strin
                                   <p className="text-sm text-gray-500 flex items-center gap-1 mb-2">
                                     <MapPin className="h-3 w-3" />
                                     {property.address}
-                                    {property.district && `, ${property.district}`}
+                                    {property.district && `, ${property.district?.nameEn || ''}`}
                                   </p>
 
                                   <p className="text-xl font-bold text-blue-600 mb-2">

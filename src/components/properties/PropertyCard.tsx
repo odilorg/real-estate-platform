@@ -36,6 +36,8 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
   const favorite = isFavorite(property.id)
   const inComparison = isInComparison(property.id)
 
+  // Get city name for display (from location object)
+  const cityName = property.city?.nameEn || ''
   // Image gallery navigation
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -108,7 +110,7 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
     if (property.latitude && property.longitude) {
       router.push(`/properties?view=map&lat=${property.latitude}&lng=${property.longitude}&zoom=15`)
     } else {
-      router.push(`/properties?view=map&city=${encodeURIComponent(property.city)}`)
+      router.push(`/properties?view=map&city=${encodeURIComponent(cityName)}`)
     }
   }
 
@@ -144,7 +146,7 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
         listingType: property.listingType,
         propertyType: property.propertyType,
         address: property.address,
-        city: property.city,
+        city: cityName,
         state: property.state ?? undefined,
         bedrooms: property.bedrooms ?? undefined,
         bathrooms: property.bathrooms ?? undefined,
@@ -205,7 +207,7 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
                   <h3 className="font-medium text-sm truncate">{property.title}</h3>
                   <p className="text-xs text-gray-500 truncate flex items-center gap-1 mt-0.5">
                     <MapPin className="h-3 w-3" />
-                    {property.city}{property.state && `, ${property.state}`}
+                    {cityName}{property.state && `, ${property.state}`}
                   </p>
                 </div>
                 <Button
@@ -403,7 +405,7 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
               {/* Location with map link */}
               <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-2">
                 <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
-                <span className="truncate">{property.address}, {property.city}</span>
+                <span className="truncate">{property.address}, {cityName}</span>
                 <button
                   onClick={handleMapClick}
                   className="ml-2 text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 flex-shrink-0 text-xs sm:text-sm"

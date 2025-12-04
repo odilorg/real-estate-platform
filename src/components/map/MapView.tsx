@@ -243,7 +243,7 @@ export function MapView({
                       </p>
                       <h3 className="font-semibold text-sm mb-1 line-clamp-1">{property.title}</h3>
                       <p className="text-xs text-gray-500 mb-2 line-clamp-1">
-                        {property.address}, {property.city}
+                        {property.address}, {property.city?.nameEn || ''}
                       </p>
                       <div className="flex items-center gap-3 text-xs text-gray-600">
                         {property.bedrooms && <span>{property.bedrooms} bed</span>}

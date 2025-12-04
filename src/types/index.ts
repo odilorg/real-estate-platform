@@ -1,5 +1,31 @@
 // Shared type definitions for the real estate platform
 
+// Location types for unified location system
+export interface PropertyRegion {
+  id: string
+  slug: string
+  nameEn: string
+  nameRu: string
+  nameUz: string
+}
+
+export interface PropertyCity {
+  id: string
+  slug: string
+  nameEn: string
+  nameRu: string
+  nameUz: string
+  region?: PropertyRegion | null
+}
+
+export interface PropertyDistrict {
+  id: string
+  slug: string
+  nameEn: string
+  nameRu: string
+  nameUz: string
+}
+
 // Agent/Seller info for property cards
 export interface PropertyAgent {
   id: string
@@ -27,13 +53,15 @@ export interface Property {
   status: string
   // Location details
   address: string
-  city: string
+  cityId: string | null
+  districtId: string | null
+  city?: PropertyCity | null
+  district?: PropertyDistrict | null
   state: string | null
   country: string
   zipCode: string | null
   latitude: number | null
   longitude: number | null
-  district: string | null
   nearestMetro: string | null
   metroDistance: number | null
   // Property details - Areas

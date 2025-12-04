@@ -147,11 +147,11 @@ export default function EditPropertyPage() {
           price: property.price,
           // Location
           address: property.address,
-          city: property.city,
+          city: property.city?.nameEn || '',
           state: property.state || '',
           country: property.country || 'USA',
           zipCode: property.zipCode || '',
-          district: property.district || '',
+          district: property.district?.nameEn || '',
           nearestMetro: property.nearestMetro || '',
           metroDistance: property.metroDistance || undefined,
           latitude: property.latitude || undefined,
