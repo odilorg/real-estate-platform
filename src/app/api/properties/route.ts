@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { propertySchema } from '@/lib/validations/property'
 import { getAllProperties, createProperty } from '@/lib/db'
+import { prisma } from '@/lib/prisma'
 
 // GET /api/properties - List all properties
 export async function GET() {
@@ -31,6 +32,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Verify user exists in database (session may be stale after database reset)
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true }
+    })
+
+    if (!userExists) {
+      return NextResponse.json(
+        { error: 'Session expired. Please log out and log in again.' },
+        { status: 401 }
+      )
+    }
+
     // Parse and validate request body
     const body = await request.json()
     const validatedData = propertySchema.parse(body)
@@ -50,6 +64,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.errors },
         { status: 400 }
+      )
+    }
+
+    // Handle Prisma foreign key constraint errors
+    if (error.code === 'P2003') {
+      return NextResponse.json(
+        { error: 'Session expired. Please log out and log in again.' },
+        { status: 401 }
       )
     }
 

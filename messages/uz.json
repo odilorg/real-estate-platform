@@ -400,7 +400,12 @@
     },
     "details": {
       "description": "Tavsif",
-      "features": "Xususiyatlar va qulayliklar",
+      "features": {
+        "title": "Xususiyatlar",
+        "garbageChute": "Axlat quvuri",
+        "concierge": "Konsyerj",
+        "gatedCommunity": "Yopiq hudud"
+      },
       "location": "Joylashuv",
       "locationInfo": "Joylashuv ma'lumotlari",
       "contactAgent": "Agent bilan bog'lanish",
@@ -509,12 +514,6 @@
         "gas": "Gaz",
         "roadAccess": "Yo'l kirishi",
         "contactAgentToConfirm": "Kommunikatsiyalar mavjudligini tasdiqlash uchun agent bilan bog'laning"
-      },
-      "features": {
-        "title": "Xususiyatlar",
-        "garbageChute": "Axlat quvuri",
-        "concierge": "Konsyerj",
-        "gatedCommunity": "Yopiq hudud"
       },
       "neighborhood": {
         "title": "Hudud infratuzilmasi",
@@ -767,7 +766,7 @@
     "addFirstProperty": "Birinchi mulkni joylashtirish",
     "addNew": "Qo'shish",
     "editProperty": "Tahrirlash",
-    "deleteProperty": "O'chirish",
+    "deleteProperty": "Mulkni o'chirish",
     "viewProperty": "Ko'rish",
     "propertyStatus": "Holat",
     "active": "Faol",
@@ -794,11 +793,10 @@
     "browseListingsDesc": "Yangi mulklarni kashf eting",
     "settings": "Sozlamalar",
     "settingsDesc": "Hisob va sozlamalarni boshqaring",
-    "notes": "Eslatmalar",
+    "notes": "Izohlar",
     "myNotes": "Mening eslatmalarim",
     "noNotes": "Hali eslatmalar yo'q",
     "noNotesDesc": "Sizni qiziqtirgan mulklarga eslatmalar qo'shing.",
-    "browseProperties": "Mulklarni ko'rish",
     "savedSearches": "Saqlangan qidiruvlar",
     "viewings": "Ko'rishlar",
     "viewingsDesc": "Mulk ko'rish so'rovlarini boshqaring",
@@ -813,7 +811,6 @@
     "markCompleted": "Bajarilgan deb belgilash",
     "cancelRequest": "So'rovni bekor qilish",
     "message": "Xabar",
-    "notes": "Izohlar",
     "confirmed": "Tasdiqlangan",
     "cancelled": "Bekor qilingan",
     "completed": "Bajarilgan",
@@ -828,7 +825,6 @@
     "messagesComingSoon": "Xabarlar tez orada",
     "messagesComingSoonDesc": "Xabar almashish funksiyasi ishlab chiqilmoqda. Tez orada mulk egalari va qiziquvchi xaridorlar bilan to'g'ridan-to'g'ri suhbatlasha olasiz.",
     "messagesSubtitle": "Xaridorlar va sotuvchilar bilan muloqot qiling",
-    "deleteProperty": "Mulkni o'chirish",
     "deletePropertyConfirm": "Ushbu mulkni o'chirishga ishonchingiz komilmi? Bu amalni qaytarib bo'lmaydi. Mulk platformadan butunlay o'chiriladi.",
     "deleting": "O'chirilmoqda...",
     "cancel": "Bekor qilish",
@@ -1266,6 +1262,104 @@
       "benefit3": "Tahlil va so'rovlarni boshqarish",
       "benefit4": "Tasdiqlangan agent nishoni",
       "apply": "Ariza topshirish"
+    }
+  },
+  "legal": {
+    "terms": {
+      "title": "Foydalanish shartlari",
+      "lastUpdated": "Songgi yangilanish",
+      "sections": {
+        "acceptance": {
+          "title": "Shartlarni qabul qilish",
+          "content": "EstateHub veb-saytiga kirish va undan foydalanish orqali siz ushbu Foydalanish shartlarini oqib chiqqaningizni va ularga rioya qilishga rozilik bildirasiz."
+        },
+        "services": {
+          "title": "Bizning xizmatlarimiz",
+          "content": "EstateHub kochmas mulk bozoridagi sotuvchilar, xaridorlar, ijarachilar va ijara beruvchilarni boglovchi onlayn platforma hisoblanadi."
+        },
+        "userAccounts": {
+          "title": "Foydalanuvchi hisoblari",
+          "content": "Hisobingizni royxatdan otkazishda togri va toliq malumot berishingiz shart. Hisobingizning maxfiyligi sizning javobgarligingizda."
+        },
+        "listingPolicies": {
+          "title": "Elonlar qoidalari",
+          "content": "Barcha mulk elonlari togri va haqiqatga mos bolishi kerak. Soxta yoki aldovchi elonlarni joylashtirish taqiqlanadi."
+        },
+        "prohibitedActivities": {
+          "title": "Taqiqlangan faoliyat",
+          "content": "Foydalanuvchilar quyidagilarni amalga oshirish taqiqlanadi: firibgarlik, soxta malumot joylashtirish, boshqalar huquqlarini buzish."
+        },
+        "intellectualProperty": {
+          "title": "Intellektual mulk",
+          "content": "Barcha kontent, dizayn va funksionallik EstateHub va uning litsenziarlarining intellektual mulki hisoblanadi."
+        },
+        "disclaimers": {
+          "title": "Masuliyatni rad etish",
+          "content": "EstateHub platformasi bor holaticha taqdim etiladi. Biz platformadagi malumotlarning toliq togriligini kafolatlamaymiz."
+        },
+        "liability": {
+          "title": "Javobgarlikni cheklash",
+          "content": "EstateHub platformadan foydalanish natijasida yuzaga keladigan zararlar uchun javobgar emas."
+        },
+        "termination": {
+          "title": "Bekor qilish",
+          "content": "Biz ushbu shartlarni buzgan foydalanuvchining hisobini ogohlantirishsiz bekor qilish huquqini saqlab qolamiz."
+        },
+        "changes": {
+          "title": "Shartlar ozgarishlari",
+          "content": "Biz ushbu Foydalanish shartlarini istalgan vaqtda ozgartirish huquqini saqlab qolamiz."
+        },
+        "contact": {
+          "title": "Biz bilan boglanish",
+          "content": "Ushbu Foydalanish shartlari boyicha savollar bolsa, biz bilan boglaning"
+        }
+      }
+    },
+    "privacy": {
+      "title": "Maxfiylik siyosati",
+      "lastUpdated": "Songgi yangilanish",
+      "sections": {
+        "introduction": {
+          "title": "Kirish",
+          "content": "EstateHubda biz sizning maxfiyligingizga hurmat bilan qaraymiz. Ushbu siyosat malumotlaringizni qanday himoya qilishimizni tushuntiradi."
+        },
+        "collection": {
+          "title": "Biz toplaydigan malumotlar",
+          "content": "Biz quyidagi malumotlarni toplaymiz: shaxsiy malumotlar (ism, email, telefon), hisob malumotlari, qidiruv tarixi."
+        },
+        "usage": {
+          "title": "Malumotlardan foydalanish",
+          "content": "Sizning malumotlaringiz quyidagi maqsadlarda ishlatiladi: xizmatlarimizni taqdim etish, mulk sorovlarini yuborish."
+        },
+        "sharing": {
+          "title": "Malumotlarni ulashish",
+          "content": "Biz sizning shaxsiy malumotlaringizni sotmaymiz. Malumotlar faqat mulk egasi yoki agentlari bilan ulashilishi mumkin."
+        },
+        "security": {
+          "title": "Malumotlar xavfsizligi",
+          "content": "Biz sizning malumotlaringizni himoya qilish uchun sanoat standartlaridagi xavfsizlik choralarini qollaymiz."
+        },
+        "cookies": {
+          "title": "Cookie fayllar",
+          "content": "Biz tajribangizni yaxshilash uchun cookie fayllardan foydalanamiz. Siz brauzer sozlamalaridan boshqarishingiz mumkin."
+        },
+        "rights": {
+          "title": "Sizning huquqlaringiz",
+          "content": "Siz quyidagi huquqlarga egasiz: malumotlaringizga kirish, notogri malumotlarni togrilash, ochirishni sorash."
+        },
+        "children": {
+          "title": "Bolalar maxfiyligi",
+          "content": "Bizning xizmatlarimiz 18 yoshdan kichik shaxslar uchun moljallangan emas."
+        },
+        "changes": {
+          "title": "Siyosat ozgarishlari",
+          "content": "Biz ushbu Maxfiylik siyosatini vaqti-vaqti bilan yangilashimiz mumkin."
+        },
+        "contact": {
+          "title": "Biz bilan boglanish",
+          "content": "Savollar bolsa, biz bilan boglaning"
+        }
+      }
     }
   }
 }

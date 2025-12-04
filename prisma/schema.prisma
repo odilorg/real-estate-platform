@@ -105,13 +105,14 @@ model Property {
   address     String
   city        String
   state       String?
-  country     String        @default("USA")
+  country     String        @default("Uzbekistan")
   zipCode     String?
   latitude    Float?
   longitude   Float?
   district    String?       // Neighborhood/District name
   nearestMetro String?      // Nearest metro/transit station
   metroDistance Int?        // Walking minutes to metro
+  locationId  String?       // Reference to Location for structured search
 
   // Property details - Areas
   bedrooms    Int?
@@ -158,6 +159,7 @@ model Property {
 
   // Relations
   user        User          @relation(fields: [userId], references: [id])
+  location    Location?     @relation("PropertyLocation", fields: [locationId], references: [id])
   images      PropertyImage[]
   amenities   PropertyAmenity[]
   favorites   Favorite[]
@@ -169,6 +171,7 @@ model Property {
   @@index([listingType])
   @@index([price])
   @@index([buildingClass])
+  @@index([locationId])
 }
 
 // Property images
@@ -523,4 +526,36 @@ model PropertyNote {
   @@unique([userId, propertyId])
   @@index([userId])
   @@index([propertyId])
+}
+
+// ============ Location Models ============
+
+// Location model for cities, districts, regions with multilingual support
+model Location {
+  id          String     @id // slug: "tashkent", "samarkand-city"
+  type        String     // REGION, CITY, DISTRICT, METRO, RESIDENTIAL_COMPLEX
+  name_ru     String     // Russian name: "Ташкент"
+  name_uz     String     // Uzbek Latin name: "Toshkent"
+  name_en     String?    // English name (optional): "Tashkent"
+  parentId    String?    // Parent location ID (district -> city -> region)
+  latitude    Float?     // Center coordinates for map
+  longitude   Float?
+  population  Int?       // For sorting by importance
+  isPopular   Boolean    @default(false) // Featured in quick select
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Self-relation for hierarchy
+  parent      Location?  @relation("LocationHierarchy", fields: [parentId], references: [id])
+  children    Location[] @relation("LocationHierarchy")
+
+  // Properties in this location
+  properties  Property[] @relation("PropertyLocation")
+
+  @@index([type])
+  @@index([parentId])
+  @@index([name_ru])
+  @@index([name_uz])
+  @@index([isPopular])
 }

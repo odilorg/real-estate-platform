@@ -8,7 +8,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PropertyRating } from './PropertyRating'
-import { Heart, MapPin, Bed, Bath, Maximize, Calendar, GitCompare, Check, Map, Printer, Flag, Phone, Building2, Shield, Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ContactModal } from '@/components/agents/ContactModal'
+import { Heart, MapPin, Bed, Bath, Maximize, Calendar, GitCompare, Check, Map, Printer, Flag, Phone, Building2, Shield, Eye, EyeOff, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react'
 import { useFavorites } from '@/contexts/FavoritesContext'
 import { useComparison } from '@/contexts/ComparisonContext'
 import { useSession } from 'next-auth/react'
@@ -30,6 +31,7 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
   const t = useTranslations('property')
   const tAgent = useTranslations('agent')
   const [showPhone, setShowPhone] = useState(false)
+  const [showContactModal, setShowContactModal] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const favorite = isFavorite(property.id)
   const inComparison = isInComparison(property.id)
@@ -64,6 +66,22 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
         setTimeout(() => printWindow.print(), 500)
       }
     }
+  }
+
+  // Handle message button click
+  const handleMessageClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!user) {
+      toast.info('Please sign in to send messages', {
+        action: {
+          label: 'Sign In',
+          onClick: () => router.push('/sign-in'),
+        },
+      })
+      return
+    }
+    setShowContactModal(true)
   }
 
   // Handle report
@@ -340,18 +358,23 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
           {/* Content Section */}
           <CardContent className="flex-1 p-3 sm:p-4">
             <div className="flex flex-col h-full">
-              {/* Title - Cian style */}
+              {/* Title - Cian style: actual title as prominent blue link */}
               <Link
                 href={`/properties/${property.id}`}
-                className="block hover:text-blue-600 transition-colors mb-1"
+                className="block text-blue-600 hover:text-blue-800 hover:underline transition-colors mb-2"
               >
-                <h3 className="text-sm sm:text-base font-medium line-clamp-1">
-                  {property.rooms ? `${property.rooms}-${t('room')} ` : ''}
-                  {property.propertyType.toLowerCase()}
-                  {property.area ? `, ${property.area} ${t('sqm')}` : ''}
-                  {property.floor && property.totalFloors ? `, ${property.floor}/${property.totalFloors} ${t('floor')}` : ''}
+                <h3 className="text-lg sm:text-xl font-bold line-clamp-2">
+                  {property.title}
                 </h3>
               </Link>
+
+              {/* Property type and specs line - h4 for SEO hierarchy */}
+              <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">
+                {property.rooms ? `${property.rooms}-${t('room')} ` : ''}
+                {property.propertyType.toLowerCase()}
+                {property.area ? `, ${property.area} ${t('sqm')}` : ''}
+                {property.floor && property.totalFloors ? `, ${property.floor}/${property.totalFloors} ${t('floor')}` : ''}
+              </h4>
 
               {/* Property specs */}
               <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-600 mb-2">
@@ -534,6 +557,17 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
                   )}
                 </Button>
               )}
+
+              {/* Write message button */}
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full"
+                onClick={handleMessageClick}
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                {tAgent('writeMessage')}
+              </Button>
             </div>
           ) : (
             <div className="space-y-3">
@@ -551,18 +585,35 @@ export function PropertyCard({ property, compact = false }: PropertyCardProps) {
                 size="sm"
                 variant="outline"
                 className="w-full"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  router.push(`/properties/${property.id}`)
-                }}
+                onClick={handleMessageClick}
               >
-                {tAgent('contactOwner')}
+                <MessageCircle className="h-4 w-4 mr-2" />
+                {tAgent('writeMessage')}
               </Button>
             </div>
           )}
         </div>
       </div>
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={showContactModal}
+        onClose={() => setShowContactModal(false)}
+        propertyId={property.id}
+        property={{
+          title: property.title,
+          price: property.price,
+          currency: 'USD',
+          image: property.images[0] || null,
+        }}
+        recipient={{
+          name: property.agent
+            ? `${property.agent.firstName} ${property.agent.lastName}`
+            : tAgent('privateOwner') || 'Private Owner',
+          photo: property.agent?.photo,
+          isAgent: !!property.agent,
+        }}
+      />
     </Card>
   )
 }

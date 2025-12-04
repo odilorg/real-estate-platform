@@ -25,6 +25,7 @@ interface ImageUploaderProps {
 export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploaderProps) {
   const t = useTranslations('properties.form.imageUploader')
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
 
   const { startUpload, isUploading } = useUploadThing("propertyImages", {
@@ -33,10 +34,15 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
       onChange([...images, ...newUrls])
       toast.success(t('uploadSuccess', { count: files.length }))
       setUploading(false)
+      setUploadProgress(0)
     },
     onUploadError: (error) => {
       toast.error(`Upload failed: ${error.message}`)
       setUploading(false)
+      setUploadProgress(0)
+    },
+    onUploadProgress: (progress) => {
+      setUploadProgress(progress)
     },
   })
 
@@ -110,10 +116,21 @@ export function ImageUploader({ images, onChange, maxImages = 10 }: ImageUploade
           <input {...getInputProps()} />
           <div className="flex flex-col items-center gap-2">
             {uploading || isUploading ? (
-              <>
+              <div className="w-full max-w-xs flex flex-col items-center gap-3">
                 <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
-                <p className="text-sm text-gray-600">{t('uploading')}</p>
-              </>
+                <div className="w-full">
+                  <div className="flex justify-between items-center mb-1">
+                    <p className="text-sm text-gray-600">{t('uploading')}</p>
+                    <span className="text-sm font-medium text-blue-600">{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-blue-500 h-full rounded-full transition-all duration-300 ease-out"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
             ) : (
               <>
                 <Upload className="h-10 w-10 text-gray-400" />
