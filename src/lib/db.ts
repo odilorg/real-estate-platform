@@ -58,6 +58,7 @@ export interface PropertyWithRelations {
   country: string
   zipCode: string | null
   latitude: number | null
+  longitude: number | null
   nearestMetro: string | null
   metroDistance: number | null
   city?: PropertyCity | null
