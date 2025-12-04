@@ -102,8 +102,8 @@ export interface PropertyWithRelations {
 const propertyInclude = {
   images: { orderBy: { order: 'asc' } as const },
   amenities: true,
-  cityRef: { include: { region: true } },
-  districtRef: true,
+  City: { include: { region: true } },
+  District: true,
 }
 
 function transformProperty(property: any): PropertyWithRelations {
@@ -111,26 +111,26 @@ function transformProperty(property: any): PropertyWithRelations {
     ...property,
     images: property.images?.map((img: any) => img.url) || [],
     amenities: property.amenities?.map((a: any) => a.amenity) || [],
-    city: property.cityRef ? {
-      id: property.cityRef.id,
-      slug: property.cityRef.slug,
-      nameEn: property.cityRef.nameEn,
-      nameRu: property.cityRef.nameRu,
-      nameUz: property.cityRef.nameUz,
-      region: property.cityRef.region ? {
-        id: property.cityRef.region.id,
-        slug: property.cityRef.region.slug,
-        nameEn: property.cityRef.region.nameEn,
-        nameRu: property.cityRef.region.nameRu,
-        nameUz: property.cityRef.region.nameUz,
+    city: property.City ? {
+      id: property.City.id,
+      slug: property.City.slug,
+      nameEn: property.City.nameEn,
+      nameRu: property.City.nameRu,
+      nameUz: property.City.nameUz,
+      region: property.City.region ? {
+        id: property.City.region.id,
+        slug: property.City.region.slug,
+        nameEn: property.City.region.nameEn,
+        nameRu: property.City.region.nameRu,
+        nameUz: property.City.region.nameUz,
       } : null,
     } : null,
-    district: property.districtRef ? {
-      id: property.districtRef.id,
-      slug: property.districtRef.slug,
-      nameEn: property.districtRef.nameEn,
-      nameRu: property.districtRef.nameRu,
-      nameUz: property.districtRef.nameUz,
+    district: property.District ? {
+      id: property.District.id,
+      slug: property.District.slug,
+      nameEn: property.District.nameEn,
+      nameRu: property.District.nameRu,
+      nameUz: property.District.nameUz,
     } : null,
     agent: property.agent ? {
       id: property.agent.id,
@@ -591,13 +591,13 @@ export async function getAdminStats() {
 export async function getAdminProperties(filters?: { status?: string; search?: string }) {
   const props = await prisma.property.findMany({
     where: { ...(filters?.status && { status: filters.status }) },
-    include: { images: { take: 1, orderBy: { order: 'asc' } }, cityRef: true },
+    include: { images: { take: 1, orderBy: { order: 'asc' } }, City: true },
     orderBy: { createdAt: 'desc' },
   })
   if (filters?.search) {
     const q = filters.search.toLowerCase()
     return props.filter(p => p.title.toLowerCase().includes(q) || p.address.toLowerCase().includes(q) ||
-      (p.cityRef && (p.cityRef.nameEn.toLowerCase().includes(q) || p.cityRef.nameRu.toLowerCase().includes(q) || p.cityRef.nameUz.toLowerCase().includes(q))))
+      (p.City && (p.City.nameEn.toLowerCase().includes(q) || p.City.nameRu.toLowerCase().includes(q) || p.City.nameUz.toLowerCase().includes(q))))
   }
   return props
 }
