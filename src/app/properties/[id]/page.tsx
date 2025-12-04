@@ -1,7 +1,88 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { getSession } from '@/lib/auth'
 import { getTranslations } from 'next-intl/server'
+import { getPropertyById } from '@/lib/db'  // Also used in generateMetadata
+
+// Generate dynamic metadata for SEO and social sharing
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const property = await getPropertyById(id)
+
+  if (!property) {
+    return {
+      title: 'Property Not Found',
+      description: 'The requested property could not be found.',
+    }
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+  // Build SEO-friendly title
+  const listingAction = property.listingType === 'SALE' ? 'Buy' : 'Rent'
+  const propertyTypeText = property.propertyType.charAt(0) + property.propertyType.slice(1).toLowerCase()
+  const roomsText = property.rooms ? `${property.rooms}-room ` : ''
+  const areaText = property.area ? `, ${property.area} m²` : ''
+  const floorText = property.floor && property.totalFloors ? `, floor ${property.floor}/${property.totalFloors}` : ''
+
+  const title = `${listingAction} ${roomsText}${propertyTypeText}${areaText}${floorText} in ${property.city} - $${property.price.toLocaleString()}`
+
+  // Build description (max 160 chars for SEO)
+  const description = property.description
+    ? property.description.substring(0, 155) + (property.description.length > 155 ? '...' : '')
+    : `${listingAction} this ${roomsText}${propertyTypeText.toLowerCase()} in ${property.city}, ${property.district || property.state || ''}. ${property.area ? `Area: ${property.area} m².` : ''} Price: $${property.price.toLocaleString()}${property.listingType === 'RENT' ? '/month' : ''}.`
+
+  // Get primary image
+  const primaryImage = property.images?.[0] || null
+  const imageUrl = primaryImage || `${baseUrl}/og-default.jpg`
+
+  return {
+    title,
+    description,
+
+    // Canonical URL
+    alternates: {
+      canonical: `${baseUrl}/properties/${property.id}`,
+    },
+
+    // Open Graph - Used by Facebook, Instagram, Telegram, LinkedIn
+    openGraph: {
+      title,
+      description,
+      url: `${baseUrl}/properties/${property.id}`,
+      siteName: 'EstateHub',
+      images: primaryImage ? [
+        {
+          url: primaryImage,
+          width: 800,
+          height: 600,
+          alt: property.title,
+        },
+      ] : [],
+      locale: 'ru_RU',
+      type: 'website',
+    },
+
+    // Twitter Card - Also used by some platforms
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: primaryImage ? [primaryImage] : [],
+    },
+
+    // Additional meta tags
+    other: {
+      // Price meta for rich snippets
+      'product:price:amount': property.price.toString(),
+      'product:price:currency': 'USD',
+      // Location meta
+      'geo.placename': property.city,
+      'geo.region': property.state || '',
+    },
+  }
+}
 import { MainLayout } from '@/components/layout'
 import { ImageGallery } from '@/components/properties/ImageGallery'
 import { PropertyCard } from '@/components/properties/PropertyCard'
@@ -50,7 +131,7 @@ import {
   Hospital,
   Landmark,
 } from 'lucide-react'
-import { getPropertyById, getAllProperties, incrementPropertyViews, getPropertySocialProof } from '@/lib/db'
+import { getAllProperties, incrementPropertyViews, getPropertySocialProof } from '@/lib/db'
 import { getAgentByUserId, getAgentListingsCount } from '@/lib/agents'
 import { LABELS } from '@/lib/validations/property'
 import { AgentSidebar } from '@/components/agents/AgentSidebar'
