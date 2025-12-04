@@ -102,7 +102,7 @@ export interface PropertyWithRelations {
 const propertyInclude = {
   images: { orderBy: { order: 'asc' } as const },
   amenities: true,
-  City: { include: { region: true } },
+  City: { include: { Region: true } },
   District: true,
 }
 
@@ -117,12 +117,12 @@ function transformProperty(property: any): PropertyWithRelations {
       nameEn: property.City.nameEn,
       nameRu: property.City.nameRu,
       nameUz: property.City.nameUz,
-      region: property.City.region ? {
-        id: property.City.region.id,
-        slug: property.City.region.slug,
-        nameEn: property.City.region.nameEn,
-        nameRu: property.City.region.nameRu,
-        nameUz: property.City.region.nameUz,
+      region: property.City.Region ? {
+        id: property.City.Region.id,
+        slug: property.City.Region.slug,
+        nameEn: property.City.Region.nameEn,
+        nameRu: property.City.Region.nameRu,
+        nameUz: property.City.Region.nameUz,
       } : null,
     } : null,
     district: property.District ? {
@@ -288,9 +288,9 @@ export async function searchProperties(filters: SearchFilters): Promise<Property
         p.district.nameUz.toLowerCase().includes(searchQuery)
       ) : false
       const regionMatch = p.city?.region ? (
-        p.city.region.nameEn.toLowerCase().includes(searchQuery) ||
-        p.city.region.nameRu.toLowerCase().includes(searchQuery) ||
-        p.city.region.nameUz.toLowerCase().includes(searchQuery)
+        p.city?.Region.nameEn.toLowerCase().includes(searchQuery) ||
+        p.city?.Region.nameRu.toLowerCase().includes(searchQuery) ||
+        p.city?.Region.nameUz.toLowerCase().includes(searchQuery)
       ) : false
       return p.title.toLowerCase().includes(searchQuery) ||
         p.description.toLowerCase().includes(searchQuery) ||
